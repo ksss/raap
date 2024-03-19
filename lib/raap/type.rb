@@ -26,10 +26,6 @@ module RaaP
       GENERATORS[type_name] = block
     end
 
-    def self.list
-      RBS.env.class_decls.keys.map(&:to_s)
-    end
-
     # Special class case
     register("::Array") do
       t = type.args[0] || 'untyped'
@@ -60,17 +56,16 @@ module RaaP
     register("::String") { string }
     register("::Struct") { sized { Struct.new(:foo, :bar).new } }
     register("::Symbol") { symbol }
-    register("::Time") { sized { Time.now } }
+    # register("::Time") { sized { Time.now } }
     register("::TrueClass") { sized { true } }
     register("::UnboundMethod") { sized { temp_method_object.unbind } }
 
     attr_reader :type
     attr_reader :range
 
-    def initialize(type, range: nil..nil, &block)
+    def initialize(type, range: nil..nil)
       @type = parse(type)
       @range = range
-      @block = block
     end
 
     def sized(&block)
@@ -82,9 +77,9 @@ module RaaP
       eval ? SymbolicCaller.new(symb).eval : symb
     end
 
-    def to_symbolic_call(size:)
+    def to_symbolic_call(size: 10)
+      raise TypeError, "size should be Integer" unless size.is_a?(Integer)
       raise ArgumentError, "negative size" if size.negative?
-      return instance_exec(&@block).pick(size: size) if @block
 
       case type
       when ::RBS::Types::Tuple
@@ -294,12 +289,13 @@ module RaaP
     end
 
     def untyped
-      case Random.rand(4)
+      case Random.rand(5)
       in 0 then integer
       in 1 then float
       in 2 then string
       in 3 then symbol
       in 4 then bool
+      in 5 then encoding
       end
     end
 

@@ -145,13 +145,16 @@ class TestType < Minitest::Test
   end
 
   def test_litelal
-    assert 42, Type.new("42").pick
-    assert :ok, Type.new(":ok").pick
-    assert "cool", Type.new('"cool"').pick
+    assert_equal 42, Type.new("42").pick
+    assert_equal :ok, Type.new(":ok").pick
+    assert_equal "cool", Type.new('"cool"').pick
+    assert_nil Type.new('nil').pick
+    assert_equal true, Type.new('true').pick
+    assert_equal false, Type.new('false').pick
   end
 
   def test_top
-    assert BasicObject === Type.new("top").pick
+    assert RaaP::BindCall.instance_of?(Type.new("top").pick, RaaP::Value::Top)
   end
 
   # TODO

@@ -177,6 +177,7 @@ module RaaP
     @block: ::Proc
     @such_that: ::Proc?
 
+    def initialize: () { (Integer) -> untyped } -> void
     include _Pick[untyped]
     def such_that: () { (untyped) -> boolish } -> self
     def such_that_loop: [R] () { (Integer) -> R } -> R
@@ -225,7 +226,7 @@ module RaaP
     SIMPLE_SOURCE: Array[String]
     RECURSION: Hash[String, :found | :logged]
 
-    def self.register: (String) { () [self: instance] -> untyped } -> void
+    def self.register: (String) { () [self: instance] -> _Pick[untyped] } -> void
     attr_reader type: ::RBS::Types::t
     attr_reader range: Range[untyped]
 
@@ -233,7 +234,7 @@ module RaaP
 
     include _Pick[untyped]
     def pick: (?size: Integer, ?eval: bool) -> untyped | ...
-    def _pick: (size: Integer, type: ::RBS::Types::t) -> untyped
+    def to_symbolic_call: (?size: Integer) -> untyped
     def pick_from_initialize: (::RBS::Types::ClassInstance, size: Integer) -> untyped
     def sized: () { (Integer size) -> untyped } -> _Pick[untyped]
 
@@ -300,6 +301,11 @@ module RaaP
       attr_reader type: ::RBS::Types::Variable
 
       def initialize: (::RBS::Types::Variable) -> void
+      def inspect: () -> String
+      def class: () -> class
+    end
+
+    class Void < BasicObject
       def inspect: () -> String
       def class: () -> class
     end
