@@ -1,0 +1,108 @@
+module Test
+  class Property
+    def method_property1: () -> bool
+  end
+
+  class Sleep
+    def sleep: () -> bot
+  end
+
+  class List[T]
+    attr_reader head: T
+    attr_reader tail: List[T]?
+
+    def add: (T) -> self
+    def each: () { (T) -> void } -> void
+  end
+
+  class CSelf
+    def self.meth: () -> self
+    def meth: () -> self
+    def self.arg: (self) -> void
+    def arg: (self) -> void
+  end
+
+  class CInstance
+    def self.meth: () -> instance
+    def meth: () -> instance
+    def self.arg: (instance) -> void
+    def arg: (instance) -> void
+  end
+
+  class CClass
+    def self.meth: () -> class
+    def meth: () -> class
+    def self.arg: (class) -> void
+    def arg: (class) -> void
+  end
+
+  module MSelf
+    def self.meth: () -> self
+    def meth: () -> self
+    def self.arg: (self) -> void
+    def arg: (self) -> void
+  end
+
+  module MInstance
+    def self.meth: () -> instance
+    def meth: () -> instance
+    def self.arg: (instance) -> void
+    def arg: (instance) -> void
+  end
+
+  module MClass
+    def self.meth: () -> class
+    def meth: () -> class
+    def self.arg: (class) -> void
+    def arg: (class) -> void
+  end
+
+  class CMSelf
+    include MSelf
+  end
+
+  class CMInstance
+    include MInstance
+  end
+
+  class CMClass
+    include MClass
+  end
+
+  interface _Interface
+    def void: () -> void
+    def selfie: (self) -> self
+    def instance: (instance) -> instance
+    def klass: (class) -> class
+  end
+
+  class Interface
+    def i: (_Interface) -> void
+  end
+
+  class Bottom
+    def b: () -> bot
+  end
+
+  class A
+  end
+
+  class B
+  end
+
+  class C
+    def initialize: (a: A, b: B) -> void
+                  | (a: A) -> void
+                  | (b: Complex) -> void
+    def run: () -> Integer
+  end
+
+  class Value
+    def top: (top) -> void
+    def bottom: (bot) -> void
+  end
+
+  # class Nested
+  #   def initialize: (Nested) -> void
+  # end
+end

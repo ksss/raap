@@ -1,0 +1,307 @@
+module RaaP
+  type symbolic_call = [:call, untyped, Symbol, Array[untyped], Hash[Symbol, untyped], Proc?]
+  VERSION: String
+
+  def self.logger: () -> ::Logger
+  def self.logger=: (::Logger) -> void
+
+  module BindCall
+    def self.define_singleton_method: (untyped, Symbol) { (*untyped, **untyped) -> untyped } -> void
+    def self.respond_to?: (untyped, Symbol, ?bool) -> bool
+    def self.instance_of?: (untyped, Module) -> bool
+    def self.is_a?: (untyped, Module) -> bool
+    def self.extend: (untyped, Module) -> void
+    def self.name: (Module) -> String?
+    def self.to_s: (untyped) -> String
+    def self.class: (untyped) -> untyped
+    def self.inspect: (untyped) -> String
+  end
+
+  class CLI
+    class Option < ::Struct[untyped]
+      def self.new: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer) -> instance
+
+      def self.[]: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer) -> instance
+
+      def self.keyword_init?: () -> true
+
+      def self.members: () -> [ :dirs, :requires, :library, :timeout, :size_from, :size_to, :size_by]
+
+      def members: () -> [ :dirs, :requires, :library, :timeout, :size_from, :size_to, :size_by]
+
+      attr_accessor dirs: ::Array[String]
+
+      attr_accessor requires: ::Array[String]
+
+      attr_accessor libraries: ::Array[String]
+
+      attr_accessor timeout: (Integer | Float | nil)
+
+      attr_accessor size_from: ::Integer
+
+      attr_accessor size_to: ::Integer
+
+      attr_accessor size_by: ::Integer
+    end
+
+    @argv: Array[String]
+
+    def self.option: () -> Option
+    def self.option=: (Option) -> void
+
+    def initialize: (Array[String]) -> void
+    def load: () -> self
+
+    type property_result = [Integer, Symbol, ::RBS::MethodType]
+    def run: () -> self
+    def run_by: (tag: String) -> Array[Array[property_result]]
+    def run_by_instance: (tag: String) -> Array[Array[property_result]]
+    def run_by_singleton: (tag: String) -> Array[Array[property_result]]
+    def run_by_type_name: (tag: String) -> Array[Array[property_result]]
+    def run_by_type_name_with_search: (tag: String) -> Array[Array[property_result]]
+    def property: (receiver_type: Type, type_params_decl: Array[::RBS::AST::TypeParam], method_name: Symbol, method_type: ::RBS::MethodType) -> property_result
+  end
+
+  class FunctionType
+    @fun: ::RBS::Types::Function
+
+    def initialize: (::RBS::Types::Function) -> void
+    def pick_arguments: (?size: Integer, ?eval: bool) -> [Array[untyped], Hash[Symbol, untyped]]
+
+    private
+
+    def recursive_pick: (untyped, size: Integer, eval: bool) -> untyped
+    def build_args_type: () -> Array[Type]
+    def build_kwargs_type: () -> Hash[Symbol, Type]
+  end
+
+  class MethodProperty
+    class Stats
+      attr_accessor success: Integer
+      attr_accessor skip: Integer
+      attr_accessor exception: Integer
+    end
+    attr_reader receiver_type: Type
+    attr_reader method_name: Symbol
+    attr_reader method_type: MethodType
+    attr_reader size_step: _Each[Integer]
+    attr_reader timeout: (Integer | Float | nil)
+    def initialize: (receiver_type: Type, method_name: Symbol, method_type: MethodType, size_step: _Each[Integer], timeout: (Integer | Float | nil)) -> void
+    def run: () { (Result::Success | Result::Failure | Result::Skip | Result::Exception) -> void } -> Stats
+
+    private
+
+    def call: (size: Integer, stats: Stats) -> (Result::Success | Result::Failure | Result::Skip | Result::Exception)
+    def check_return: (receiver_value: untyped, return_value: untyped, method_type: MethodType) -> bool
+    def return_type: () -> RBS::Types::t
+  end
+
+  class MethodType
+    attr_reader rbs: ::RBS::MethodType
+    @fun_type: FunctionType
+
+    def initialize: (::RBS::MethodType | String method, ?type_params_decl: Array[untyped], ?type_args: Array[untyped], ?self_type: ::RBS::Types::ClassInstance?, ?instance_type: ::RBS::Types::ClassInstance?, ?class_type: ::RBS::Types::ClassSingleton?) -> void
+    def pick_arguments: (?size: Integer, ?eval: bool) -> [Array[untyped], Hash[Symbol, untyped], ::Proc?]
+    def pick_block: (?size: Integer, ?eval: bool) -> ::Proc?
+  end
+
+  class MethodValue < Data
+    def self.new: (untyped receiver_value, [Array[untyped], Hash[Symbol, untyped], ::Proc?] arguments, Symbol method_name, Integer size) -> instance
+                | (receiver_value: untyped, arguments: [Array[untyped], Hash[Symbol, untyped], ::Proc?], method_name: Symbol, size: Integer) -> instance
+
+    def self.[]: (untyped receiver_value, [Array[untyped], Hash[Symbol, untyped], ::Proc?] arguments, Symbol method_name, Integer size) -> instance
+               | (receiver_value: untyped, arguments: [Array[untyped], Hash[Symbol, untyped], ::Proc?], method_name: Symbol, size: Integer) -> instance
+
+    def self.members: () -> [ :receiver_value, :arguments, :method_name, :size ]
+    def members: () -> [ :receiver_value, :arguments, :method_name, :size ]
+
+    attr_reader receiver_value: untyped
+    attr_reader arguments: [Array[untyped], Hash[Symbol, untyped], ::Proc?]
+    attr_reader method_name: Symbol
+    attr_reader size: Integer
+
+    def to_symbolic_call: () -> symbolic_call
+    def call_str: () -> String
+
+    private
+
+    def argument_str: () -> String
+    def block_str: () -> String?
+  end
+
+  module RBS
+    def self.builder: () -> ::RBS::DefinitionBuilder
+    def self.env: () -> ::RBS::Environment
+    def self.loader: () -> ::RBS::EnvironmentLoader
+    def self.parse_type: (String) -> ::RBS::Types::t
+  end
+
+  module Result
+    interface _MethodValueReturnValue
+      def method_value: () -> MethodValue
+      def return_value: () -> untyped
+    end
+    module CalledStr : _MethodValueReturnValue
+      def called_str: () -> String
+    end
+    class Success < Data
+      def self.new: (method_value: MethodValue, return_value: untyped) -> instance
+      attr_reader method_value: MethodValue
+      attr_reader return_value: untyped
+      include CalledStr
+    end
+    class Failure < Data
+      def self.new: (method_value: MethodValue, return_value: untyped, symbolic_call: symbolic_call) -> instance
+      attr_reader method_value: MethodValue
+      attr_reader return_value: untyped
+      attr_reader symbolic_call: symbolic_call
+      include CalledStr
+    end
+    class Skip < Data
+      def self.new: (method_value: MethodValue?, exception: ::Exception) -> instance
+      attr_reader method_value: MethodValue?
+      attr_reader exception: ::Exception
+    end
+    class Exception < Data
+      def self.new: (method_value: MethodValue?, exception: ::Exception) -> instance
+      attr_reader method_value: MethodValue?
+      attr_reader exception: ::Exception
+    end
+  end
+
+  interface _Pick[T]
+    def pick: (size: Integer) -> T
+  end
+
+  class Sized
+    @block: ::Proc
+    @such_that: ::Proc?
+
+    include _Pick[untyped]
+    def such_that: () { (untyped) -> boolish } -> self
+    def such_that_loop: [R] () { (Integer) -> R } -> R
+  end
+
+  class SymbolicCaller
+    attr_reader symbolic_call: untyped
+    def initialize: (untyped) -> void
+    def eval: () -> untyped
+    def walk: () ?{ (symbolic_call) -> untyped} -> untyped
+    def to_lines: () -> Array[String]
+
+    private
+
+    def _walk: (untyped) ?{ (symbolic_call) -> untyped} -> untyped
+    def eval_one: (symbolic_call) -> untyped
+    def var_name: (Module) -> String
+    def printable?: (untyped) -> bool
+    def printable: (untyped) -> String
+  end
+
+  class TypeSubstitution
+    @type_params: ::Array[::RBS::AST::TypeParam]
+    @type_args: ::Array[::RBS::Types::t]
+
+    def initialize: (::Array[::RBS::AST::TypeParam], ::Array[::RBS::Types::t]) -> void
+    def build: () -> ::RBS::Substitution
+    def method_type_sub: (::RBS::MethodType, ?self_type: ::RBS::Types::ClassInstance?, ?instance_type: ::RBS::Types::ClassInstance?, ?class_type: ::RBS::Types::ClassSingleton?) -> ::RBS::MethodType
+
+    private
+
+    interface _MapType
+      def map_type: { (untyped) -> untyped } -> untyped
+    end
+
+    def sub: (_MapType search, self_type: ::RBS::Types::ClassInstance?, instance_type: ::RBS::Types::ClassInstance?, ?class_type: ::RBS::Types::ClassSingleton?) -> untyped
+  end
+
+  class Type
+    module Arithmetic
+      def self.float: () -> Float
+      def self.positive_float: () -> Float
+    end
+
+    GENERATORS: Hash[String, ^() -> _Pick[untyped] | Proc]
+    SIMPLE_SOURCE: Array[String]
+    RECURSION: Hash[String, :found | :logged]
+
+    def self.register: (String) { () [self: instance] -> untyped } -> void
+    attr_reader type: ::RBS::Types::t
+    attr_reader range: Range[untyped]
+
+    def initialize: (String | ::RBS::Types::t, ?range: Range[untyped]) -> void
+
+    include _Pick[untyped]
+    def pick: (?size: Integer, ?eval: bool) -> untyped | ...
+    def _pick: (size: Integer, type: ::RBS::Types::t) -> untyped
+    def pick_from_initialize: (::RBS::Types::ClassInstance, size: Integer) -> untyped
+    def sized: () { (Integer size) -> untyped } -> _Pick[untyped]
+
+    private
+
+    def parse: (String | ::RBS::Types::t) -> ::RBS::Types::t?
+    def try: (times: Integer, size: Integer) { (Integer size) -> untyped } -> untyped
+
+    def numeric: () -> _Pick[Numeric]
+    def integer: () -> _Pick[Integer]
+    def none_zero_integer: () -> _Pick[Integer]
+    def float: () -> _Pick[Float]
+    def rational: () -> _Pick[Rational]
+    def complex: () -> _Pick[Complex]
+    def string: () -> _Pick[String]
+    def symbol: () -> _Pick[Symbol]
+    def array: (Type) -> _Pick[Array[untyped]]
+    def encoding: () -> _Pick[Encoding]
+    def bool: () -> _Pick[bool]
+    def untyped: () -> _Pick[untyped]
+    def temp_method_object: () -> ::Method
+  end
+
+  module Value
+    class Bottom < BasicObject
+      def inspect: () -> String
+      def class: () -> class
+    end
+
+    class Interface < BasicObject
+      @type: ::RBS::Types::Interface
+      @size: Integer
+      @definition: ::RBS::Definition
+
+      def initialize: (String | ::RBS::Types::Interface, ?size: Integer) -> void
+      def inspect: () -> String
+      def class: () -> class
+    end
+
+    class Intersection < BasicObject
+      @type: ::RBS::Types::Intersection
+      @children: Array[Type]
+      @size: Integer
+
+      def initialize: (::RBS::Types::Intersection, size: Integer) -> void
+      def inspect: () -> String
+      def class: () -> class
+    end
+
+    class Module < BasicObject
+      attr_reader type: ::RBS::Types::ClassInstance
+
+      def initialize: (::RBS::Types::ClassInstance) -> void
+      def inspect: () -> String
+      def class: () -> class
+    end
+
+    class Top < BasicObject
+      def inspect: () -> String
+      def class: () -> class
+    end
+
+    class Variable < BasicObject
+      attr_reader type: ::RBS::Types::Variable
+
+      def initialize: (::RBS::Types::Variable) -> void
+      def inspect: () -> String
+      def class: () -> class
+    end
+  end
+end

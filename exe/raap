@@ -1,0 +1,3 @@
+require 'raap'
+
+RaaP::CLI.new(ARGV).load.run
