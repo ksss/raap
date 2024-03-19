@@ -80,6 +80,8 @@ module RaaP
       stats.skip += 1
       RaaP.logger.warn "Found recursive type definition."
       Result::Skip.new(method_value: nil, exception:)
+    rescue TypeError => exception
+      Result::Failure.new(method_value:, return_value:, symbolic_call:)
     rescue => exception
       stats.exception += 1
       Result::Exception.new(method_value:, exception:)
