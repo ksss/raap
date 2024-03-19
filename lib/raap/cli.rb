@@ -161,8 +161,8 @@ module RaaP
         next if method_name == :fork || method_name == :spawn # TODO: skip solution
         puts "# #{type_name}.#{method_name}"
         puts
-        method.method_types.each do |method_type|
-          ret << property(receiver_type: Type.new("singleton(#{type})"), type_params_decl:, method_type:, method_name:)
+        ret << method.method_types.map do |method_type|
+          property(receiver_type: Type.new("singleton(#{type})"), type_params_decl:, method_type:, method_name:)
         end
       end
 
@@ -173,8 +173,8 @@ module RaaP
         next if method_name == :fork || method_name == :spawn # TODO: skip solution
         puts "# #{type_name}##{method_name}"
         puts
-        method.method_types.each do |method_type|
-          ret << property(receiver_type: Type.new(type.to_s), type_params_decl:, method_type:, method_name:)
+        ret << method.method_types.map do |method_type|
+          property(receiver_type: Type.new(type.to_s), type_params_decl:, method_type:, method_name:)
         end
       end
 
