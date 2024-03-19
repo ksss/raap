@@ -129,7 +129,7 @@ module RaaP
       when ::RBS::Types::Bases::Bool
         bool.pick(size: size)
       when ::RBS::Types::Bases::Void
-        :raap_void
+        Value::Void.new
       when ::RBS::Types::Bases::Any
         untyped.pick(size: size)
       when ::RBS::Types::Bases::Nil

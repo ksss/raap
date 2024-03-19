@@ -4,7 +4,7 @@ class TestInterface < Minitest::Test
   Interface = RaaP::Value::Interface
 
   def test_simple
-    assert_equal :raap_void, Interface.new("Test::_Interface").void
+    assert RaaP::BindCall.instance_of?(Interface.new("Test::_Interface").void, RaaP::Value::Void)
   end
 
   def test_with_self_type

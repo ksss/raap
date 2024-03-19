@@ -8,5 +8,6 @@ module RaaP
     autoload :Module, "raap/value/module"
     autoload :Top, "raap/value/top"
     autoload :Variable, "raap/value/variable"
+    autoload :Void, "raap/value/void"
   end
 end
