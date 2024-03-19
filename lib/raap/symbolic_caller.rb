@@ -92,9 +92,8 @@ module RaaP
 
       begin
         receiver_value.__send__(method_name, *args, **kwargs, &block)
-      rescue TypeError, ArgumentError, RangeError
-        raise
       rescue => e
+        RaaP.logger.error("Cannot eval symbolic call #{symbolic_call} with #{e.class}")
         raise
       end
     end
