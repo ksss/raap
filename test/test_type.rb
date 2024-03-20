@@ -24,6 +24,7 @@ class TestType < Minitest::Test
     assert Type.new("Struct").pick.kind_of?(Struct)
     assert Type.new("Time").pick.instance_of?(Time)
     assert Type.new("UnboundMethod").pick.instance_of?(UnboundMethod)
+    assert Type.new("Encoding").pick.instance_of?(Encoding)
   end
 
   def test_bool

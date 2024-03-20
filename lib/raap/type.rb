@@ -279,8 +279,9 @@ module RaaP
 
     def encoding
       sized do
+        # @type block: RaaP::symbolic_call
         e = Encoding.list.sample
-        [Encoding, :find, [e.name], {} , nil]
+        [:call, Encoding, :find, [e.name], {} , nil]
       end
     end
 
