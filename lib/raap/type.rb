@@ -47,7 +47,7 @@ module RaaP
       end
     end
     register("::Integer") { integer }
-    register("::IO") { sized { StringIO.new } } # FIXME StringIO is not IO
+    register("::IO") { sized { $stdout } }
     register("::Method") { sized { temp_method_object } }
     register("::NilClass") { sized { nil } }
     register("::Proc") { sized { Proc.new {} } }
