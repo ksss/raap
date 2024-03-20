@@ -1,7 +1,7 @@
 module RaaP
   module Value
     class Bottom < BasicObject
-      def inspect = "#<bottom>"
+      def inspect = "#<bot>"
       def class = Bottom
     end
   end
