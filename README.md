@@ -80,6 +80,8 @@ RaaP has already found many RBS mistakes and bug in CRuby during the development
 * https://bugs.ruby-lang.org/issues/20292
 * https://github.com/ruby/rbs/pull/1768
 * https://github.com/ruby/rbs/pull/1769
+* https://github.com/ruby/rbs/pull/1770
+* https://github.com/ruby/rbs/pull/1771
 
 ## Development
 
