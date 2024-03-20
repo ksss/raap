@@ -56,7 +56,7 @@ module RaaP
     register("::String") { string }
     register("::Struct") { sized { Struct.new(:foo, :bar).new } }
     register("::Symbol") { symbol }
-    # register("::Time") { sized { Time.now } }
+    register("::Time") { sized { Time.now } }
     register("::TrueClass") { sized { true } }
     register("::UnboundMethod") { sized { temp_method_object.unbind } }
 
