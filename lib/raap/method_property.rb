@@ -45,24 +45,31 @@ module RaaP
       arguments = method_type.pick_arguments(size: size, eval: false)
       method_value = MethodValue.new(receiver_value:, arguments:, method_name:, size:)
       symbolic_call = method_value.to_symbolic_call
-      check = false
-      if return_type.instance_of?(::RBS::Types::Bases::Bottom)
-        begin
+      begin
+        # ensure method_value
+        check = false
+        if return_type.instance_of?(::RBS::Types::Bases::Bottom)
+          begin
+            return_value = SymbolicCaller.new(symbolic_call).eval
+          rescue => e
+            check = true
+            return_value = Value::Bottom.new
+          end
+        else
           return_value = SymbolicCaller.new(symbolic_call).eval
-        rescue => e
-          check = true
-          return_value = Value::Bottom.new
+          check = check_return(receiver_value:, return_value:, method_type:)
         end
-      else
-        return_value = SymbolicCaller.new(symbolic_call).eval
-        check = check_return(receiver_value:, return_value:, method_type:)
-      end
-      if check
-        stats.success += 1
-        Result::Success.new(method_value:, return_value:)
-      else
+        if check
+          stats.success += 1
+          Result::Success.new(method_value:, return_value:)
+        else
+          Result::Failure.new(method_value:, return_value:, symbolic_call:)
+        end
+      rescue TypeError => exception
         Result::Failure.new(method_value:, return_value:, symbolic_call:)
       end
+
+    # not ensure method_value
     rescue NoMethodError => exception
       stats.skip += 1
       Result::Skip.new(method_value:, exception:)
@@ -77,8 +84,6 @@ module RaaP
       stats.skip += 1
       RaaP.logger.warn "Found recursive type definition."
       Result::Skip.new(method_value: nil, exception:)
-    rescue TypeError => exception
-      Result::Failure.new(method_value:, return_value:, symbolic_call:)
     rescue => exception
       stats.exception += 1
       Result::Exception.new(method_value:, exception:)
@@ -101,7 +106,7 @@ module RaaP
         instance_class: instance_class,
         class_class: Module,
         builder: RBS.builder,
-        sample_size: 1,
+        sample_size: 100,
         unchecked_classes: []
       )
       begin

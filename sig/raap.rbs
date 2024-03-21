@@ -169,16 +169,12 @@ module RaaP
     end
   end
 
-  interface _Pick[T]
-    def pick: (size: Integer) -> T
-  end
-
-  class Sized
+  class Sized[T]
     @block: ::Proc
     @such_that: ::Proc?
 
     def initialize: () { (Integer) -> untyped } -> void
-    include _Pick[untyped]
+    def pick: (size: Integer) -> T
     def such_that: () { (untyped) -> boolish } -> self
     def such_that_loop: [R] () { (Integer) -> R } -> R
   end
@@ -213,7 +209,7 @@ module RaaP
       def map_type: { (untyped) -> untyped } -> untyped
     end
 
-    def sub: (_MapType search, self_type: ::RBS::Types::ClassInstance?, instance_type: ::RBS::Types::ClassInstance?, ?class_type: ::RBS::Types::ClassSingleton?) -> untyped
+    def sub: (_MapType search, self_type: ::RBS::Types::ClassInstance?, instance_type: ::RBS::Types::ClassInstance?, class_type: ::RBS::Types::ClassSingleton?) -> untyped
   end
 
   class Type
@@ -222,39 +218,38 @@ module RaaP
       def self.positive_float: () -> Float
     end
 
-    GENERATORS: Hash[String, ^() -> _Pick[untyped] | Proc]
+    GENERATORS: Hash[String, ^() -> Sized[untyped]]
     SIMPLE_SOURCE: Array[String]
     RECURSION: Hash[String, :found | :logged]
 
-    def self.register: (String) { () [self: instance] -> _Pick[untyped] } -> void
+    def self.register: (String) { () [self: instance] -> Sized[untyped] } -> void
     attr_reader type: ::RBS::Types::t
     attr_reader range: Range[untyped]
 
     def initialize: (String | ::RBS::Types::t, ?range: Range[untyped]) -> void
 
-    include _Pick[untyped]
-    def pick: (?size: Integer, ?eval: bool) -> untyped | ...
+    def pick: (?size: Integer, ?eval: bool) -> untyped
     def to_symbolic_call: (?size: Integer) -> untyped
     def pick_from_initialize: (::RBS::Types::ClassInstance, size: Integer) -> untyped
-    def sized: () { (Integer size) -> untyped } -> _Pick[untyped]
+    def sized: [T] () { (Integer size) -> T } -> Sized[T]
 
     private
 
     def parse: (String | ::RBS::Types::t) -> ::RBS::Types::t?
     def try: (times: Integer, size: Integer) { (Integer size) -> untyped } -> untyped
 
-    def numeric: () -> _Pick[Numeric]
-    def integer: () -> _Pick[Integer]
-    def none_zero_integer: () -> _Pick[Integer]
-    def float: () -> _Pick[Float]
-    def rational: () -> _Pick[Rational]
-    def complex: () -> _Pick[Complex]
-    def string: () -> _Pick[String]
-    def symbol: () -> _Pick[Symbol]
-    def array: (Type) -> _Pick[Array[untyped]]
-    def encoding: () -> _Pick[Encoding]
-    def bool: () -> _Pick[bool]
-    def untyped: () -> _Pick[untyped]
+    def numeric: () -> Sized[Numeric]
+    def integer: () -> Sized[Integer]
+    def none_zero_integer: () -> Sized[Integer]
+    def float: () -> Sized[Float]
+    def rational: () -> Sized[symbolic_call]
+    def complex: () -> Sized[symbolic_call]
+    def string: () -> Sized[String]
+    def symbol: () -> Sized[Symbol]
+    def array: (Type) -> Sized[Array[untyped]]
+    def encoding: () -> Sized[symbolic_call]
+    def bool: () -> Sized[bool]
+    def untyped: () -> Sized[untyped]
     def temp_method_object: () -> ::Method
   end
 

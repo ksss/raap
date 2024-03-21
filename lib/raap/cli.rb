@@ -103,7 +103,11 @@ module RaaP
 
     def run_by_instance(tag:)
       t, m = tag.split('#', 2)
+      t or raise
+      m or raise
       type = RBS.parse_type(t)
+      type = __skip__ = type
+      raise "cannot specified #{type}" unless type.respond_to?(:name)
       receiver_type = Type.new(type.to_s)
       method_name = m.to_sym
       definition = RBS.builder.build_instance(type.name)
@@ -121,7 +125,11 @@ module RaaP
 
     def run_by_singleton(tag:)
       t, m = tag.split('.', 2)
+      t or raise
+      m or raise
       type = RBS.parse_type(t)
+      raise "cannot specified #{type.class}" unless type.respond_to?(:name)
+      type = __skip__ = type
       receiver_type = Type.new("singleton(#{type.name})")
       method_name = m.to_sym
       definition = RBS.builder.build_singleton(type.name)
@@ -150,6 +158,8 @@ module RaaP
 
     def run_by_type_name(tag:)
       type = RBS.parse_type(tag)
+      type = __skip__ = type
+      raise "cannot specified #{type.class}" unless type.respond_to?(:name)
       type_name = type.name.absolute!
 
       ret = []
@@ -182,12 +192,13 @@ module RaaP
     end
 
     def property(receiver_type:, type_params_decl:, method_type:, method_name:)
+      rtype = __skip__ = receiver_type.type
       if receiver_type.type.instance_of?(::RBS::Types::ClassSingleton)
         prefix = 'self.'
         type_args = []
       else
         prefix = ''
-        type_args = receiver_type.type.args
+        type_args = rtype.args
       end
       puts "## def #{prefix}#{method_name}: #{method_type}"
       status = 0
@@ -198,9 +209,9 @@ module RaaP
           method_type,
           type_params_decl:,
           type_args:,
-          self_type: receiver_type.type,
-          instance_type: ::RBS::Types::ClassInstance.new(name: receiver_type.type.name, args: type_args, location: nil),
-          class_type: ::RBS::Types::ClassSingleton.new(name: receiver_type.type.name, location: nil),
+          self_type: rtype,
+          instance_type: ::RBS::Types::ClassInstance.new(name: rtype.name, args: type_args, location: nil),
+          class_type: ::RBS::Types::ClassSingleton.new(name: rtype.name, location: nil),
         ),
         size_step: CLI.option.size_from.step(to: CLI.option.size_to, by: CLI.option.size_by),
         timeout: CLI.option.timeout,

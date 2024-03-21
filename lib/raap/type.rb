@@ -23,12 +23,15 @@ module RaaP
 
     # Type.register "::Integer::positive" { sized { |size| size } }
     def self.register(type_name, &block)
-      GENERATORS[type_name] = block
+      raise ArgumentError, "block is required" unless block
+      GENERATORS[type_name] = __skip__ = block
     end
 
     # Special class case
     register("::Array") do
-      t = type.args[0] || 'untyped'
+      _type = __skip__ = type
+      args = _type.args
+      t = _type.args[0] || 'untyped'
       array(Type.new(t, range: range))
     end
     register("::Binding") { sized { binding } }
@@ -40,8 +43,9 @@ module RaaP
     register("::Hash") do
       sized do |size|
         Array.new(integer.pick(size: size).abs).to_h do
-          k = type.args[0] || 'untyped'
-          v = type.args[1] || 'untyped'
+          _type = __skip__ = type
+          k = _type.args[0] || 'untyped'
+          v = _type.args[1] || 'untyped'
           [Type.new(k).pick(size: size), Type.new(v).pick(size: size)]
         end
       end
@@ -112,8 +116,8 @@ module RaaP
         Object.const_get(type.name.to_s)
       when ::RBS::Types::ClassInstance
         case gen = GENERATORS[type.name.absolute!.to_s]
-        when Proc then instance_exec(&gen).pick(size: size)
-        when nil then pick_from_initialize(type, size:)
+        in Proc then instance_exec(&gen).pick(size: size)
+        in nil then pick_from_initialize(type, size:)
         end
       when ::RBS::Types::Record
         type.fields.transform_values { |t| Type.new(t).pick(size:) }
@@ -279,14 +283,19 @@ module RaaP
 
     def encoding
       sized do
-        # @type block: RaaP::symbolic_call
-        e = Encoding.list.sample
+        e = Encoding.list.sample or raise
         [:call, Encoding, :find, [e.name], {} , nil]
       end
     end
 
     def bool
-      sized { [true, false].sample }
+      sized do
+        case Random.rand(1)
+        when 0 then true
+        when 1 then false
+        else raise
+        end
+      end
     end
 
     def untyped
