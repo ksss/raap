@@ -24,9 +24,6 @@ module RaaP
 
     def run
       stats = Stats.new
-      if receiver_type.type.to_s == 'String' && method_name == :initialize
-        return stats
-      end
       begin
         Timeout.timeout(@timeout) do
           catch(:break) do
