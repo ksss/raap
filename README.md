@@ -12,6 +12,45 @@ The return value of the method is checked to see if it matches the type, if not,
 
 If you write an RBS, it becomes a test case.
 
+## Concept
+
+If you has next signature.
+
+```rbs
+class Foo
+end
+
+class Bar
+  def initialize: (foo: Foo) -> void
+  def f2s: (Float) -> String
+end
+```
+
+Then, RaaP run next testing code automaticaly.
+
+```rb
+describe Bar do
+  let(:foo) { Foo.new }
+  let(:bar) { Bar.new(foo: foo) }
+
+  it "#f2s" do
+    100.times do |size|
+      float = Random.rand * size
+      expect(bar.f2s(float)).to be_a(String)
+    end
+  end
+end
+```
+
+If you got a failure?
+
+- Fix RBS
+- Fix implementation of `Bar#f2s`
+
+Then, you can start loop again.
+
+Finally, you get the perfect RBS!
+
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
