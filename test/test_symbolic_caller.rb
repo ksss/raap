@@ -50,4 +50,16 @@ class TestSymbolicCaller < Minitest::Test
       test_c.run()
     CODE
   end
+
+  def test_to_lines_with_kernel
+    sc = SymbolicCaller.new([
+      :call, 3, :pow, [
+        [:call, Kernel, :Rational, [-3, -11], {}, nil]
+      ], {}, nil
+    ])
+    assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
+      rational = Rational(-3, -11)
+      3.pow(rational)
+    CODE
+  end
 end

@@ -56,7 +56,7 @@ module RaaP
 
           case
           when receiver_value == Kernel
-            var = Var.new(var_name(method_name))
+            var = Var.new(method_name.to_s.downcase)
             var_eq = "#{var} = "
             receiver = ''
           when BindCall.instance_of?(receiver_value, Var)
