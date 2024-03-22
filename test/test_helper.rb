@@ -9,8 +9,8 @@ require_relative './test'
 
 RaaP::RBS.loader.add(path: Pathname('test/test.rbs'))
 
-def forall(*types)
-  (0...10).each do |size|
+def forall(*types, size_step: 0...10)
+  size_step.each do |size|
     vals = types.map do |type|
       case type
       in String then RaaP::Type.new(type)

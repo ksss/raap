@@ -289,16 +289,12 @@ module RaaP
 
     def bool
       sized do
-        case Random.rand(1)
-        when 0 then true
-        when 1 then false
-        else raise
-        end
+        Random.rand(2) == 0
       end
     end
 
     def untyped
-      case Random.rand(5)
+      case Random.rand(6)
       in 0 then integer
       in 1 then float
       in 2 then string

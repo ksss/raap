@@ -28,9 +28,15 @@ class TestType < Minitest::Test
   end
 
   def test_bool
-    forall("bool") do |bool|
-      bool.equal?(true) || bool.equal?(false)
+    come_true = false
+    come_false = false
+    forall("bool", size_step: 0...100) do |bool|
+      come_true = true if bool.equal?(true)
+      come_false = true if bool.equal?(false)
+      true
     end
+    assert come_true
+    assert come_false
   end
 
   def test_numeric

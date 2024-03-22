@@ -130,6 +130,10 @@ module RaaP
   end
 
   module RBS
+    self.@builder: ::RBS::DefinitionBuilder
+    self.@env: ::RBS::Environment
+    self.@loader: ::RBS::EnvironmentLoader
+
     def self.builder: () -> ::RBS::DefinitionBuilder
     def self.env: () -> ::RBS::Environment
     def self.loader: () -> ::RBS::EnvironmentLoader
