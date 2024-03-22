@@ -103,6 +103,7 @@ module RaaP
     def initialize: (::RBS::MethodType | String method, ?type_params_decl: Array[untyped], ?type_args: Array[untyped], ?self_type: ::RBS::Types::ClassInstance?, ?instance_type: ::RBS::Types::ClassInstance?, ?class_type: ::RBS::Types::ClassSingleton?) -> void
     def pick_arguments: (?size: Integer, ?eval: bool) -> [Array[untyped], Hash[Symbol, untyped], ::Proc?]
     def pick_block: (?size: Integer, ?eval: bool) -> ::Proc?
+    def check_return: (untyped) -> bool
   end
 
   class MethodValue < Data
@@ -229,6 +230,8 @@ module RaaP
       def self.positive_float: () -> Float
     end
 
+    @such_that: (^(untyped) -> ::boolish)?
+
     GENERATORS: Hash[String, ^() -> Sized[untyped]]
     SIMPLE_SOURCE: Array[String]
     RECURSION: Hash[String, :found | :logged]
@@ -239,6 +242,11 @@ module RaaP
 
     def initialize: (String | ::RBS::Types::t, ?range: Range[untyped]) -> void
 
+    # Define rule for generating values
+    #     type.such_that { |i| i != 0 }.pick #=> ensure that the value is not 0
+    def such_that: () { (untyped) -> boolish } -> self
+
+    # Basic API for materializing values
     def pick: (?size: Integer, ?eval: bool) -> untyped
     def to_symbolic_call: (?size: Integer) -> untyped
     def sized: [T] () { (Integer size) -> T } -> Sized[T]

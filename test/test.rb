@@ -133,6 +133,12 @@ module Test
     private def private_method; end
   end
 
+  class Meth
+    def arg1(int)
+      int.to_s
+    end
+  end
+
   class Nested
     def initialize(nested) = @nested = nested
   end

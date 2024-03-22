@@ -36,5 +36,18 @@ module RaaP
 
       Proc.new { Type.new(block.type.return_type).pick(size:, eval:) }
     end
+
+    def check_return(return_value)
+      untyped = __skip__ = nil
+      type_check = ::RBS::Test::TypeCheck.new(
+        self_class: untyped,     # cannot support `self`
+        instance_class: untyped, # cannot support `instance`
+        class_class: untyped,    # cannot support `class`
+        builder: RBS.builder,
+        sample_size: 100,
+        unchecked_classes: []
+      )
+      type_check.value(return_value, rbs.type.return_type)
+    end
   end
 end

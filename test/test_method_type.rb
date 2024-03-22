@@ -19,6 +19,23 @@ class TestMethodType < Minitest::Test
     assert block.nil?
   end
 
+  def test_minitest
+    forall("(Integer, sym: Symbol) -> String") do |int, sym:|
+      Test::Meth.new.arg1(int)
+    end
+  end
+
+  def test_minitest_fail
+    begin
+      forall("(Integer, sym: Symbol) -> Integer") do |int, sym:|
+        Test::Meth.new.arg1(int)
+      end
+    rescue Minitest::Assertion => e
+      puts e.message
+      assert e
+    end
+  end
+
   def test_pick_arguments_with_rest_positionals_and_trailings
     10.times do |size|
       args, _, _ = MethodType.new("(*Integer, String) -> void").pick_arguments(size: size)

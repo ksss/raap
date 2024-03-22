@@ -107,6 +107,10 @@ module Test
     private def private_method: () -> void
   end
 
+  class Meth
+    def arg1: (Integer) -> String
+  end
+
   # class Nested
   #   def initialize: (Nested) -> void
   # end

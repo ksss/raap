@@ -69,10 +69,20 @@ module RaaP
     def initialize(type, range: nil..nil)
       @type = parse(type)
       @range = range
+      @such_that = nil
+    end
+
+    def such_that(&block)
+      @such_that = block
+      self
     end
 
     def sized(&block)
-      Sized.new(&block)
+      Sized.new(&block).tap do |sized|
+        if s = @such_that
+          sized.such_that(&s)
+        end
+      end
     end
 
     def pick(size: 10, eval: true)
@@ -294,13 +304,16 @@ module RaaP
     end
 
     def untyped
-      case Random.rand(6)
+      case Random.rand(9)
       in 0 then integer
       in 1 then float
-      in 2 then string
-      in 3 then symbol
-      in 4 then bool
-      in 5 then encoding
+      in 2 then rational
+      in 3 then complex
+      in 4 then string
+      in 5 then symbol
+      in 6 then bool
+      in 7 then encoding
+      in 8 then sized { BasicObject.new }
       end
     end
 
