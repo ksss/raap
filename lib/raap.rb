@@ -16,7 +16,7 @@ module RaaP
   end
 
   self.logger = ::Logger.new($stdout)
-  self.logger.level = ::Logger::WARN
+  self.logger.level = ::Logger::INFO
 
   autoload :BindCall, "raap/bind_call"
   autoload :CLI, "raap/cli"
