@@ -239,7 +239,7 @@ module RaaP
           RaaP::logger.debug("Skip: [#{s.exception.class}] #{s.exception.message}")
         in Result::Exception => e
           print 'E'
-          RaaP.logger.info("#{e.exception.class}: #{e.exception.message}")
+          RaaP.logger.info("Exception: [#{e.exception.class}] #{e.exception.message}")
           RaaP.logger.debug(e.exception.backtrace.join("\n"))
         end
       end
