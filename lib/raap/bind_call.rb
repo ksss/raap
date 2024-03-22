@@ -8,6 +8,7 @@ module RaaP
       def extend(...) = ::Kernel.instance_method(:extend).bind_call(...)
       def name(...) = ::Module.instance_method(:name).bind_call(...)
       def to_s(...) = ::Kernel.instance_method(:to_s).bind_call(...)
+      def public_send(...) = ::Kernel.instance_method(:public_send).bind_call(...)
 
       def class(obj)
         if respond_to?(obj, :class)

@@ -167,6 +167,7 @@ module RaaP
       definition = RBS.builder.build_singleton(type_name)
       type_params_decl = definition.type_params_decl
       definition.methods.filter_map do |method_name, method|
+        next unless method.accessibility == :public
         next if method.defined_in != type_name
         next if method_name == :fork || method_name == :spawn # TODO: skip solution
         puts "# #{type_name}.#{method_name}"
@@ -179,6 +180,7 @@ module RaaP
       definition = RBS.builder.build_instance(type_name)
       type_params_decl = definition.type_params_decl
       definition.methods.filter_map do |method_name, method|
+        next unless method.accessibility == :public
         next if method.defined_in != type_name
         next if method_name == :fork || method_name == :spawn # TODO: skip solution
         puts "# #{type_name}##{method_name}"

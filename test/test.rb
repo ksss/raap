@@ -128,6 +128,11 @@ module Test
     def bottom(b); end
   end
 
+  class Accessibility
+    public def public_method; end
+    private def private_method; end
+  end
+
   class Nested
     def initialize(nested) = @nested = nested
   end

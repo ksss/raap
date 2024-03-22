@@ -115,13 +115,7 @@ module RaaP
 
     def eval_one(symbolic_call)
       symbolic_call => [:call, receiver_value, method_name, args, kwargs, block]
-
-      begin
-        receiver_value.__send__(method_name, *args, **kwargs, &block)
-      rescue => e
-        RaaP.logger.warn("Cannot eval symbolic call #{symbolic_call} with #{e.class}")
-        raise
-      end
+      BindCall.public_send(receiver_value, method_name, *args, **kwargs, &block)
     end
 
     def var_name(mod)

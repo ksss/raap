@@ -22,6 +22,18 @@ class TestSymbolicCaller < Minitest::Test
     assert_instance_of Integer, sc.eval
   end
 
+  def tests_eval_accessibility
+    sc = [:call,
+           [:call, Test::Accecibility, :new, [], {}, nil],
+           :public_method, [], {}, nil]
+    assert_nil SymbolicCaller.new(sc).eval
+
+    sc = [:call,
+           [:call, Test::Accecibility, :new, [], {}, nil],
+           :private_method, [], {}, nil]
+    assert_raises(NoMethodError) { SymbolicCaller.new(sc).eval }
+  end
+
   def test_to_lines
     sc = SymbolicCaller.new([
       :call,

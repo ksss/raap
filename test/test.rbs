@@ -102,6 +102,11 @@ module Test
     def bottom: (bot) -> void
   end
 
+  class Accessibility
+    public def public_method: () -> void
+    private def private_method: () -> void
+  end
+
   # class Nested
   #   def initialize: (Nested) -> void
   # end
