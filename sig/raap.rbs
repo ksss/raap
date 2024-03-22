@@ -130,6 +130,9 @@ module RaaP
     def block_str: () -> String?
   end
 
+  module Minitest
+  end
+
   module RBS
     self.@builder: ::RBS::DefinitionBuilder
     self.@env: ::RBS::Environment
