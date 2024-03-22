@@ -30,7 +30,6 @@ module RaaP
     # Special class case
     register("::Array") do
       _type = __skip__ = type
-      args = _type.args
       t = _type.args[0] || 'untyped'
       array(Type.new(t, range: range))
     end
