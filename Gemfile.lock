@@ -24,7 +24,7 @@ GEM
     bigdecimal (3.1.7)
     concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
-    csv (3.2.8)
+    csv (3.3.0)
     debug (1.9.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
@@ -58,7 +58,7 @@ GEM
       ffi (~> 1.0)
     rbs (3.4.4)
       abbrev
-    rdoc (6.6.2)
+    rdoc (6.6.3.1)
       psych (>= 4.0.0)
     reline (0.4.3)
       io-console (~> 0.5)
