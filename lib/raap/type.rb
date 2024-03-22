@@ -141,6 +141,8 @@ module RaaP
       end
     end
 
+    private
+
     def pick_from_initialize(type, size:)
       type_name = type.name.absolute!
       const = Object.const_get(type_name.to_s)
@@ -168,8 +170,6 @@ module RaaP
         Value::Module.new(type)
       end
     end
-
-    private
 
     def parse(type)
       case type

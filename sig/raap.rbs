@@ -241,11 +241,11 @@ module RaaP
 
     def pick: (?size: Integer, ?eval: bool) -> untyped
     def to_symbolic_call: (?size: Integer) -> untyped
-    def pick_from_initialize: (::RBS::Types::ClassInstance, size: Integer) -> untyped
     def sized: [T] () { (Integer size) -> T } -> Sized[T]
 
     private
 
+    def pick_from_initialize: (::RBS::Types::ClassInstance, size: Integer) -> (symbolic_call | Value::Module)
     def parse: (String | ::RBS::Types::t) -> ::RBS::Types::t?
     def try: (times: Integer, size: Integer) { (Integer size) -> untyped } -> untyped
 
