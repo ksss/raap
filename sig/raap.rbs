@@ -180,6 +180,13 @@ module RaaP
   end
 
   class SymbolicCaller
+    class Var
+      attr_reader name: String
+      def initialize: (String name) -> void
+      def +: (String) -> String
+      def to_s: () -> String
+    end
+
     attr_reader symbolic_call: untyped
     def initialize: (untyped) -> void
     def eval: () -> untyped
