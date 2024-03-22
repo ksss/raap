@@ -227,7 +227,7 @@ module RaaP
           puts "Failed in case of `#{f.called_str}`"
           puts
           RaaP.logger.debug { PP.pp(f.symbolic_call, ''.dup) }
-          puts "# call stack:"
+          puts "### call stack:"
           puts
           puts "```"
           puts SymbolicCaller.new(f.symbolic_call).to_lines.join("\n")
