@@ -100,7 +100,17 @@ module RaaP
       when ::RBS::Types::Union
         type.types.sample&.then { |t| Type.new(t).pick(size:) }
       when ::RBS::Types::Intersection
-        Value::Intersection.new(type, size: size)
+        [:call, Value::Intersection, :new, [type], {size:}, nil]
+      when ::RBS::Types::Interface
+        [:call, Value::Interface, :new, [type], {size:}, nil]
+      when ::RBS::Types::Variable
+        [:call, Value::Variable, :new, [type], {}, nil]
+      when ::RBS::Types::Bases::Void
+        [:call, Value::Void, :new, [], {}, nil]
+      when ::RBS::Types::Bases::Top
+        [:call, Value::Top, :new, [], {}, nil]
+      when ::RBS::Types::Bases::Bottom
+        [:call, Value::Bottom, :new, [], {}, nil]
       when ::RBS::Types::Optional
         case Random.rand(2)
         in 0 then Type.new(type.type).pick(size:)
@@ -117,10 +127,6 @@ module RaaP
         raise "cannot resolve `instance` type"
       when ::RBS::Types::Bases::Self
         raise "cannot resolve `self` type"
-      when ::RBS::Types::Interface
-        Value::Interface.new(type, size: size)
-      when ::RBS::Types::Variable
-        Value::Variable.new(type)
       when ::RBS::Types::ClassSingleton
         Object.const_get(type.name.to_s)
       when ::RBS::Types::ClassInstance
@@ -136,16 +142,10 @@ module RaaP
         type.literal
       when ::RBS::Types::Bases::Bool
         bool.pick(size: size)
-      when ::RBS::Types::Bases::Void
-        Value::Void.new
       when ::RBS::Types::Bases::Any
         untyped.pick(size: size)
       when ::RBS::Types::Bases::Nil
         nil
-      when ::RBS::Types::Bases::Top
-        Value::Top.new
-      when ::RBS::Types::Bases::Bottom
-        Value::Bottom.new
       else
         raise "not implemented #{type.to_s}"
       end
@@ -177,7 +177,7 @@ module RaaP
           raise
         end
       else
-        Value::Module.new(type)
+        [:call, Value::Module, :new, [type], {}, nil]
       end
     end
 
@@ -313,7 +313,7 @@ module RaaP
       in 5 then symbol
       in 6 then bool
       in 7 then encoding
-      in 8 then sized { BasicObject.new }
+      in 8 then sized { [:call, BasicObject, :new, [], {}, nil] }
       end
     end
 
