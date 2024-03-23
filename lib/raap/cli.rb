@@ -221,7 +221,11 @@ module RaaP
         case called
         in Result::Success => s
           print '.'
-          RaaP.logger.debug { "Success: #{s.called_str}" }
+          RaaP.logger.debug do
+            "Success: #{s.called_str}"
+          rescue => e
+            "Success: But cannot print called_str with `[#{e.class}] #{e.message}`"
+          end
         in Result::Failure => f
           puts 'F'
           puts "Failed in case of `#{f.called_str}`"
@@ -239,7 +243,8 @@ module RaaP
           throw :break
         in Result::Skip => s
           print 'S'
-          RaaP::logger.debug("Skip: [#{s.exception.class}] #{s.exception.message}")
+          RaaP.logger.debug("Skip: [#{s.exception.class}] #{s.exception.message}")
+          RaaP.logger.debug(s.exception.backtrace.join("\n"))
         in Result::Exception => e
           print 'E'
           RaaP.logger.info("Exception: [#{e.exception.class}] #{e.exception.message}")
