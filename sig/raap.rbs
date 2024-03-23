@@ -302,7 +302,7 @@ module RaaP
       def class: () -> class
     end
 
-    class Module < BasicObject
+    class Module
       attr_reader type: ::RBS::Types::ClassInstance
 
       def initialize: (::RBS::Types::ClassInstance) -> void

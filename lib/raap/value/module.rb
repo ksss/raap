@@ -1,13 +1,14 @@
 module RaaP
   module Value
     # FIXME: consider self_types
-    class Module < BasicObject
+    # HINT: intersection?
+    class Module
       attr_reader :type
 
       def initialize(type)
         @type = type
         const = ::Object.const_get(type.name.absolute!.to_s)
-        BindCall.extend(self, const)
+        extend(const)
       end
 
       def inspect = "#<module #{@type}>"
