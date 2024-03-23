@@ -66,7 +66,7 @@ module RaaP
           Result::Failure.new(method_value:, return_value:, symbolic_call:)
         end
       rescue TypeError => exception
-        Result::Failure.new(method_value:, return_value:, symbolic_call:)
+        Result::Failure.new(method_value:, return_value:, symbolic_call:, exception:)
       end
 
     # not ensure method_value

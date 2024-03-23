@@ -159,10 +159,11 @@ module RaaP
       include CalledStr
     end
     class Failure < Data
-      def self.new: (method_value: MethodValue, return_value: untyped, symbolic_call: symbolic_call) -> instance
+      def self.new: (method_value: MethodValue, return_value: untyped, symbolic_call: symbolic_call, ?exception: ::Exception?) -> instance
       attr_reader method_value: MethodValue
       attr_reader return_value: untyped
       attr_reader symbolic_call: symbolic_call
+      attr_reader exception: ::Exception?
       include CalledStr
     end
     class Skip < Data

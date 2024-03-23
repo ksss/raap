@@ -10,7 +10,11 @@ module RaaP
 
     Success = Data.define(:method_value, :return_value)
     Success.include CalledStr
-    Failure = Data.define(:method_value, :return_value, :symbolic_call)
+    Failure = Data.define(:method_value, :return_value, :symbolic_call, :exception) do
+      def initialize(exception: nil, **)
+        super
+      end
+    end
     Failure.include CalledStr
     Skip = Data.define(:method_value, :exception)
     Exception = Data.define(:method_value, :exception)

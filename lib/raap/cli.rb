@@ -225,6 +225,9 @@ module RaaP
         in Result::Failure => f
           puts 'F'
           puts "Failed in case of `#{f.called_str}`"
+          if e = f.exception
+            RaaP.logger.debug { "Failure: with exception [#{e.class}] #{e.message}" }
+          end
           puts
           RaaP.logger.debug { PP.pp(f.symbolic_call, ''.dup) }
           puts "### call stack:"
