@@ -13,7 +13,11 @@ module RaaP
     end
 
     def call_str
-      r = SymbolicCaller.new(receiver_value).eval
+      r = begin
+            SymbolicCaller.new(receiver_value).eval
+          rescue RuntimeError, NotImplementedError
+            receiver_value
+          end
       "#{BindCall.inspect(r)}.#{method_name}(#{argument_str})#{block_str}"
     end
 

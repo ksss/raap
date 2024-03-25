@@ -221,11 +221,7 @@ module RaaP
         case called
         in Result::Success => s
           print '.'
-          RaaP.logger.debug do
-            "Success: #{s.called_str}"
-          rescue RuntimeError, NotImplementedError => e
-            "Success: But cannot print called_str with `[#{e.class}] #{e.message}`"
-          end
+          RaaP.logger.debug { "Success: #{s.called_str}" }
         in Result::Failure => f
           puts 'F'
           puts "Failed in case of `#{f.called_str}`"
