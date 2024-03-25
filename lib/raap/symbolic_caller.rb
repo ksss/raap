@@ -33,8 +33,9 @@ module RaaP
 
     attr_reader :symbolic_call
 
-    def initialize(symbolic_call)
+    def initialize(symbolic_call, allow_private: false)
       @symbolic_call = symbolic_call
+      @allow_private = allow_private
     end
 
     def eval
@@ -115,7 +116,11 @@ module RaaP
 
     def eval_one(symbolic_call)
       symbolic_call => [:call, receiver_value, method_name, args, kwargs, block]
-      BindCall.public_send(receiver_value, method_name, *args, **kwargs, &block)
+      if @allow_private
+        receiver_value.__send__(method_name, *args, **kwargs, &block)
+      else
+        BindCall.public_send(receiver_value, method_name, *args, **kwargs, &block)
+      end
     end
 
     def var_name(mod)

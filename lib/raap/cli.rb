@@ -16,6 +16,7 @@ module RaaP
       :size_from,
       :size_to,
       :size_by,
+      :allow_private,
       keyword_init: true
     )
 
@@ -28,6 +29,7 @@ module RaaP
       size_from: 0,
       size_to: 99,
       size_by: 1,
+      allow_private: false,
     )
 
     def initialize(argv)
@@ -59,6 +61,9 @@ module RaaP
         end
         o.on('--size-by int', Integer, "default: #{CLI.option.size_by}") do |arg|
           CLI.option.size_by = arg
+        end
+        o.on('--allow-private', "default: #{CLI.option.allow_private}") do
+          CLI.option.allow_private = true
         end
       end.parse!(@argv)
 
@@ -217,6 +222,7 @@ module RaaP
         ),
         size_step: CLI.option.size_from.step(to: CLI.option.size_to, by: CLI.option.size_by),
         timeout: CLI.option.timeout,
+        allow_private: true,
       ).run do |called|
         case called
         in Result::Success => s

@@ -8,18 +8,13 @@ module RaaP
       end
     end
 
-    attr_reader :receiver_type
-    attr_reader :method_name
-    attr_reader :method_type
-    attr_reader :size_step
-    attr_reader :timeout
-
-    def initialize(receiver_type:, method_name:, method_type:, size_step:, timeout:)
+    def initialize(receiver_type:, method_name:, method_type:, size_step:, timeout:, allow_private: false)
       @receiver_type = receiver_type
       @method_name = method_name
       @method_type = method_type
       @size_step = size_step
       @timeout = timeout
+      @allow_private = allow_private
     end
 
     def run
@@ -41,23 +36,24 @@ module RaaP
     private
 
     def call(size:, stats:)
-      receiver_value = receiver_type.pick(size: size, eval: false)
-      arguments = method_type.pick_arguments(size: size, eval: false)
-      method_value = MethodValue.new(receiver_value:, arguments:, method_name:, size:)
+      receiver_value = @receiver_type.pick(size: size, eval: false)
+      arguments = @method_type.pick_arguments(size: size, eval: false)
+      method_value = MethodValue.new(receiver_value:, arguments:, method_name: @method_name, size:)
       symbolic_call = method_value.to_symbolic_call
+      sc = SymbolicCaller.new(symbolic_call, allow_private: @allow_private)
       begin
         # ensure method_value
         check = false
         if return_type.instance_of?(::RBS::Types::Bases::Bottom)
           begin
-            return_value = SymbolicCaller.new(symbolic_call).eval
+            return_value = sc.eval
           rescue StandardError, NotImplementedError
             check = true
             return_value = Value::Bottom.new
           end
         else
-          return_value = SymbolicCaller.new(symbolic_call).eval
-          check = check_return(receiver_value:, return_value:, method_type:)
+          return_value = sc.eval
+          check = check_return(receiver_value:, return_value:, method_type: @method_type)
         end
         if check
           stats.success += 1
@@ -118,7 +114,7 @@ module RaaP
     end
 
     def return_type
-      method_type.rbs.type.return_type
+      @method_type.rbs.type.return_type
     end
   end
 end
