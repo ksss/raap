@@ -223,7 +223,7 @@ module RaaP
           print '.'
           RaaP.logger.debug do
             "Success: #{s.called_str}"
-          rescue => e
+          rescue RuntimeError, NotImplementedError => e
             "Success: But cannot print called_str with `[#{e.class}] #{e.message}`"
           end
         in Result::Failure => f

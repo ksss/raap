@@ -51,7 +51,7 @@ module RaaP
         if return_type.instance_of?(::RBS::Types::Bases::Bottom)
           begin
             return_value = SymbolicCaller.new(symbolic_call).eval
-          rescue => e
+          rescue RuntimeError, NotImplementedError => e
             check = true
             return_value = Value::Bottom.new
           end
