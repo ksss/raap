@@ -87,4 +87,29 @@ class TestSymbolicCaller < Minitest::Test
       test_c.run()
     CODE
   end
+
+  def test_to_lines_with_hash
+    sc = SymbolicCaller.new([:call, {a: {b: {c: 123}}}, :keys, [], {}, nil])
+    assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
+      {a: {b: {c: 123}}}.keys()
+    CODE
+
+    sc = SymbolicCaller.new([
+      :call,
+      [:call, Test::C, :new, [], {
+        a: nil,
+        b: {
+          c: [:call, Test::A, :new, [{a: {b: {c: 123}}}], {}, nil],
+          d: { e: [ { f: [:call, Test::B, :new, [], {b: {'b' => 1}}, nil] } ] }
+        },
+      }, nil],
+      :run, [], {}, nil
+    ])
+    assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
+      test_a = Test::A.new({a: {b: {c: 123}}})
+      test_b = Test::B.new(b: {'b' => 1})
+      test_c = Test::C.new(a: nil, b: {c: test_a, d: {e: [{f: test_b}]}})
+      test_c.run()
+    CODE
+  end
 end

@@ -70,13 +70,7 @@ module RaaP
             receiver = receiver_value.name + '.'
           else
             var_eq = ""
-            receiver = if printable?(receiver_value)
-              var = Var.new(printable(receiver_value))
-              var + '.'
-            else
-              var = Var.new(var_name(receiver_value.class))
-              var + '.'
-            end
+            receiver = Var.new(printable(receiver_value)) + '.'
           end
 
           arguments = []
@@ -127,16 +121,11 @@ module RaaP
       printable(mod).gsub('::', '_').downcase
     end
 
-    def printable?(obj)
-      case obj
-      when Symbol, Integer, Float, Regexp, nil, true, false, String, Module, Var, Array
-        true
-      else
-        false
-      end
-    end
-
     def printable(obj)
+      if obj in [:call, _, Symbol, Array, Hash, _]
+        return _walk(obj)
+      end
+
       case obj
       when Var
         obj.name
@@ -145,6 +134,13 @@ module RaaP
         obj.inspect
       when String
         obj.inspect.gsub('"', "'") or raise
+      when Hash
+        hash_body = obj.map do |k, v|
+          ks = printable(k)
+          vs = printable(v)
+          ks.start_with?(':') ? "#{ks[1..-1]}: #{vs}" : "#{ks} => #{vs}"
+        end
+        "{#{hash_body.join(', ')}}"
       when Array
         "[#{obj.map { |o| printable(o) }.join(', ')}]"
       when Module
