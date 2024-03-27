@@ -129,7 +129,7 @@ module RaaP
 
     def printable?(obj)
       case obj
-      when Symbol, Integer, Float, Regexp, nil, true, false, String, Module, Var
+      when Symbol, Integer, Float, Regexp, nil, true, false, String, Module, Var, Array
         true
       else
         false
@@ -145,6 +145,8 @@ module RaaP
         obj.inspect
       when String
         obj.inspect.gsub('"', "'") or raise
+      when Array
+        "[#{obj.map { |o| printable(o) }.join(', ')}]"
       when Module
         BindCall.name(obj) or raise
       else

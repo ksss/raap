@@ -62,4 +62,29 @@ class TestSymbolicCaller < Minitest::Test
       3.pow(rational)
     CODE
   end
+
+  def test_to_lines_with_array
+    sc = SymbolicCaller.new([:call, [1, 2, 3], :sum, [], {}, nil])
+    assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
+      [1, 2, 3].sum()
+    CODE
+
+    sc = SymbolicCaller.new([
+      :call,
+      [:call, Test::C, :new, [], {
+        a: nil,
+        b: [
+          [:call, Test::A, :new, [[1, [2, [3]]]], {}, nil],
+          [[[[:call, Test::B, :new, [], {}, nil]]]]
+        ],
+      }, nil],
+      :run, [], {}, nil
+    ])
+    assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
+      test_a = Test::A.new([1, [2, [3]]])
+      test_b = Test::B.new()
+      test_c = Test::C.new(a: nil, b: [test_a, [[[test_b]]]])
+      test_c.run()
+    CODE
+  end
 end
