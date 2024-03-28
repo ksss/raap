@@ -78,6 +78,21 @@ For example, an Integer with size zero is `0` and an Array is `[]`.
 
 RaaP, like other property-based tests, changes the size 100 times from 0 to 99 by default to generate test data.
 
+## Symbolic call
+
+You may possibly see the following data structure in the debug logs.
+
+```rb
+[:call, Object, :method, [], {}, nil]
+```
+
+This is a data structure of the state of the method call.
+
+Symbolic call is a tuple beginning with `:call`, followed by the receiver, method name, positional arguments, keyword arguments, and block arguments, in that order.
+And the receiver and arguments are nestable.
+
+It is used in QuickCheck and Proper to keep as much history of method calls as possible.
+
 ## Options
 
 ### `-I PATH` or `--include PATH`
