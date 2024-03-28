@@ -15,12 +15,13 @@ module RaaP
 
           subed_method_type = ts.method_type_sub(method_type, self_type:, instance_type:, class_type:)
 
-          BindCall.define_singleton_method(self, name) do |*, &b|
-            @fixed_return_value ||= Type.new(subed_method_type.type.return_type).pick(size: size)
+          BindCall.define_singleton_method(self, name) do |*_, &b|
+            # @type var b: Proc?
+            @fixed_return_value ||= Type.new(subed_method_type.type.return_type).pick(size:)
             if subed_method_type.block
               @fixed_block_arguments ||= size.times.map do
                 fun_type = FunctionType.new(subed_method_type.block.type)
-                fun_type.pick_arguments(size: size)
+                fun_type.pick_arguments(size:)
               end
             else
               @fixed_block_arguments = []

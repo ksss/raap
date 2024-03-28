@@ -6,25 +6,29 @@ module RaaP
       @fun = fun
     end
 
-    def pick_arguments(size: 10, eval: true)
-      a = recursive_pick(build_args_type, size:, eval:)
-      k = recursive_pick(build_kwargs_type, size:, eval:)
+    def pick_arguments(size: 10)
+      SymbolicCaller.new(arguments_to_symbolic_call(size:)).eval
+    end
+
+    def arguments_to_symbolic_call(size: 10)
+      a = to_symbolic_call_recursive(build_args_type, size:)
+      k = to_symbolic_call_recursive(build_kwargs_type, size:)
 
       [a, k]
     end
 
     private
 
-    def recursive_pick(type, size:, eval:)
+    def to_symbolic_call_recursive(type, size:)
       case
       when type.nil?
         nil
       when type.respond_to?(:each_pair)
-        type.each_pair.to_h { |k, v| [k, recursive_pick(v, size:, eval:)] }
+        type.each_pair.to_h { |k, v| [k, to_symbolic_call_recursive(v, size:)] }
       when type.respond_to?(:each)
-        type.each.map { |v| recursive_pick(v, size:, eval:) }
+        type.each.map { |v| to_symbolic_call_recursive(v, size:) }
       else
-        type.pick(size:, eval:)
+        type.to_symbolic_call(size:)
       end
     end
 

@@ -45,7 +45,7 @@ module RaaP
           _type = __skip__ = type
           k = _type.args[0] || 'untyped'
           v = _type.args[1] || 'untyped'
-          [Type.new(k).pick(size: size), Type.new(v).pick(size: size)]
+          [Type.new(k).to_symbolic_call(size: size / 2), Type.new(v).to_symbolic_call(size: size / 2)]
         end
       end
     end
@@ -85,9 +85,9 @@ module RaaP
       end
     end
 
-    def pick(size: 10, eval: true)
+    def pick(size: 10)
       symb = to_symbolic_call(size:)
-      eval ? SymbolicCaller.new(symb).eval : symb
+      SymbolicCaller.new(symb).eval
     end
 
     def to_symbolic_call(size: 10)
@@ -96,9 +96,9 @@ module RaaP
 
       case type
       when ::RBS::Types::Tuple
-        type.types.map { |t| Type.new(t).pick(size:) }
+        type.types.map { |t| Type.new(t).to_symbolic_call(size:) }
       when ::RBS::Types::Union
-        type.types.sample&.then { |t| Type.new(t).pick(size:) }
+        type.types.sample&.then { |t| Type.new(t).to_symbolic_call(size:) }
       when ::RBS::Types::Intersection
         [:call, Value::Intersection, :new, [type], {size:}, nil]
       when ::RBS::Types::Interface
@@ -113,13 +113,13 @@ module RaaP
         [:call, Value::Bottom, :new, [], {}, nil]
       when ::RBS::Types::Optional
         case Random.rand(2)
-        in 0 then Type.new(type.type).pick(size:)
+        in 0 then Type.new(type.type).to_symbolic_call(size: size / 2)
         in 1 then nil
         end
       when ::RBS::Types::Alias
         case gen = GENERATORS[type.name.absolute!.to_s]
         in Proc then instance_exec(&gen)
-        in nil then Type.new(RBS.builder.expand_alias2(type.name, type.args)).pick(size:)
+        in nil then Type.new(RBS.builder.expand_alias2(type.name, type.args)).to_symbolic_call(size:)
         end
       when ::RBS::Types::Bases::Class
         raise "cannot resolve `class` type"
@@ -132,12 +132,12 @@ module RaaP
       when ::RBS::Types::ClassInstance
         case gen = GENERATORS[type.name.absolute!.to_s]
         in Proc then instance_exec(&gen).pick(size: size)
-        in nil then pick_from_initialize(type, size:)
+        in nil then to_symbolic_call_from_initialize(type, size:)
         end
       when ::RBS::Types::Record
-        type.fields.transform_values { |t| Type.new(t).pick(size:) }
+        type.fields.transform_values { |t| Type.new(t).to_symbolic_call(size: size / 2) }
       when ::RBS::Types::Proc
-        Proc.new { Type.new(type.type.return_type).pick(size:) }
+        Proc.new { Type.new(type.type.return_type).to_symbolic_call(size:) }
       when ::RBS::Types::Literal
         type.literal
       when ::RBS::Types::Bases::Bool
@@ -153,7 +153,7 @@ module RaaP
 
     private
 
-    def pick_from_initialize(type, size:)
+    def to_symbolic_call_from_initialize(type, size:)
       type_name = type.name.absolute!
       const = Object.const_get(type_name.to_s)
       definition = RBS.builder.build_singleton(type_name)
@@ -169,7 +169,7 @@ module RaaP
 
         begin
           try(times: 5, size: size) do |size|
-            args, kwargs, block = method_type.pick_arguments(size: size, eval: false)
+            args, kwargs, block = method_type.arguments_to_symbolic_call(size: size)
             [:call, const, :new, args, kwargs, block]
           end
         rescue
@@ -285,7 +285,7 @@ module RaaP
     def array(type)
       sized do |size|
         Array.new(integer.pick(size: size).abs) do
-          type.pick(size: size)
+          type.to_symbolic_call(size: size / 2)
         end
       end
     end

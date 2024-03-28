@@ -22,19 +22,27 @@ module RaaP
       @fun_type = FunctionType.new(@rbs.type)
     end
 
-    def pick_arguments(size: 10, eval: true)
-      args, kwargs = @fun_type.pick_arguments(size: size, eval:)
-      block = pick_block(size: size, eval:)
+    def pick_arguments(size: 10)
+      SymbolicCaller.new(arguments_to_symbolic_call(size:)).eval
+    end
+
+    def arguments_to_symbolic_call(size: 10)
+      args, kwargs = @fun_type.arguments_to_symbolic_call(size:)
+      block = block_to_symbolic_call(size:)
 
       [args, kwargs, block]
     end
 
-    def pick_block(size: 10, eval: true)
+    def pick_block(size: 10)
+      SymbolicCaller.new(block_to_symbolic_call(size:)).eval
+    end
+
+    def block_to_symbolic_call(size: 10)
       block = @rbs.block
       return nil if block.nil?
       return nil if (block.required == false) && [true, false].sample
 
-      Proc.new { Type.new(block.type.return_type).pick(size:, eval:) }
+      Proc.new { Type.new(block.type.return_type).to_symbolic_call(size:) }
     end
 
     def check_return(return_value)

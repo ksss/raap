@@ -36,8 +36,8 @@ module RaaP
     private
 
     def call(size:, stats:)
-      receiver_value = @receiver_type.pick(size: size, eval: false)
-      args, kwargs, block = @method_type.pick_arguments(size: size, eval: false)
+      receiver_value = @receiver_type.to_symbolic_call(size: size)
+      args, kwargs, block = @method_type.arguments_to_symbolic_call(size: size)
       # @type var symbolic_call: symbolic_call
       symbolic_call = [:call, receiver_value, @method_name, args, kwargs, block]
       symbolic_caller = SymbolicCaller.new(symbolic_call, allow_private: @allow_private)

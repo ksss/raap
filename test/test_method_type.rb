@@ -19,6 +19,11 @@ class TestMethodType < Minitest::Test
     assert block.nil?
   end
 
+  def test_to_symbolic_call
+    args, _, _ = MethodType.new("(Array[Test::C]) -> void").arguments_to_symbolic_call(size: 0)
+    assert_equal [[]], args
+  end
+
   def test_minitest
     forall("(Integer, sym: Symbol) -> String") do |int, sym:|
       Test::Meth.new.arg1(int)
