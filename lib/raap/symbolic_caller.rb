@@ -32,6 +32,7 @@ module RaaP
     end
 
     attr_reader :symbolic_call
+    attr_reader :allow_private
 
     def initialize(symbolic_call, allow_private: false)
       @symbolic_call = symbolic_call
@@ -44,8 +45,18 @@ module RaaP
       end
     end
 
-    def walk(&)
-      _walk(@symbolic_call, &)
+    def call_str
+      symbolic_call => [:call, receiver, Symbol => method_name, Array => args, Hash => kwargs, b]
+      receiver = try_eval(receiver)
+      args, kwargs, block = try_eval([args, kwargs, block])
+
+      a = []
+      a << args.map(&:inspect).join(', ') if !args.empty?
+      a << kwargs.map { |k ,v| "#{k}: #{BindCall.inspect(v)}" }.join(', ') if !kwargs.empty?
+      argument_str = a.join(', ')
+      block_str = block ? "{ }" : nil
+
+      "#{BindCall.inspect(receiver)}.#{method_name}(#{argument_str})#{block_str}"
     end
 
     def to_lines
@@ -86,6 +97,16 @@ module RaaP
     end
 
     private
+
+    def try_eval(symbolic_call)
+      SymbolicCaller.new(symbolic_call).eval
+    rescue RuntimeError, NotImplementedError
+      symbolic_call
+    end
+
+    def walk(&)
+      _walk(@symbolic_call, &)
+    end
 
     def _walk(symbolic_call, &block)
       return symbolic_call if BindCall::instance_of?(symbolic_call, BasicObject)

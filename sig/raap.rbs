@@ -111,30 +111,6 @@ module RaaP
     def check_return: (untyped) -> bool
   end
 
-  class MethodValue < Data
-    def self.new: (untyped receiver_value, [Array[untyped], Hash[Symbol, untyped], ::Proc?] arguments, Symbol method_name, Integer size) -> instance
-                | (receiver_value: untyped, arguments: [Array[untyped], Hash[Symbol, untyped], ::Proc?], method_name: Symbol, size: Integer) -> instance
-
-    def self.[]: (untyped receiver_value, [Array[untyped], Hash[Symbol, untyped], ::Proc?] arguments, Symbol method_name, Integer size) -> instance
-               | (receiver_value: untyped, arguments: [Array[untyped], Hash[Symbol, untyped], ::Proc?], method_name: Symbol, size: Integer) -> instance
-
-    def self.members: () -> [ :receiver_value, :arguments, :method_name, :size ]
-    def members: () -> [ :receiver_value, :arguments, :method_name, :size ]
-
-    attr_reader receiver_value: untyped
-    attr_reader arguments: [Array[untyped], Hash[Symbol, untyped], ::Proc?]
-    attr_reader method_name: Symbol
-    attr_reader size: Integer
-
-    def to_symbolic_call: () -> symbolic_call
-    def call_str: () -> String
-
-    private
-
-    def argument_str: () -> String
-    def block_str: () -> String?
-  end
-
   module Minitest
   end
 
@@ -151,34 +127,33 @@ module RaaP
 
   module Result
     interface _MethodValueReturnValue
-      def method_value: () -> MethodValue
+      def symbolic_call: () -> symbolic_call
       def return_value: () -> untyped
     end
     module CalledStr : _MethodValueReturnValue
       def called_str: () -> String
     end
     class Success < Data
-      def self.new: (method_value: MethodValue, return_value: untyped) -> instance
-      attr_reader method_value: MethodValue
+      def self.new: (symbolic_call: symbolic_call, return_value: untyped) -> instance
+      attr_reader symbolic_call: symbolic_call
       attr_reader return_value: untyped
       include CalledStr
     end
     class Failure < Data
-      def self.new: (method_value: MethodValue, return_value: untyped, symbolic_call: symbolic_call, ?exception: ::Exception?) -> instance
-      attr_reader method_value: MethodValue
-      attr_reader return_value: untyped
+      def self.new: (symbolic_call: symbolic_call, return_value: untyped, ?exception: ::Exception?) -> instance
       attr_reader symbolic_call: symbolic_call
+      attr_reader return_value: untyped
       attr_reader exception: ::Exception?
       include CalledStr
     end
     class Skip < Data
-      def self.new: (method_value: MethodValue?, exception: ::Exception) -> instance
-      attr_reader method_value: MethodValue?
+      def self.new: (symbolic_call: symbolic_call?, exception: ::Exception) -> instance
+      attr_reader symbolic_call: symbolic_call?
       attr_reader exception: ::Exception
     end
     class Exception < Data
-      def self.new: (method_value: MethodValue?, exception: ::Exception) -> instance
-      attr_reader method_value: MethodValue?
+      def self.new: (symbolic_call: symbolic_call?, exception: ::Exception) -> instance
+      attr_reader symbolic_call: symbolic_call?
       attr_reader exception: ::Exception
     end
   end
@@ -202,13 +177,17 @@ module RaaP
     end
 
     attr_reader symbolic_call: untyped
+    attr_reader allow_private: bool
+
     def initialize: (untyped, ?allow_private: bool) -> void
     def eval: () -> untyped
-    def walk: () ?{ (symbolic_call) -> untyped} -> untyped
+    def call_str: () -> String
     def to_lines: () -> Array[String]
 
     private
 
+    def try_eval: (untyped) -> untyped
+    def walk: () ?{ (symbolic_call) -> untyped} -> untyped
     def _walk: (untyped) ?{ (symbolic_call) -> untyped} -> untyped
     def eval_one: (symbolic_call) -> untyped
     def var_name: (Module) -> String

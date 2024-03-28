@@ -37,52 +37,52 @@ module RaaP
 
     def call(size:, stats:)
       receiver_value = @receiver_type.pick(size: size, eval: false)
-      arguments = @method_type.pick_arguments(size: size, eval: false)
-      method_value = MethodValue.new(receiver_value:, arguments:, method_name: @method_name, size:)
-      symbolic_call = method_value.to_symbolic_call
-      sc = SymbolicCaller.new(symbolic_call, allow_private: @allow_private)
+      args, kwargs, block = @method_type.pick_arguments(size: size, eval: false)
+      # @type var symbolic_call: symbolic_call
+      symbolic_call = [:call, receiver_value, @method_name, args, kwargs, block]
+      symbolic_caller = SymbolicCaller.new(symbolic_call, allow_private: @allow_private)
       begin
-        # ensure method_value
+        # ensure symbolic_call
         check = false
         if return_type.instance_of?(::RBS::Types::Bases::Bottom)
           begin
-            return_value = sc.eval
+            return_value = symbolic_caller.eval
           rescue StandardError, NotImplementedError
             check = true
             return_value = Value::Bottom.new
           end
         else
-          return_value = sc.eval
+          return_value = symbolic_caller.eval
           check = check_return(receiver_value:, return_value:, method_type: @method_type)
         end
         if check
           stats.success += 1
-          Result::Success.new(method_value:, return_value:)
+          Result::Success.new(symbolic_call:, return_value:)
         else
-          Result::Failure.new(method_value:, return_value:, symbolic_call:)
+          Result::Failure.new(symbolic_call:, return_value:)
         end
       rescue TypeError => exception
-        Result::Failure.new(method_value:, return_value:, symbolic_call:, exception:)
+        Result::Failure.new(symbolic_call:, return_value:, exception:)
       end
 
-    # not ensure method_value
+    # not ensure symbolic_call
     rescue NoMethodError => exception
       stats.skip += 1
-      Result::Skip.new(method_value:, exception:)
+      Result::Skip.new(symbolic_call:, exception:)
     rescue NameError => e
       msg = e.name.nil? ? '' : "for `#{BindCall.to_s(e.receiver)}::#{e.name}`"
       RaaP.logger.error("Implementation is not found #{msg} maybe.")
       throw :break
     rescue NotImplementedError => exception
       stats.skip += 1
-      Result::Skip.new(method_value:, exception:)
+      Result::Skip.new(symbolic_call:, exception:)
     rescue SystemStackError => exception
       stats.skip += 1
       RaaP.logger.warn "Found recursive type definition."
-      Result::Skip.new(method_value: nil, exception:)
+      Result::Skip.new(symbolic_call:, exception:)
     rescue => exception
       stats.exception += 1
-      Result::Exception.new(method_value:, exception:)
+      Result::Exception.new(symbolic_call:, exception:)
     end
 
     def check_return(receiver_value:, return_value:, method_type:)

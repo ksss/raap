@@ -232,7 +232,7 @@ module RaaP
           puts 'F'
           puts "Failed in case of `#{f.called_str}`"
           if e = f.exception
-            RaaP.logger.debug { "Failure: with exception [#{e.class}] #{e.message}" }
+            RaaP.logger.debug { "Failure: [#{e.class}] #{e.message}" }
           end
           puts
           RaaP.logger.debug { PP.pp(f.symbolic_call, ''.dup) }
@@ -245,10 +245,12 @@ module RaaP
           throw :break
         in Result::Skip => s
           print 'S'
+          RaaP.logger.debug { PP.pp(s.symbolic_call, ''.dup) }
           RaaP.logger.debug("Skip: [#{s.exception.class}] #{s.exception.message}")
           RaaP.logger.debug(s.exception.backtrace.join("\n"))
         in Result::Exception => e
           print 'E'
+          RaaP.logger.debug { PP.pp(e.symbolic_call, ''.dup) }
           RaaP.logger.debug("Exception: [#{e.exception.class}] #{e.exception.message}")
           RaaP.logger.debug(e.exception.backtrace.join("\n"))
         end

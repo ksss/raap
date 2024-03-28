@@ -4,19 +4,20 @@ module RaaP
   module Result
     module CalledStr
       def called_str
-        "#{method_value.call_str} -> #{return_value.inspect}[#{return_value.class}]"
+        scr = SymbolicCaller.new(symbolic_call)
+        "#{scr.call_str} -> #{return_value.inspect}[#{return_value.class}]"
       end
     end
 
-    Success = Data.define(:method_value, :return_value)
+    Success = Data.define(:symbolic_call, :return_value)
     Success.include CalledStr
-    Failure = Data.define(:method_value, :return_value, :symbolic_call, :exception) do
+    Failure = Data.define(:symbolic_call, :return_value, :exception) do
       def initialize(exception: nil, **)
         super
       end
     end
     Failure.include CalledStr
-    Skip = Data.define(:method_value, :exception)
-    Exception = Data.define(:method_value, :exception)
+    Skip = Data.define(:symbolic_call, :exception)
+    Exception = Data.define(:symbolic_call, :exception)
   end
 end
