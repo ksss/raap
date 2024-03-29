@@ -46,12 +46,12 @@ module RaaP
     end
 
     def call_str
-      symbolic_call => [:call, receiver, Symbol => method_name, Array => args, Hash => kwargs, b]
+      symbolic_call => [:call, receiver, Symbol => method_name, Array => args, Hash => kwargs, block]
       receiver = try_eval(receiver)
       args, kwargs, block = try_eval([args, kwargs, block])
 
       a = []
-      a << args.map(&:inspect).join(', ') if !args.empty?
+      a << args.map(&BindCall.method(:inspect)).join(', ') if !args.empty?
       a << kwargs.map { |k ,v| "#{k}: #{BindCall.inspect(v)}" }.join(', ') if !kwargs.empty?
       argument_str = a.join(', ')
       block_str = block ? "{ }" : nil
@@ -61,7 +61,7 @@ module RaaP
 
     def to_lines
       [].tap do |lines|
-        walk do |symbolic_call|
+        walk do |symbolic_call, is_last|
           symbolic_call => [:call, receiver_value, method_name, args, kwargs, block]
 
           is_mod = receiver_value.is_a?(Module)
@@ -72,7 +72,7 @@ module RaaP
             var_eq = "#{var} = "
             receiver = ''
           when BindCall.instance_of?(receiver_value, Var)
-            var_eq = ""
+            var_eq = "#{receiver_value} = "
             var = Var.new(receiver_value.name)
             receiver = var + '.'
           when is_mod
@@ -80,16 +80,19 @@ module RaaP
             var_eq = "#{var} = "
             receiver = receiver_value.name + '.'
           else
-            var_eq = ""
+            var_eq = ''
             receiver = Var.new(printable(receiver_value)) + '.'
           end
+
+          var_eq = '' if is_last
 
           arguments = []
           arguments << args.map { |a| printable(a) } if !args.empty?
           arguments << kwargs.map{|k,v| "#{k}: #{printable(v)}" }.join(', ') if !kwargs.empty?
           block_str = block ? " { }" : ""
 
-          lines << "#{var_eq}#{receiver}#{method_name}(#{arguments.join(', ')})#{block_str}"
+          line = "#{var_eq}#{receiver}#{method_name}(#{arguments.join(', ')})#{block_str}"
+          lines << line
 
           var
         end
@@ -105,25 +108,25 @@ module RaaP
     end
 
     def walk(&)
-      _walk(@symbolic_call, &)
+      _walk(@symbolic_call, true, &)
     end
 
-    def _walk(symbolic_call, &block)
+    def _walk(symbolic_call, is_last, &block)
       return symbolic_call if BindCall::instance_of?(symbolic_call, BasicObject)
       return symbolic_call if !BindCall.respond_to?(symbolic_call, :deconstruct) && !BindCall.respond_to?(symbolic_call, :deconstruct_keys)
 
       case symbolic_call
       in [:call, receiver, Symbol => method_name, Array => args, Hash => kwargs, b]
-        receiver = _walk(receiver, &block)
-        args = _walk(args, &block) if !args.empty?
-        kwargs = _walk(kwargs, &block) if !kwargs.empty?
-        block.call [:call, receiver, method_name, args, kwargs, b]
+        receiver = _walk(receiver, false, &block)
+        args = _walk(args, false, &block) if !args.empty?
+        kwargs = _walk(kwargs, false, &block) if !kwargs.empty?
+        block.call [:call, receiver, method_name, args, kwargs, b], is_last
       in Var
         symbolic_call.name
       in Array
-        symbolic_call.map { |sc| _walk(sc, &block) }
+        symbolic_call.map { |sc| _walk(sc, false, &block) }
       in Hash
-        symbolic_call.transform_values { |sc| _walk(sc, &block) }
+        symbolic_call.transform_values { |sc| _walk(sc, false, &block) }
       else
         symbolic_call
       end
@@ -143,10 +146,6 @@ module RaaP
     end
 
     def printable(obj)
-      if obj in [:call, _, Symbol, Array, Hash, _]
-        return _walk(obj)
-      end
-
       case obj
       when Var
         obj.name

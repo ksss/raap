@@ -191,7 +191,7 @@ module RaaP
 
     def try_eval: (untyped) -> untyped
     def walk: () ?{ (symbolic_call) -> untyped} -> untyped
-    def _walk: (untyped) ?{ (symbolic_call) -> untyped} -> untyped
+    def _walk: (untyped, bool is_last) ?{ (symbolic_call) -> untyped} -> untyped
     def eval_one: (symbolic_call) -> untyped
     def var_name: (Module) -> String
     def printable?: (untyped) -> bool

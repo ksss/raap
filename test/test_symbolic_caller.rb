@@ -63,6 +63,17 @@ class TestSymbolicCaller < Minitest::Test
     CODE
   end
 
+  def test_to_lines_end_with_singlaton_method
+    sc = SymbolicCaller.new(
+      [:call, Test::A, :singleton_method, [
+        [:call, Test::B, :new, [], {}, nil]
+      ], {}, nil])
+    assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
+      test_b = Test::B.new()
+      Test::A.singleton_method(test_b)
+    CODE
+  end
+
   def test_to_lines_with_array
     sc = SymbolicCaller.new([:call, [1, 2, 3], :sum, [], {}, nil])
     assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
