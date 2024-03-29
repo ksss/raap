@@ -94,10 +94,16 @@ module RaaP
         end
       end.each do |ret|
         ret.each do |methods|
-          methods.each do |status, method_name, method_type|
+          methods.each do |status, method_name, method_type, reason|
             if status == 1
-              puts "Fail:"
+              puts "# Fail:"
+              puts
               puts "def #{method_name}: #{method_type}"
+              puts
+              puts "## Reason"
+              puts
+              puts reason&.string
+              puts
             end
           end
         end
@@ -209,6 +215,7 @@ module RaaP
       end
       puts "## def #{prefix}#{method_name}: #{method_type}"
       status = 0
+      reason = nil
       stats = MethodProperty.new(
         receiver_type:,
         method_name: method_name,
@@ -230,17 +237,19 @@ module RaaP
           RaaP.logger.debug { "Success: #{s.called_str}" }
         in Result::Failure => f
           puts 'F'
-          puts "Failed in case of `#{f.called_str}`"
           if e = f.exception
             RaaP.logger.debug { "Failure: [#{e.class}] #{e.message}" }
           end
-          puts
           RaaP.logger.debug { PP.pp(f.symbolic_call, ''.dup) }
-          puts "### call stack:"
-          puts
-          puts "```"
-          puts SymbolicCaller.new(f.symbolic_call).to_lines.join("\n")
-          puts "```"
+          reason = StringIO.new
+          reason.puts "Failed in case of `#{f.called_str}`"
+          reason.puts
+          reason.puts "### call stack:"
+          reason.puts
+          reason.puts "```"
+          reason.puts SymbolicCaller.new(f.symbolic_call).to_lines.join("\n")
+          reason.puts "```"
+          puts reason.string
           status = 1
           throw :break
         in Result::Skip => s
@@ -259,7 +268,7 @@ module RaaP
       puts "success: #{stats.success}, skip: #{stats.skip}, exception: #{stats.exception}"
       puts
 
-      [status, method_name, method_type]
+      [status, method_name, method_type, reason]
     end
   end
 end

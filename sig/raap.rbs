@@ -54,7 +54,7 @@ module RaaP
     def initialize: (Array[String]) -> void
     def load: () -> self
 
-    type property_result = [Integer, Symbol, ::RBS::MethodType]
+    type property_result = [Integer, Symbol, ::RBS::MethodType, StringIO?]
     def run: () -> self
     def run_by: (tag: String) -> Array[Array[property_result]]
     def run_by_instance: (tag: String) -> Array[Array[property_result]]
