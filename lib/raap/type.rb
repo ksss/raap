@@ -102,7 +102,9 @@ module RaaP
       when ::RBS::Types::Intersection
         [:call, Value::Intersection, :new, [type], {size:}, nil]
       when ::RBS::Types::Interface
-        [:call, Value::Interface, :new, [type], {size:}, nil]
+        typename = [:call, Kernel, :TypeName, [type.name.absolute!.to_s], {}, nil]
+        sc = [:call, ::RBS::Types::Interface, :new, [], {name: typename, args: type.args, location: nil}, nil]
+        [:call, Value::Interface, :new, [sc], {size:}, nil]
       when ::RBS::Types::Variable
         [:call, Value::Variable, :new, [type], {}, nil]
       when ::RBS::Types::Bases::Void
