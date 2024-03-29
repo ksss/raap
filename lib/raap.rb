@@ -23,7 +23,6 @@ module RaaP
   autoload :FunctionType, "raap/function_type"
   autoload :MethodProperty, "raap/method_property"
   autoload :MethodType, "raap/method_type"
-  autoload :Minitest, "raap/minitest"
   autoload :RBS, "raap/rbs"
   autoload :Result, "raap/result"
   autoload :Sized, "raap/sized"
