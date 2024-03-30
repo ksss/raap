@@ -37,6 +37,11 @@ module RaaP
     private
 
     def call(size:, stats:)
+      if @method_type.rbs.each_type.find { |t| t.instance_of?(::RBS::Types::Bases::Any) }
+        RaaP.logger.info { "Skip type check since `#{@method_type.rbs}` includes `untyped`"}
+        stats.break = true
+        throw :break
+      end
       receiver_value = @receiver_type.to_symbolic_call(size: size)
       args, kwargs, block = @method_type.arguments_to_symbolic_call(size: size)
       # @type var symbolic_call: symbolic_call
