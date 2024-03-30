@@ -2,8 +2,8 @@
 
 module RaaP
   class MethodProperty
-    class Stats < Struct.new(:success, :skip, :exception)
-      def initialize(success: 0, skip: 0, exception: 0)
+    class Stats < Struct.new(:success, :skip, :exception, :break)
+      def initialize(success: 0, skip: 0, exception: 0, break: false)
         super
       end
     end
@@ -28,7 +28,8 @@ module RaaP
           end
         end
       rescue Timeout::Error => exception
-        RaaP.logger.warn "Timeout: #{exception}"
+        stats.break = true
+        RaaP.logger.info "Timeout: #{exception}"
       end
       stats
     end
@@ -72,6 +73,7 @@ module RaaP
     rescue NameError => e
       msg = e.name.nil? ? '' : "for `#{BindCall.to_s(e.receiver)}::#{e.name}`"
       RaaP.logger.error("Implementation is not found #{msg} maybe.")
+      stats.break = true
       throw :break
     rescue NotImplementedError => exception
       stats.skip += 1
