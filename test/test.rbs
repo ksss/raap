@@ -8,7 +8,7 @@ module Test
   end
 
   class List[T]
-    attr_reader head: T
+    attr_reader head: T?
     attr_reader tail: List[T]?
 
     def add: (T) -> self
@@ -111,7 +111,8 @@ module Test
     def arg1: (Integer) -> String
   end
 
-  # class Nested
-  #   def initialize: (Nested) -> void
-  # end
+  class Nested[T]
+    def initialize: (T) -> void
+    def nest: (Nested[T]) -> self
+  end
 end

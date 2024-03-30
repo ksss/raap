@@ -85,7 +85,7 @@ module RaaP
       Result::Skip.new(symbolic_call:, exception:)
     rescue SystemStackError => exception
       stats.skip += 1
-      RaaP.logger.warn "Found recursive type definition."
+      RaaP.logger.info "Found recursive type definition."
       Result::Skip.new(symbolic_call:, exception:)
     rescue => exception
       stats.exception += 1
@@ -115,7 +115,7 @@ module RaaP
       begin
         type_check.value(return_value, return_type)
       rescue => e
-        $stderr.puts "Type check fail by `(#{e.class}) #{e.message}`"
+        RaaP.logger.error("Type check fail by `(#{e.class}) #{e.message}`")
         false
       end
     end

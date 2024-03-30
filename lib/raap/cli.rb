@@ -81,6 +81,7 @@ module RaaP
     end
 
     def run
+      i = 0
       @argv.map do |tag|
         case
         when tag.include?('#')
@@ -94,17 +95,17 @@ module RaaP
         end
       end.each do |ret|
         ret.each do |methods|
-          methods.each do |status, method_name, method_type, reason|
-            if status == 1
-              puts "# Fail:"
-              puts
-              puts "def #{method_name}: #{method_type}"
-              puts
-              puts "## Reason"
-              puts
-              puts reason&.string
-              puts
-            end
+          methods.select { |status,| status == 1 }.each do |status, method_name, method_type, reason|
+            i += 1
+            puts "\x1b[41m#\x1b[m #{i}) Failure:"
+            puts
+            puts "def #{method_name}: #{method_type}"
+            puts "  in #{method_type.location}"
+            puts
+            puts "## Reason"
+            puts
+            puts reason&.string
+            puts
           end
         end
       end
@@ -126,8 +127,7 @@ module RaaP
       type_args = type.args
       method = definition.methods[method_name]
       raise "`#{tag}` is not found" unless method
-      puts "# #{type.to_s}"
-      puts
+      RaaP.logger.debug("# #{type}")
       [
         method.method_types.map do |method_type|
           property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
@@ -149,8 +149,7 @@ module RaaP
       type_params_decl = definition.type_params_decl
       type_args = type.args
       raise "`#{tag}` not found" unless method
-      puts "# #{type}"
-      puts
+      RaaP.logger.info("# #{type}")
       [
         method.method_types.map do |method_type|
           property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
@@ -184,8 +183,7 @@ module RaaP
         next unless method.accessibility == :public
         next if method.defined_in != type_name
         next if method_name == :fork || method_name == :spawn # TODO: skip solution
-        puts "# #{type_name}.#{method_name}"
-        puts
+        RaaP.logger.info("# #{type_name}.#{method_name}")
         ret << method.method_types.map do |method_type|
           property(receiver_type: Type.new("singleton(#{type.name})"), type_params_decl:, type_args:, method_type:, method_name:)
         end
@@ -197,8 +195,7 @@ module RaaP
         next unless method.accessibility == :public
         next if method.defined_in != type_name
         next if method_name == :fork || method_name == :spawn # TODO: skip solution
-        puts "# #{type_name}##{method_name}"
-        puts
+        RaaP.logger.info("# #{type_name}##{method_name}")
         ret << method.method_types.map do |method_type|
           property(receiver_type: Type.new(type.name), type_params_decl:, type_args:, method_type:, method_name:)
         end
@@ -214,7 +211,7 @@ module RaaP
       else
         prefix = ''
       end
-      puts "## def #{prefix}#{method_name}: #{method_type}"
+      RaaP.logger.info("## def #{prefix}#{method_name}: #{method_type}")
       status = 0
       reason = nil
       stats = MethodProperty.new(
@@ -250,18 +247,17 @@ module RaaP
           reason.puts "```"
           reason.puts SymbolicCaller.new(f.symbolic_call).to_lines.join("\n")
           reason.puts "```"
-          puts reason.string
           status = 1
           throw :break
         in Result::Skip => s
           print 'S'
-          RaaP.logger.debug { PP.pp(s.symbolic_call, ''.dup) }
-          RaaP.logger.debug("Skip: [#{s.exception.class}] #{s.exception.message}")
+          RaaP.logger.debug { "\n```\n#{SymbolicCaller.new(s.symbolic_call).to_lines.join("\n")}\n```" }
+          RaaP.logger.debug("Skip: #{s.exception.detailed_message}")
           RaaP.logger.debug(s.exception.backtrace.join("\n"))
         in Result::Exception => e
           print 'E'
-          RaaP.logger.debug { PP.pp(e.symbolic_call, ''.dup) }
-          RaaP.logger.debug("Exception: [#{e.exception.class}] #{e.exception.message}")
+          RaaP.logger.debug { "\n```\n#{SymbolicCaller.new(e.symbolic_call).to_lines.join("\n")}\n```" }
+          RaaP.logger.debug("Exception: #{e.exception.detailed_message}")
           RaaP.logger.debug(e.exception.backtrace.join("\n"))
         end
       end
@@ -273,6 +269,7 @@ module RaaP
         reason = StringIO.new
         reason.puts "Never succeeded => #{stats_log}"
       end
+      puts
       [status, method_name, method_type, reason]
     end
   end

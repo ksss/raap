@@ -140,6 +140,12 @@ module Test
   end
 
   class Nested
-    def initialize(nested) = @nested = nested
+    def initialize(t)
+      @t = t
+    end
+
+    def nest(nt)
+      self
+    end
   end
 end
