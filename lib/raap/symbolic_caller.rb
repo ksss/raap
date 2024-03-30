@@ -121,12 +121,11 @@ module RaaP
         args = _walk(args, false, &block) if !args.empty?
         kwargs = _walk(kwargs, false, &block) if !kwargs.empty?
         block.call [:call, receiver, method_name, args, kwargs, b], is_last
-      in Var
-        symbolic_call.name
       in Array
         symbolic_call.map { |sc| _walk(sc, false, &block) }
       in Hash
-        symbolic_call.transform_values { |sc| _walk(sc, false, &block) }
+        symbolic_call.transform_keys { |k| _walk(k, false, &block) }
+                     .transform_values! { |v| _walk(v, false, &block) }
       else
         symbolic_call
       end
