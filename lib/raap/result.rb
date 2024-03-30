@@ -5,7 +5,14 @@ module RaaP
     module CalledStr
       def called_str
         scr = SymbolicCaller.new(symbolic_call)
-        "#{scr.call_str} -> #{return_value.inspect}[#{return_value.class}]"
+        return_type =
+          case return_value
+          when nil then ''
+          when true, false then 'bool'
+          else
+            BindCall.class(return_value)
+          end
+        "#{scr.call_str} -> #{BindCall.inspect(return_value)}[#{return_type}]"
       end
     end
 
