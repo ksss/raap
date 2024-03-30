@@ -11,18 +11,28 @@ module RaaP
       def public_send(...) = ::Kernel.instance_method(:public_send).bind_call(...)
 
       def class(obj)
-        if respond_to?(obj, :class)
-          obj.class
-        else
+        if instance_of?(obj, BasicObject)
           ::Kernel.instance_method(:class).bind_call(obj)
+        else
+          obj.class
         end
       end
 
       def inspect(obj)
-        if respond_to?(obj, :inspect)
-          obj.inspect
-        else
+        if instance_of?(obj, BasicObject)
           ::Kernel.instance_method(:inspect).bind_call(obj)
+        else
+          case obj
+          when Hash
+            body = obj.map do |k, v|
+              "#{inspect(k)} => #{inspect(v)}"
+            end
+            "{#{body.join(', ')}}"
+          when Array
+            "[#{obj.map { |o| inspect(o) }.join(', ')}]"
+          else
+            obj.inspect
+          end
         end
       end
     end
