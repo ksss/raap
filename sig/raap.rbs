@@ -83,6 +83,7 @@ module RaaP
       attr_accessor success: Integer
       attr_accessor skip: Integer
       attr_accessor exception: Integer
+      attr_accessor break: bool
     end
 
     @receiver_type: Type
