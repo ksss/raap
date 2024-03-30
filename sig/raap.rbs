@@ -61,7 +61,7 @@ module RaaP
     def run_by_singleton: (tag: String) -> Array[Array[property_result]]
     def run_by_type_name: (tag: String) -> Array[Array[property_result]]
     def run_by_type_name_with_search: (tag: String) -> Array[Array[property_result]]
-    def property: (receiver_type: Type, type_params_decl: Array[::RBS::AST::TypeParam], method_name: Symbol, method_type: ::RBS::MethodType) -> property_result
+    def property: (receiver_type: Type, type_params_decl: Array[::RBS::AST::TypeParam], type_args: Array[::RBS::Types::t], method_name: Symbol, method_type: ::RBS::MethodType) -> property_result
   end
 
   class FunctionType

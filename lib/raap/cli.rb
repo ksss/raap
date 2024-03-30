@@ -123,13 +123,14 @@ module RaaP
       method_name = m.to_sym
       definition = RBS.builder.build_instance(type.name)
       type_params_decl = definition.type_params_decl
+      type_args = type.args
       method = definition.methods[method_name]
       raise "`#{tag}` is not found" unless method
       puts "# #{type.to_s}"
       puts
       [
         method.method_types.map do |method_type|
-          property(receiver_type:, type_params_decl:, method_type:, method_name:)
+          property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
         end
       ]
     end
@@ -146,12 +147,13 @@ module RaaP
       definition = RBS.builder.build_singleton(type.name)
       method = definition.methods[method_name]
       type_params_decl = definition.type_params_decl
+      type_args = type.args
       raise "`#{tag}` not found" unless method
       puts "# #{type}"
       puts
       [
         method.method_types.map do |method_type|
-          property(receiver_type:, type_params_decl:, method_type:, method_name:)
+          property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
         end
       ]
     end
@@ -172,6 +174,7 @@ module RaaP
       type = __skip__ = type
       raise "cannot specified #{type.class}" unless type.respond_to?(:name)
       type_name = type.name.absolute!
+      type_args = type.args
 
       ret = []
 
@@ -184,7 +187,7 @@ module RaaP
         puts "# #{type_name}.#{method_name}"
         puts
         ret << method.method_types.map do |method_type|
-          property(receiver_type: Type.new("singleton(#{type})"), type_params_decl:, method_type:, method_name:)
+          property(receiver_type: Type.new("singleton(#{type.name})"), type_params_decl:, type_args:, method_type:, method_name:)
         end
       end
 
@@ -197,21 +200,19 @@ module RaaP
         puts "# #{type_name}##{method_name}"
         puts
         ret << method.method_types.map do |method_type|
-          property(receiver_type: Type.new(type.to_s), type_params_decl:, method_type:, method_name:)
+          property(receiver_type: Type.new(type.name), type_params_decl:, type_args:, method_type:, method_name:)
         end
       end
 
       ret
     end
 
-    def property(receiver_type:, type_params_decl:, method_type:, method_name:)
+    def property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
       rtype = __skip__ = receiver_type.type
       if receiver_type.type.instance_of?(::RBS::Types::ClassSingleton)
         prefix = 'self.'
-        type_args = []
       else
         prefix = ''
-        type_args = rtype.args
       end
       puts "## def #{prefix}#{method_name}: #{method_type}"
       status = 0

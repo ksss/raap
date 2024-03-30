@@ -12,4 +12,13 @@ class TestExe < Minitest::Test
       "Test::*"
     ]).load.run
   end
+
+  def test_exe_with_args
+    RaaP::CLI.new([
+      "--log-level", "info",
+      "--timeout", "1",
+      "--size-by", "1",
+      "Test::List[Integer]",
+    ]).load.run
+  end
 end
