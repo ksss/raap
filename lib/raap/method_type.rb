@@ -16,7 +16,9 @@ module RaaP
         else
           raise "bad method #{method}"
         end
-      ts = TypeSubstitution.new(type_params_decl + rbs.type_params, type_args)
+
+      params = (type_params_decl + rbs.type_params).uniq
+      ts = TypeSubstitution.new(params, type_args)
 
       @rbs = ts.method_type_sub(rbs, self_type:, instance_type:, class_type:)
       @fun_type = FunctionType.new(@rbs.type)
