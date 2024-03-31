@@ -14,7 +14,7 @@ module RaaP
         elsif bound.upper_bound
           [bound.name, bound.upper_bound]
         else
-          [bound.name, ::RBS::Types::Bases::Top.new(location: nil)]
+          [bound.name, ::RBS::Types::Variable.new(name: bound.name, location: nil)]
         end
       end
       ::RBS::Substitution.build(bound_map.keys, bound_map.values)

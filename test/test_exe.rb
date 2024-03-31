@@ -4,7 +4,7 @@ require "test_helper"
 require "test"
 
 class TestExe < Minitest::Test
-  def test_exe
+  def test_exe_with_search
     RaaP::CLI.new([
       "--log-level", "info",
       "--timeout", "1",
