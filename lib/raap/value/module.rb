@@ -6,8 +6,11 @@ module RaaP
       attr_reader :type
 
       def initialize(type)
-        @type = type
-        const = ::Object.const_get(type.name.absolute!.to_s)
+        @type = type.is_a?(String) ? RBS.parse_type(type) : type
+        unless @type.instance_of?(::RBS::Types::ClassInstance)
+          raise ::TypeError, "not a module type: #{@type}"
+        end
+        const = ::Object.const_get(@type.name.absolute!.to_s)
         extend(const)
       end
 

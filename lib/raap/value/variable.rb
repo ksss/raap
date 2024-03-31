@@ -4,7 +4,16 @@ module RaaP
       attr_reader :type
 
       def initialize(type)
-        @type = type
+        @type =
+          if type.respond_to?(:to_sym)
+            # @type var type: String | Symbol
+            ::RBS::Types::Variable.new(name: type.to_sym, location: nil)
+          else
+            type
+          end
+        unless @type.instance_of?(::RBS::Types::Variable)
+          ::Kernel.raise ::TypeError, "not a variable type: #{@type}"
+        end
       end
 
       def inspect = "#<var #{type}>"

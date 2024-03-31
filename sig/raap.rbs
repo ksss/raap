@@ -274,7 +274,7 @@ module RaaP
       @size: Integer
       @definition: ::RBS::Definition
 
-      def initialize: (String | ::RBS::Types::Interface, ?size: Integer) -> void
+      def initialize: (String | ::RBS::Types::Interface | String, ?size: Integer) -> void
       def inspect: () -> String
       def class: () -> class
     end
@@ -284,7 +284,7 @@ module RaaP
       @children: Array[Type]
       @size: Integer
 
-      def initialize: (::RBS::Types::Intersection, size: Integer) -> void
+      def initialize: (::RBS::Types::Intersection | String, ?size: Integer) -> void
       def inspect: () -> String
       def class: () -> class
     end
@@ -292,7 +292,7 @@ module RaaP
     class Module
       attr_reader type: ::RBS::Types::ClassInstance
 
-      def initialize: (::RBS::Types::ClassInstance) -> void
+      def initialize: (::RBS::Types::ClassInstance | String) -> void
       def inspect: () -> String
       def class: () -> class
     end
@@ -305,7 +305,7 @@ module RaaP
     class Variable < BasicObject
       attr_reader type: ::RBS::Types::Variable
 
-      def initialize: (::RBS::Types::Variable) -> void
+      def initialize: (::RBS::Types::Variable | String | Symbol) -> void
       def inspect: () -> String
       def class: () -> class
     end

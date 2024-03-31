@@ -5,6 +5,9 @@ module RaaP
     class Interface < BasicObject
       def initialize(type, size: 3, self_type: nil, instance_type: nil, class_type: nil)
         @type = type.is_a?(::String) ? RBS.parse_type(type) : type
+        unless @type.instance_of?(::RBS::Types::Interface)
+          ::Kernel.raise ::TypeError, "not an interface type: #{@type}"
+        end
         @size = size
 
         definition = RBS.builder.build_interface(@type.name.absolute!)

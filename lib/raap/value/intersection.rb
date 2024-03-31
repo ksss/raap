@@ -3,14 +3,17 @@
 module RaaP
   module Value
     class Intersection < BasicObject
-      def initialize(type, size:)
-        @type = type
-        @children = type.types.map { |t| Type.new(t).pick(size: size) }
+      def initialize(type, size: 3)
+        @type = type.is_a?(::String) ? RBS.parse_type(type) : type
+        unless @type.instance_of?(::RBS::Types::Intersection)
+          ::Kernel.raise ::TypeError, "not an intersection type: #{@type}"
+        end
+        @children = @type.types.map { |t| Type.new(t).pick(size:) }
         @size = size
       end
 
       def inspect
-        "#<intersection @type=#{@type.to_s.inspect} @size=#{@size.inspect}>"
+        "#<intersection @type.to_s=#{@type.to_s.inspect} @size=#{@size.inspect}>"
       end
 
       def class

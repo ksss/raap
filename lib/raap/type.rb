@@ -99,13 +99,11 @@ module RaaP
       when ::RBS::Types::Union
         type.types.sample&.then { |t| Type.new(t).to_symbolic_call(size:) }
       when ::RBS::Types::Intersection
-        [:call, Value::Intersection, :new, [type], {size:}, nil]
+        [:call, Value::Intersection, :new, [type.to_s], {size:}, nil]
       when ::RBS::Types::Interface
-        typename = [:call, Kernel, :TypeName, [type.name.absolute!.to_s], {}, nil]
-        sc = [:call, ::RBS::Types::Interface, :new, [], {name: typename, args: type.args, location: nil}, nil]
-        [:call, Value::Interface, :new, [sc], {size:}, nil]
+        [:call, Value::Interface, :new, [type.to_s], {size:}, nil]
       when ::RBS::Types::Variable
-        [:call, Value::Variable, :new, [type], {}, nil]
+        [:call, Value::Variable, :new, [type.to_s], {}, nil]
       when ::RBS::Types::Bases::Void
         [:call, Value::Void, :new, [], {}, nil]
       when ::RBS::Types::Bases::Top
