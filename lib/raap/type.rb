@@ -19,7 +19,6 @@ module RaaP
 
     GENERATORS = {}
     SIMPLE_SOURCE = ('a'..'z').to_a << '_'
-    RECURSION = Hash.new { |h, k| h[k] = { count: 0, logged: false } }
 
     # Type.register "::Integer::positive" { sized { |size| size } }
     def self.register(type_name, &block)

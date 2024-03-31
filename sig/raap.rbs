@@ -226,7 +226,6 @@ module RaaP
 
     GENERATORS: Hash[String, ^() -> Sized[untyped]]
     SIMPLE_SOURCE: Array[String]
-    RECURSION: Hash[String, :found | :logged]
 
     def self.register: (String) { () [self: instance] -> Sized[untyped] } -> void
     attr_reader type: ::RBS::Types::t
