@@ -85,8 +85,11 @@ module RaaP
     end
 
     def pick(size: 10)
-      symb = to_symbolic_call(size:)
-      SymbolicCaller.new(symb).eval
+      to_symbolic_caller.eval
+    end
+
+    def to_symbolic_caller(size: 10)
+      SymbolicCaller.new(to_symbolic_call(size:))
     end
 
     def to_symbolic_call(size: 10)
@@ -103,7 +106,7 @@ module RaaP
       when ::RBS::Types::Interface
         [:call, Value::Interface, :new, [type.to_s], {size:}, nil]
       when ::RBS::Types::Variable
-        [:call, Value::Variable, :new, [type.to_s], {}, nil]
+        [:call, Value::Variable, :new, [type.to_s.to_sym], {}, nil]
       when ::RBS::Types::Bases::Void
         [:call, Value::Void, :new, [], {}, nil]
       when ::RBS::Types::Bases::Top
@@ -176,7 +179,7 @@ module RaaP
           raise
         end
       else
-        [:call, Value::Module, :new, [type], {}, nil]
+        [:call, Value::Module, :new, [type.to_s], {}, nil]
       end
     end
 

@@ -239,6 +239,7 @@ module RaaP
 
     # Basic API for materializing values
     def pick: (?size: Integer) -> untyped
+    def to_symbolic_caller: (?size: Integer) -> SymbolicCaller
     def to_symbolic_call: (?size: Integer) -> untyped
     def sized: [T] () { (Integer size) -> T } -> Sized[T]
 

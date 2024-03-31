@@ -79,10 +79,8 @@ class TestType < Minitest::Test
   #   end
   # end
 
-  def test_pick_module
-    assert Kernel === Type.new("Kernel").pick
-    assert Enumerable === Type.new("Enumerable").pick
-    assert Comparable === Type.new("Comparable").pick
+  def test_bottom
+    assert_equal ["RaaP::Value::Bottom.new()"], Type.new("bot").to_symbolic_caller.to_lines
   end
 
   def test_interface
@@ -92,6 +90,9 @@ class TestType < Minitest::Test
     end
     assert 3, a.length
     assert a.all? { |i| i.is_a?(Integer) }
+
+    assert_equal ["RaaP::Value::Interface.new('_Each[Integer]', size: 3)"],
+                 Type.new("_Each[Integer]").to_symbolic_caller(size: 3).to_lines
   end
 
   def test_intersection
@@ -101,6 +102,30 @@ class TestType < Minitest::Test
       a << i
     end
     assert a.all? { |i| i.instance_of?(Integer) }
+
+    assert_equal ["RaaP::Value::Intersection.new('_Each[Integer] & Object', size: 3)"],
+                 Type.new("_Each[Integer] & Object").to_symbolic_caller(size: 3).to_lines
+  end
+
+  def test_module
+    assert Kernel === Type.new("Kernel").pick
+    assert Enumerable === Type.new("Enumerable").pick
+    assert Comparable === Type.new("Comparable").pick
+    assert_equal ["RaaP::Value::Module.new('Comparable')"],
+                 Type.new("Comparable").to_symbolic_caller.to_lines
+  end
+
+  def test_variable
+    t = ::RBS::Types::Variable.new(name: :T, location: nil)
+    assert_equal ["RaaP::Value::Variable.new(:T)"], Type.new(t).to_symbolic_caller.to_lines
+  end
+
+  def test_top
+    assert_equal ["RaaP::Value::Top.new()"], Type.new("top").to_symbolic_caller.to_lines
+  end
+
+  def test_void
+    assert_equal ["RaaP::Value::Void.new()"], Type.new("void").to_symbolic_caller.to_lines
   end
 
   def test_union
