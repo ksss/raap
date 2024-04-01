@@ -261,6 +261,7 @@ module RaaP
           RaaP.logger.debug(e.exception.backtrace.join("\n"))
         end
       end
+      puts
       stats_log = "success: #{stats.success}, skip: #{stats.skip}, exception: #{stats.exception}"
       RaaP.logger.info(stats_log)
 
@@ -269,7 +270,7 @@ module RaaP
         reason = StringIO.new
         reason.puts "Never succeeded => #{stats_log}"
       end
-      puts
+
       [status, method_name, method_type, reason]
     end
   end

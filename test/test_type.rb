@@ -144,6 +144,23 @@ class TestType < Minitest::Test
     end
   end
 
+  def test_hash
+    forall("Hash") do |hash|
+      assert hash.instance_of?(Hash)
+    end
+
+    forall("Hash[Symbol]") do |hash|
+      assert hash.instance_of?(Hash)
+      assert hash.keys.all? { |key| key.instance_of?(Symbol) }
+    end
+
+    forall("Hash[Symbol, Integer]") do |hash|
+      assert hash.instance_of?(Hash)
+      assert hash.keys.all? { |key| key.instance_of?(Symbol) }
+      assert hash.values.all? { |key| key.instance_of?(Integer) }
+    end
+  end
+
   def test_hash_with_union
     forall("Hash[Symbol, Test::A | Test::B]") do |hash|
       assert hash.instance_of?(Hash)

@@ -260,7 +260,8 @@ module RaaP
     def array: (Type) -> Sized[Array[untyped]]
     def encoding: () -> Sized[symbolic_call]
     def bool: () -> Sized[bool]
-    def untyped: () -> Sized[untyped]
+    def random: () -> Type
+    def random_without_basic_object: () -> Type
     def temp_method_object: () -> ::Method
   end
 

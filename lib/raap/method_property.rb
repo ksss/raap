@@ -78,6 +78,7 @@ module RaaP
     rescue NameError => e
       msg = e.name.nil? ? '' : "for `#{BindCall.to_s(e.receiver)}::#{e.name}`"
       RaaP.logger.error("Implementation is not found #{msg} maybe.")
+      RaaP.logger.debug(e.backtrace&.join("\n"))
       stats.break = true
       throw :break
     rescue NotImplementedError => exception

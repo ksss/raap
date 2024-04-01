@@ -163,9 +163,9 @@ module RaaP
       when Array
         "[#{obj.map { |o| printable(o) }.join(', ')}]"
       when Module
-        BindCall.name(obj) or raise
+        BindCall.name(obj) or raise "`#class` method returns nil"
       else
-        var_name(obj.class)
+        var_name(BindCall.class(obj))
       end
     end
   end

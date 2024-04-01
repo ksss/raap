@@ -40,11 +40,12 @@ module RaaP
     register("::Float") { float }
     register("::Hash") do
       sized do |size|
+        csize = size / 2
+        type = __skip__ = type
+        key_type = type.args[0] ? Type.new(type.args[0]) : random_without_basic_object
+        value_type = type.args[1] ? Type.new(type.args[1]) : random_without_basic_object
         Array.new(integer.pick(size: size).abs).to_h do
-          _type = __skip__ = type
-          k = _type.args[0] || 'untyped'
-          v = _type.args[1] || 'untyped'
-          [Type.new(k).to_symbolic_call(size: size / 2), Type.new(v).to_symbolic_call(size: size / 2)]
+          [key_type.to_symbolic_call(size: csize), value_type.to_symbolic_call(size: csize)]
         end
       end
     end
@@ -145,7 +146,7 @@ module RaaP
       when ::RBS::Types::Bases::Bool
         bool.pick(size: size)
       when ::RBS::Types::Bases::Any
-        untyped.pick(size: size)
+        random.pick(size: size)
       when ::RBS::Types::Bases::Nil
         nil
       else
@@ -305,17 +306,15 @@ module RaaP
       end
     end
 
-    def untyped
-      case Random.rand(9)
-      in 0 then integer
-      in 1 then float
-      in 2 then rational
-      in 3 then complex
-      in 4 then string
-      in 5 then symbol
-      in 6 then bool
-      in 7 then encoding
-      in 8 then sized { [:call, BasicObject, :new, [], {}, nil] }
+    def random
+      Type.new("Integer | Float | Rational | Complex | String | Symbol | bool | Encoding | BasicObject")
+    end
+
+    def random_without_basic_object
+      random.tap do |r|
+        # @type var type: ::RBS::Types::Union
+        type = r.type
+        type.types.reject! { |type| type.to_s == "BasicObject" }
       end
     end
 
