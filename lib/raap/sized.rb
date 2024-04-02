@@ -4,6 +4,7 @@ module RaaP
   class Sized
     def initialize(&block)
       raise LocalJumpError, "no block given" unless block
+
       @block = block
       @such_that = nil
     end
@@ -28,6 +29,7 @@ module RaaP
         picked = yield(skip)
         such_that = @such_that
         return picked if such_that.nil? || such_that.call(picked)
+
         skip += 1
         raise "too many skips" unless skip < 100
       end

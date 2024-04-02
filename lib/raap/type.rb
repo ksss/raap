@@ -23,6 +23,7 @@ module RaaP
     # Type.register "::Integer::positive" { sized { |size| size } }
     def self.register(type_name, &block)
       raise ArgumentError, "block is required" unless block
+
       GENERATORS[type_name] = __skip__ = block
     end
 
@@ -67,7 +68,7 @@ module RaaP
     register("::NilClass") { sized { nil } }
     register("::Proc") { sized { Proc.new {} } }
     register("::Rational") { rational }
-    register("::Regexp") { sized { |size| Regexp.new(string.pick(size: size)) } }
+    register("::Regexp") { sized { |size| Regexp.new(string.pick(size:)) } }
     register("::String") { string }
     register("::Struct") { sized { Struct.new(:foo, :bar).new } }
     register("::Symbol") { symbol }
@@ -91,14 +92,14 @@ module RaaP
 
     def sized(&block)
       Sized.new(&block).tap do |sized|
-        if s = @such_that
+        if (s = @such_that)
           sized.such_that(&s)
         end
       end
     end
 
     def pick(size: 10)
-      to_symbolic_caller.eval
+      to_symbolic_caller(size:).eval
     end
 
     def to_symbolic_caller(size: 10)
@@ -109,17 +110,24 @@ module RaaP
       raise TypeError, "size should be Integer" unless size.is_a?(Integer)
       raise ArgumentError, "negative size" if size.negative?
 
+      stringable =
+        if type.each_type.find { |t| t.instance_of?(::RBS::Types::Variable) }
+          type
+        else
+          type.to_s
+        end
+
       case type
       when ::RBS::Types::Tuple
         type.types.map { |t| Type.new(t).to_symbolic_call(size:) }
       when ::RBS::Types::Union
         type.types.sample&.then { |t| Type.new(t).to_symbolic_call(size:) }
       when ::RBS::Types::Intersection
-        [:call, Value::Intersection, :new, [type.to_s], {size:}, nil]
+        [:call, Value::Intersection, :new, [stringable], { size: }, nil]
       when ::RBS::Types::Interface
-        [:call, Value::Interface, :new, [type.to_s], {size:}, nil]
+        [:call, Value::Interface, :new, [stringable], { size: }, nil]
       when ::RBS::Types::Variable
-        [:call, Value::Variable, :new, [type.to_s.to_sym], {}, nil]
+        [:call, Value::Variable, :new, [stringable], {}, nil]
       when ::RBS::Types::Bases::Void
         [:call, Value::Void, :new, [], {}, nil]
       when ::RBS::Types::Bases::Top
@@ -146,7 +154,7 @@ module RaaP
         Object.const_get(type.name.to_s)
       when ::RBS::Types::ClassInstance
         case gen = GENERATORS[type.name.absolute!.to_s]
-        in Proc then instance_exec(&gen).pick(size: size)
+        in Proc then instance_exec(&gen).pick(size:)
         in nil then to_symbolic_call_from_initialize(type, size:)
         end
       when ::RBS::Types::Record
@@ -156,13 +164,13 @@ module RaaP
       when ::RBS::Types::Literal
         type.literal
       when ::RBS::Types::Bases::Bool
-        bool.pick(size: size)
+        bool.pick(size:)
       when ::RBS::Types::Bases::Any
         Type.random.to_symbolic_call(size:)
       when ::RBS::Types::Bases::Nil
         nil
       else
-        raise "not implemented #{type.to_s}"
+        raise "not implemented #{type}"
       end
     end
 
@@ -178,13 +186,12 @@ module RaaP
         rbs_method_type = snew.method_types.sample or raise
         type_params = definition.type_params_decl.concat(rbs_method_type.type_params.drop(definition.type_params_decl.length))
         ts = TypeSubstitution.new(type_params, type.args)
-        maped_rbs_method_type = rbs_method_type
         maped_rbs_method_type = ts.method_type_sub(rbs_method_type)
         method_type = MethodType.new(maped_rbs_method_type)
 
         begin
-          try(times: 5, size: size) do |size|
-            args, kwargs, block = method_type.arguments_to_symbolic_call(size: size)
+          try(times: 5, size:) do |size|
+            args, kwargs, block = method_type.arguments_to_symbolic_call(size:)
             [:call, const, :new, args, kwargs, block]
           end
         rescue
@@ -233,7 +240,7 @@ module RaaP
     end
 
     def integer
-      sized { |size| float.pick(size: size).round }
+      sized { |size| float.pick(size:).round }
     end
 
     def none_zero_integer
@@ -257,16 +264,16 @@ module RaaP
 
     def rational
       sized do |size|
-        a = integer.pick(size: size)
-        b = none_zero_integer.pick(size: size)
+        a = integer.pick(size:)
+        b = none_zero_integer.pick(size:)
         [:call, Kernel, :Rational, [a, b], {}, nil]
       end
     end
 
     def complex
       sized do |size|
-        a = integer.pick(size: size)
-        b = none_zero_integer.pick(size: size)
+        a = integer.pick(size:)
+        b = none_zero_integer.pick(size:)
         [:call, Kernel, :Complex, [a, b], {}, nil]
       end
     end
@@ -293,13 +300,13 @@ module RaaP
 
     def symbol
       sized do |size|
-        string.pick(size: size).to_sym
+        string.pick(size:).to_sym
       end
     end
 
     def array(type)
       sized do |size|
-        Array.new(integer.pick(size: size).abs) do
+        Array.new(integer.pick(size:).abs) do
           type.to_symbolic_call(size: size / 2)
         end
       end
@@ -308,7 +315,7 @@ module RaaP
     def encoding
       sized do
         e = Encoding.list.sample or raise
-        [:call, Encoding, :find, [e.name], {} , nil]
+        [:call, Encoding, :find, [e.name], {}, nil]
       end
     end
 
@@ -321,7 +328,7 @@ module RaaP
     def temp_method_object
       o = Object.new
       m = 6.times.map { SIMPLE_SOURCE.sample }.join
-      o.define_singleton_method(m) { }
+      o.define_singleton_method(m) {}
       o.method(m)
     end
   end

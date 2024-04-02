@@ -57,8 +57,8 @@ class TestType < Minitest::Test
   def test_pick_hash
     forall("Hash[Symbol, Integer]") do |hash|
       assert hash.instance_of?(Hash)
-      assert hash.keys.all? { |key| key.instance_of?(Symbol) }
-      assert hash.values.all? { |value| value.instance_of?(Integer) }
+      assert(hash.keys.all? { |key| key.instance_of?(Symbol) })
+      assert(hash.values.all? { |value| value.instance_of?(Integer) })
     end
   end
 
@@ -89,7 +89,7 @@ class TestType < Minitest::Test
       a << i
     end
     assert 3, a.length
-    assert a.all? { |i| i.is_a?(Integer) }
+    assert(a.all? { |i| i.is_a?(Integer) })
 
     assert_equal ["RaaP::Value::Interface.new('_Each[Integer]', size: 3)"],
                  Type.new("_Each[Integer]").to_symbolic_caller(size: 3).to_lines
@@ -101,7 +101,7 @@ class TestType < Minitest::Test
     o.each do |i|
       a << i
     end
-    assert a.all? { |i| i.instance_of?(Integer) }
+    assert(a.all? { |i| i.instance_of?(Integer) })
 
     assert_equal ["RaaP::Value::Intersection.new('_Each[Integer] & Object', size: 3)"],
                  Type.new("_Each[Integer] & Object").to_symbolic_caller(size: 3).to_lines
@@ -117,19 +117,22 @@ class TestType < Minitest::Test
 
   def test_variable
     t = ::RBS::Types::Variable.new(name: :T, location: nil)
-    assert_equal ["RaaP::Value::Variable.new(:T)"], Type.new(t).to_symbolic_caller.to_lines
+    assert RaaP::BindCall.instance_of?(Type.new(t).pick, RaaP::Value::Variable)
+    assert_equal ["RaaP::Value::Variable.new('T')"], Type.new(t).to_symbolic_caller.to_lines
   end
 
   def test_top
+    assert RaaP::BindCall.instance_of?(Type.new("top").pick, RaaP::Value::Top)
     assert_equal ["RaaP::Value::Top.new()"], Type.new("top").to_symbolic_caller.to_lines
   end
 
   def test_void
+    assert RaaP::BindCall.instance_of?(Type.new("void").pick, RaaP::Value::Void)
     assert_equal ["RaaP::Value::Void.new()"], Type.new("void").to_symbolic_caller.to_lines
   end
 
   def test_union
-    forall("Test::A | Array[Test::B] | Hash[Symbol, String | Test::C]") do |o|
+    forall("Test::A | Array[Test::B] | Hash[Symbol, String | Test::C]") do
       true
     end
   end
@@ -138,7 +141,7 @@ class TestType < Minitest::Test
     forall("Array[Test::A | Test::B]") do |array|
       assert array.instance_of?(Array)
       if array.length > 0
-        assert array.any? { |v| v.instance_of?(Test::A) || v.instance_of?(Test::B) }
+        assert(array.any? { |v| v.instance_of?(Test::A) || v.instance_of?(Test::B) })
       end
       true
     end
@@ -151,13 +154,13 @@ class TestType < Minitest::Test
 
     forall("Hash[Symbol]") do |hash|
       assert hash.instance_of?(Hash)
-      assert hash.keys.all? { |key| key.instance_of?(Symbol) }
+      assert(hash.keys.all? { |key| key.instance_of?(Symbol) })
     end
 
     forall("Hash[Symbol, Integer]") do |hash|
       assert hash.instance_of?(Hash)
-      assert hash.keys.all? { |key| key.instance_of?(Symbol) }
-      assert hash.values.all? { |key| key.instance_of?(Integer) }
+      assert(hash.keys.all? { |key| key.instance_of?(Symbol) })
+      assert(hash.values.all? { |key| key.instance_of?(Integer) })
     end
   end
 
@@ -165,7 +168,7 @@ class TestType < Minitest::Test
     forall("Hash[Symbol, Test::A | Test::B]") do |hash|
       assert hash.instance_of?(Hash)
       if hash.length > 0
-        assert hash.values.any? { |v| v.instance_of?(Test::A) || v.instance_of?(Test::B) }
+        assert(hash.values.any? { |v| v.instance_of?(Test::A) || v.instance_of?(Test::B) })
       end
       true
     end
@@ -200,10 +203,6 @@ class TestType < Minitest::Test
     assert_nil Type.new('nil').pick
     assert_equal true, Type.new('true').pick
     assert_equal false, Type.new('false').pick
-  end
-
-  def test_top
-    assert RaaP::BindCall.instance_of?(Type.new("top").pick, RaaP::Value::Top)
   end
 
   # TODO

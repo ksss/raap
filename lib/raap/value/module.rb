@@ -10,6 +10,7 @@ module RaaP
         unless @type.instance_of?(::RBS::Types::ClassInstance)
           raise ::TypeError, "not a module type: #{@type}"
         end
+
         const = ::Object.const_get(@type.name.absolute!.to_s)
         extend(const)
       end

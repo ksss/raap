@@ -38,7 +38,7 @@ module RaaP
       sampled_optional_positionals = @fun.optional_positionals.sample(Random.rand(@fun.optional_positionals.length + 1))
       opts = sampled_optional_positionals.map { |param| Type.new(param.type) }
       rest = []
-      if param = @fun.rest_positionals
+      if (param = @fun.rest_positionals)
         rest = Array.new(Random.rand(0..3)) { Type.new(param.type) }
       end
       [reqs, opts, rest, tras].flatten
@@ -49,7 +49,7 @@ module RaaP
       rand = Random.rand(@fun.optional_keywords.length + 1)
       opts = @fun.optional_keywords.to_a.sample(rand).to_h { |name, param| [name, Type.new(param.type)] }
       kwargs = reqs.to_h.merge(opts)
-      if param = @fun.rest_keywords
+      if (param = @fun.rest_keywords)
         keys = Array.new(Random.rand(0..3)) do
           random_key = nil
           loop do

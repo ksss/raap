@@ -36,6 +36,7 @@ module RaaP
       if self_type.nil? && instance_type.nil? && class_type.nil?
         return search
       end
+
       search.map_type do |ty|
         case ty
         when ::RBS::Types::Bases::Self

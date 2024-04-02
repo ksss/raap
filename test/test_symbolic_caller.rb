@@ -24,13 +24,13 @@ class TestSymbolicCaller < Minitest::Test
 
   def tests_eval_accessibility
     sc = [:call,
-           [:call, Test::Accecibility, :new, [], {}, nil],
-           :public_method, [], {}, nil]
+          [:call, Test::Accecibility, :new, [], {}, nil],
+          :public_method, [], {}, nil]
     assert_nil SymbolicCaller.new(sc).eval
 
     sc = [:call,
-           [:call, Test::Accecibility, :new, [], {}, nil],
-           :private_method, [], {}, nil]
+          [:call, Test::Accecibility, :new, [], {}, nil],
+          :private_method, [], {}, nil]
     assert_raises(NoMethodError) { SymbolicCaller.new(sc).eval }
   end
 
@@ -67,7 +67,8 @@ class TestSymbolicCaller < Minitest::Test
     sc = SymbolicCaller.new(
       [:call, Test::A, :singleton_method, [
         [:call, Test::B, :new, [], {}, nil]
-      ], {}, nil])
+      ], {}, nil]
+    )
     assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
       test_b = Test::B.new()
       Test::A.singleton_method(test_b)
@@ -100,7 +101,7 @@ class TestSymbolicCaller < Minitest::Test
   end
 
   def test_to_lines_with_hash
-    sc = SymbolicCaller.new([:call, {a: {b: {c: 123}}}, :keys, [], {}, nil])
+    sc = SymbolicCaller.new([:call, { a: { b: { c: 123 } } }, :keys, [], {}, nil])
     assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
       {a: {b: {c: 123}}}.keys()
     CODE
@@ -110,8 +111,8 @@ class TestSymbolicCaller < Minitest::Test
       [:call, Test::C, :new, [], {
         a: nil,
         b: {
-          c: [:call, Test::A, :new, [{a: {b: {c: 123}}}], {}, nil],
-          d: { e: [ { f: [:call, Test::B, :new, [], {b: {'b' => 1}}, nil] } ] }
+          c: [:call, Test::A, :new, [{ a: { b: { c: 123 } } }], {}, nil],
+          d: { e: [{ f: [:call, Test::B, :new, [], { b: { 'b' => 1 } }, nil] }] }
         },
       }, nil],
       :run, [], {}, nil
