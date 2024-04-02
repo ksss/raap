@@ -47,7 +47,7 @@ module RaaP
       end
 
       def inspect
-        "#<interface @type=#{@type.to_s} @methods=#{RBS.builder.build_interface(@type.name.absolute!).methods.keys} @size=#{@size}>"
+        "#<interface @type=#{@type} @methods=#{RBS.builder.build_interface(@type.name.absolute!).methods.keys} @size=#{@size}>"
       end
     end
   end

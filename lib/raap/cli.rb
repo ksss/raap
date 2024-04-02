@@ -95,7 +95,7 @@ module RaaP
         end
       end.each do |ret|
         ret.each do |methods|
-          methods.select { |status,| status == 1 }.each do |status, method_name, method_type, reason|
+          methods.select { |status,| status == 1 }.each do |_, method_name, method_type, reason|
             i += 1
             puts "\x1b[41m#\x1b[m #{i}) Failure:"
             puts
@@ -120,6 +120,7 @@ module RaaP
       type = RBS.parse_type(t)
       type = __skip__ = type
       raise "cannot specified #{type}" unless type.respond_to?(:name)
+
       receiver_type = Type.new(type.to_s)
       method_name = m.to_sym
       definition = RBS.builder.build_instance(type.name)
@@ -127,6 +128,7 @@ module RaaP
       type_args = type.args
       method = definition.methods[method_name]
       raise "`#{tag}` is not found" unless method
+
       RaaP.logger.debug("# #{type}")
       [
         method.method_types.map do |method_type|
@@ -141,6 +143,7 @@ module RaaP
       m or raise
       type = RBS.parse_type(t)
       raise "cannot specified #{type.class}" unless type.respond_to?(:name)
+
       type = __skip__ = type
       receiver_type = Type.new("singleton(#{type.name})")
       method_name = m.to_sym
@@ -149,6 +152,7 @@ module RaaP
       type_params_decl = definition.type_params_decl
       type_args = type.args
       raise "`#{tag}` not found" unless method
+
       RaaP.logger.info("# #{type}")
       [
         method.method_types.map do |method_type|
@@ -160,7 +164,7 @@ module RaaP
     def run_by_type_name_with_search(tag:)
       first, _last = tag.split('::')
       ret = []
-      RBS.env.class_decls.each do |name, entry|
+      RBS.env.class_decls.each do |name, _entry|
         if ['', '::'].any? { |pre| name.to_s.match?(/\A#{pre}#{first}\b/) }
           ret << run_by_type_name(tag: name.to_s)
         end
@@ -172,6 +176,7 @@ module RaaP
       type = RBS.parse_type(tag)
       type = __skip__ = type
       raise "cannot specified #{type.class}" unless type.respond_to?(:name)
+
       type_name = type.name.absolute!
       type_args = type.args
 
@@ -183,6 +188,7 @@ module RaaP
         next unless method.accessibility == :public
         next if method.defined_in != type_name
         next if method_name == :fork || method_name == :spawn # TODO: skip solution
+
         RaaP.logger.info("# #{type_name}.#{method_name}")
         ret << method.method_types.map do |method_type|
           property(receiver_type: Type.new("singleton(#{type.name})"), type_params_decl:, type_args:, method_type:, method_name:)
@@ -195,6 +201,7 @@ module RaaP
         next unless method.accessibility == :public
         next if method.defined_in != type_name
         next if method_name == :fork || method_name == :spawn # TODO: skip solution
+
         RaaP.logger.info("# #{type_name}##{method_name}")
         ret << method.method_types.map do |method_type|
           property(receiver_type: Type.new(type.name), type_params_decl:, type_args:, method_type:, method_name:)
@@ -216,7 +223,7 @@ module RaaP
       reason = nil
       stats = MethodProperty.new(
         receiver_type:,
-        method_name: method_name,
+        method_name:,
         method_type: MethodType.new(
           method_type,
           type_params_decl:,
@@ -235,7 +242,7 @@ module RaaP
           RaaP.logger.debug { "Success: #{s.called_str}" }
         in Result::Failure => f
           puts 'F'
-          if e = f.exception
+          if (e = f.exception)
             RaaP.logger.debug { "Failure: [#{e.class}] #{e.message}" }
           end
           RaaP.logger.debug { PP.pp(f.symbolic_call, ''.dup) }

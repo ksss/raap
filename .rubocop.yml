@@ -1,0 +1,21 @@
+AllCops:
+  TargetRubyVersion: 3.3
+
+Style:
+  Enabled: false
+Style/HashSyntax:
+  EnforcedShorthandSyntax: always
+  Enabled: true
+
+Metrics:
+  Enabled: false
+
+Layout:
+  Enabled: true
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+Layout/LineLength:
+  Max: 150
+
+Naming:
+  Enabled: false

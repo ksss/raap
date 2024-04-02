@@ -11,9 +11,13 @@ module RaaP
         method_type = RaaP::MethodType.new(type)
         size_step.each do |size|
           # TODO assert_send_type
-          args, kwargs, _block = method_type.pick_arguments(size: size)
+          args, kwargs, _block = method_type.pick_arguments(size:)
           return_value = yield(*args, **kwargs)
-          assert method_type.check_return(return_value), "return value: #{BindCall.inspect(return_value)}[#{BindCall.class(return_value)}] is not match with `#{method_type.rbs.type.return_type}`"
+          i = BindCall.inspect(return_value)
+          c = BindCall.class(return_value)
+          r = method_type.rbs.type.return_type
+          msg = "return value: #{i}[#{c}] is not match with `#{r}`"
+          assert method_type.check_return(return_value), msg
         end
       else
         # forall("Integer", "String") { |int, str| Foo.new.int_str(int, str) }
@@ -24,7 +28,7 @@ module RaaP
           end
         end
         size_step.each do |size|
-          values = types.map { |type| type.pick(size: size) }
+          values = types.map { |t| t.pick(size:) }
           assert yield(*values)
         end
       end

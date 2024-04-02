@@ -38,7 +38,7 @@ class TestMethodProperty < Minitest::Test
       method_type: MethodType.new("() -> true"),
       size_step: 0...100,
       timeout: 2,
-    ).run do |called|
+    ).run do |_called|
       count += 1
       throw :break
     end

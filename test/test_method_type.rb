@@ -26,6 +26,7 @@ class TestMethodType < Minitest::Test
 
   def test_minitest
     forall("(Integer, sym: Symbol) -> String") do |int, sym:|
+      Test::Meth.new.sym(sym)
       Test::Meth.new.arg1(int)
     end
   end
@@ -33,6 +34,7 @@ class TestMethodType < Minitest::Test
   def test_minitest_fail
     begin
       forall("(Integer, sym: Symbol) -> Integer") do |int, sym:|
+        Test::Meth.new.sym(sym)
         Test::Meth.new.arg1(int)
       end
     rescue Minitest::Assertion => e
@@ -43,10 +45,10 @@ class TestMethodType < Minitest::Test
 
   def test_pick_arguments_with_rest_positionals_and_trailings
     10.times do |size|
-      args, _, _ = MethodType.new("(*Integer, String) -> void").pick_arguments(size: size)
+      args, _, _ = MethodType.new("(*Integer, String) -> void").pick_arguments(size:)
       assert args.length > 0
       trailing = args.pop
-      assert args.all? { |int| int.instance_of?(Integer) }
+      assert(args.all? { |int| int.instance_of?(Integer) })
       assert trailing.instance_of?(String)
     end
   end
@@ -63,13 +65,13 @@ class TestMethodType < Minitest::Test
   def test_pick_arguments_with_rest_keywords
     presents = []
     10.times do |size|
-      _, kwargs, _ = MethodType.new("(foo: Integer, **String) -> void").pick_arguments
+      _, kwargs, _ = MethodType.new("(foo: Integer, **String) -> void").pick_arguments(size:)
       assert kwargs.length > 0
       assert kwargs[:foo].instance_of?(Integer)
       rest = kwargs.except(:foo)
       presents << !rest.empty?
-      assert rest.keys.all? { |key| key.instance_of?(Symbol) }
-      assert rest.values.all? { |value| value.instance_of?(String) }
+      assert(rest.keys.all? { |key| key.instance_of?(Symbol) })
+      assert(rest.values.all? { |value| value.instance_of?(String) })
     end
     assert presents.any?
   end

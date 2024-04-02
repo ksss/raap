@@ -15,7 +15,7 @@ module RaaP
     attr_accessor :logger
   end
 
-  self.logger = ::Logger.new($stdout, formatter: proc { |severity, datetime, progname, msg|
+  self.logger = ::Logger.new($stdout, formatter: proc { |severity, _datetime, _progname, msg|
     "[RaaP] #{severity}: #{msg}\n"
   })
   self.logger.level = ::Logger::WARN

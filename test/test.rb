@@ -137,6 +137,10 @@ module Test
     def arg1(int)
       int.to_s
     end
+
+    def sym(_sym)
+      self
+    end
   end
 
   class Nested
@@ -144,7 +148,7 @@ module Test
       @t = t
     end
 
-    def nest(nt)
+    def nest(_nt)
       self
     end
   end

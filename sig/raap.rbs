@@ -99,7 +99,7 @@ module RaaP
     private
 
     def call: (size: Integer, stats: Stats) -> (Result::Success | Result::Failure | Result::Skip | Result::Exception)
-    def check_return: (receiver_value: untyped, return_value: untyped, method_type: MethodType) -> bool
+    def check_return: (receiver_value: untyped, return_value: untyped) -> bool
     def return_type: () -> RBS::Types::t
   end
 

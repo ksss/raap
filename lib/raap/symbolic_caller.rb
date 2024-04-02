@@ -18,6 +18,7 @@ module RaaP
   class SymbolicCaller
     class Var
       attr_reader :name
+
       def initialize(name)
         @name = name
       end
@@ -52,7 +53,7 @@ module RaaP
 
       a = []
       a << args.map(&BindCall.method(:inspect)).join(', ') if !args.empty?
-      a << kwargs.map { |k ,v| "#{k}: #{BindCall.inspect(v)}" }.join(', ') if !kwargs.empty?
+      a << kwargs.map { |k, v| "#{k}: #{BindCall.inspect(v)}" }.join(', ') if !kwargs.empty?
       argument_str = a.join(', ')
       block_str = block ? "{ }" : nil
 
@@ -88,7 +89,7 @@ module RaaP
 
           arguments = []
           arguments << args.map { |a| printable(a) } if !args.empty?
-          arguments << kwargs.map{|k,v| "#{k}: #{printable(v)}" }.join(', ') if !kwargs.empty?
+          arguments << kwargs.map { |k, v| "#{k}: #{printable(v)}" }.join(', ') if !kwargs.empty?
           block_str = block ? " { }" : ""
 
           line = "#{var_eq}#{receiver}#{method_name}(#{arguments.join(', ')})#{block_str}"
