@@ -228,6 +228,9 @@ module RaaP
     SIMPLE_SOURCE: Array[String]
 
     def self.register: (String) { () [self: instance] -> Sized[untyped] } -> void
+    def self.random: () -> Type
+    def self.random_without_basic_object: () -> Type
+
     attr_reader type: ::RBS::Types::t
     attr_reader range: Range[untyped]
 
@@ -260,8 +263,6 @@ module RaaP
     def array: (Type) -> Sized[Array[untyped]]
     def encoding: () -> Sized[symbolic_call]
     def bool: () -> Sized[bool]
-    def random: () -> Type
-    def random_without_basic_object: () -> Type
     def temp_method_object: () -> ::Method
   end
 

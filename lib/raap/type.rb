@@ -26,11 +26,23 @@ module RaaP
       GENERATORS[type_name] = __skip__ = block
     end
 
+    def self.random
+      Type.new("Integer | Float | Rational | Complex | String | Symbol | bool | Encoding | BasicObject")
+    end
+
+    def self.random_without_basic_object
+      random.tap do |r|
+        # @type var rtype: ::RBS::Types::Union
+        rtype = r.type
+        rtype.types.reject! { |t| t.to_s == "BasicObject" }
+      end
+    end
+
     # Special class case
     register("::Array") do
-      _type = __skip__ = type
-      t = _type.args[0] || 'untyped'
-      array(Type.new(t, range: range))
+      instance = __skip__ = type
+      t = instance.args[0] ? Type.new(instance.args[0], range:) : Type.random
+      array(t)
     end
     register("::Binding") { sized { binding } }
     register("::Complex") { complex }
@@ -41,10 +53,10 @@ module RaaP
     register("::Hash") do
       sized do |size|
         csize = size / 2
-        type = __skip__ = type
-        key_type = type.args[0] ? Type.new(type.args[0]) : random_without_basic_object
-        value_type = type.args[1] ? Type.new(type.args[1]) : random_without_basic_object
-        Array.new(integer.pick(size: size).abs).to_h do
+        instance = __skip__ = type
+        key_type = instance.args[0] ? Type.new(instance.args[0]) : Type.random_without_basic_object
+        value_type = instance.args[1] ? Type.new(instance.args[1]) : Type.random
+        Array.new(integer.pick(size:).abs).to_h do
           [key_type.to_symbolic_call(size: csize), value_type.to_symbolic_call(size: csize)]
         end
       end
@@ -146,7 +158,7 @@ module RaaP
       when ::RBS::Types::Bases::Bool
         bool.pick(size: size)
       when ::RBS::Types::Bases::Any
-        random.pick(size: size)
+        Type.random.to_symbolic_call(size:)
       when ::RBS::Types::Bases::Nil
         nil
       else
@@ -303,18 +315,6 @@ module RaaP
     def bool
       sized do
         Random.rand(2) == 0
-      end
-    end
-
-    def random
-      Type.new("Integer | Float | Rational | Complex | String | Symbol | bool | Encoding | BasicObject")
-    end
-
-    def random_without_basic_object
-      random.tap do |r|
-        # @type var type: ::RBS::Types::Union
-        type = r.type
-        type.types.reject! { |type| type.to_s == "BasicObject" }
       end
     end
 
