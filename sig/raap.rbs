@@ -246,7 +246,7 @@ module RaaP
 
     private
 
-    def pick_from_initialize: (::RBS::Types::ClassInstance, size: Integer) -> (symbolic_call | Value::Module)
+    def to_symbolic_call_from_initialize: (::RBS::Types::ClassInstance, size: Integer) -> (symbolic_call | Value::Module)
     def parse: (String | ::RBS::Types::t) -> ::RBS::Types::t?
     def try: (times: Integer, size: Integer) { (Integer size) -> untyped } -> untyped
 
@@ -259,6 +259,7 @@ module RaaP
     def string: () -> Sized[String]
     def symbol: () -> Sized[Symbol]
     def array: (Type) -> Sized[Array[untyped]]
+    def dict: (Type, Type) -> Sized[Hash[untyped, untyped]]
     def encoding: () -> Sized[symbolic_call]
     def bool: () -> Sized[bool]
     def temp_method_object: () -> ::Method

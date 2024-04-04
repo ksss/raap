@@ -52,15 +52,10 @@ module RaaP
     register("::FalseClass") { sized { false } }
     register("::Float") { float }
     register("::Hash") do
-      sized do |size|
-        csize = size / 2
-        instance = __skip__ = type
-        key_type = instance.args[0] ? Type.new(instance.args[0]) : Type.random_without_basic_object
-        value_type = instance.args[1] ? Type.new(instance.args[1]) : Type.random
-        Array.new(integer.pick(size:).abs).to_h do
-          [key_type.to_symbolic_call(size: csize), value_type.to_symbolic_call(size: csize)]
-        end
-      end
+      instance = __skip__ = type
+      key = instance.args[0] ? Type.new(instance.args[0]) : Type.random_without_basic_object
+      value = instance.args[1] ? Type.new(instance.args[1]) : Type.random
+      dict(key, value)
     end
     register("::Integer") { integer }
     register("::IO") { sized { $stdout } }
@@ -308,6 +303,20 @@ module RaaP
       sized do |size|
         Array.new(integer.pick(size:).abs) do
           type.to_symbolic_call(size: size / 2)
+        end
+      end
+    end
+
+    # Create Hash object. But not `hash`.
+    # Avoid to use `hash` since core method name
+    def dict(key_type, value_type)
+      sized do |size|
+        csize = size / 2
+        Array.new(integer.pick(size:).abs).to_h do
+          [
+            key_type.to_symbolic_call(size: csize),
+            value_type.to_symbolic_call(size: csize)
+          ]
         end
       end
     end
