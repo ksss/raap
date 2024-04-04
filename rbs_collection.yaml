@@ -15,6 +15,5 @@ path: .gem_rbs_collection
 
 gems:
   - name: activesupport
-    ignore: true
   - name: steep
     ignore: true

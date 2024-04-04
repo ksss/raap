@@ -5,10 +5,58 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: activesupport
+  version: '7.0'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 823e015090cd291d53c4f9d9d7e76b931a6cc75d
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+- name: base64
+  version: '0'
+  source:
+    type: stdlib
+- name: bigdecimal
+  version: '0'
+  source:
+    type: stdlib
+- name: concurrent-ruby
+  version: '1.1'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 823e015090cd291d53c4f9d9d7e76b931a6cc75d
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+- name: connection_pool
+  version: '2.4'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 823e015090cd291d53c4f9d9d7e76b931a6cc75d
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+- name: date
+  version: '0'
+  source:
+    type: stdlib
+- name: erb
+  version: '0'
+  source:
+    type: stdlib
 - name: fileutils
   version: '0'
   source:
     type: stdlib
+- name: i18n
+  version: '1.10'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 823e015090cd291d53c4f9d9d7e76b931a6cc75d
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
 - name: io-console
   version: '0'
   source:
@@ -46,7 +94,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: be76a75932e8ed6ee91a95ba936cf88b674bf044
+    revision: 823e015090cd291d53c4f9d9d7e76b931a6cc75d
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: rbs
@@ -54,6 +102,18 @@ gems:
   source:
     type: rubygems
 - name: rdoc
+  version: '0'
+  source:
+    type: stdlib
+- name: securerandom
+  version: '0'
+  source:
+    type: stdlib
+- name: singleton
+  version: '0'
+  source:
+    type: stdlib
+- name: time
   version: '0'
   source:
     type: stdlib
