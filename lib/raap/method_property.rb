@@ -75,7 +75,7 @@ module RaaP
       end
 
     # not ensure symbolic_call
-    rescue NoMethodError => exception
+    rescue NoMethodError, NotImplementedError => exception
       stats.skip += 1
       Result::Skip.new(symbolic_call:, exception:)
     rescue NameError => e
@@ -84,9 +84,6 @@ module RaaP
       RaaP.logger.debug(e.backtrace&.join("\n"))
       stats.break = true
       throw :break
-    rescue NotImplementedError => exception
-      stats.skip += 1
-      Result::Skip.new(symbolic_call:, exception:)
     rescue SystemStackError => exception
       stats.skip += 1
       RaaP.logger.info "Found recursive type definition."

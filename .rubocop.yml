@@ -1,7 +1,11 @@
 AllCops:
   TargetRubyVersion: 3.3
-  Exclude:
-    - 'test/**/*'
+  NewCops: enable
+  Include:
+  - 'lib/**/*.rb'
+
+Lint:
+  Enabled: true
 
 Style:
   Enabled: false

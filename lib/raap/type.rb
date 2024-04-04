@@ -13,7 +13,7 @@ module RaaP
 
       def self.positive_float
         x = Random.rand
-        x / Math.sqrt(1 - x * x)
+        x / Math.sqrt(1 - (x * x))
       end
     end
 
@@ -248,9 +248,9 @@ module RaaP
         in nil, nil
           Arithmetic.float * size
         in nil, high
-          high - Arithmetic.positive_float * size
+          high - (Arithmetic.positive_float * size)
         in low, nil
-          low + Arithmetic.positive_float * size
+          low + (Arithmetic.positive_float * size)
         in low, high
           Random.rand(Range.new(low.to_f, high.to_f, @range.exclude_end?))
         end.round(2)
@@ -279,13 +279,11 @@ module RaaP
           +""
         else
           case [@range.begin, @range.end]
-          in nil, nil
+          in [nil, nil]
             size.times.map { SIMPLE_SOURCE.sample }.join
-          in nil, _
+          in [nil, _] | [_, nil]
             raise "Should set range.begin and range.end"
-          in _, nil
-            raise "Should set range.begin and range.end"
-          in s, e
+          in [s, e]
             a = (s..e).to_a
             size.times.map { a.sample }.join
           end
@@ -337,7 +335,7 @@ module RaaP
     def temp_method_object
       o = Object.new
       m = 6.times.map { SIMPLE_SOURCE.sample }.join
-      o.define_singleton_method(m) {}
+      o.define_singleton_method(m) {} # rubocop:disable Lint/EmptyBlock
       o.method(m)
     end
   end
