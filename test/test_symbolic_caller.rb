@@ -124,4 +124,12 @@ class TestSymbolicCaller < Minitest::Test
       test_c.run()
     CODE
   end
+
+  def test_printable
+    expect = "[Kernel, {}, [], -3, 3.14, 1..10, 'str', :sym, /abc/, nil, true, false]"
+    sc = SymbolicCaller.new([:call, eval(expect), :then, [], {}, nil])
+    assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
+      #{expect}.then()
+    CODE
+  end
 end

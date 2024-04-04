@@ -56,6 +56,9 @@ module RaaP
           rescue StandardError, NotImplementedError
             check = true
             return_value = Value::Bottom.new
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            RaaP.logger.error("[#{e.class}] class is not supported to check `bot` type")
+            raise
           end
         else
           return_value = symbolic_caller.eval

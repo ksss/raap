@@ -8,11 +8,11 @@ module RaaP
         return_type =
           case return_value
           when nil then ''
-          when true, false then 'bool'
+          when true, false then '[bool]'
           else
-            BindCall.class(return_value)
+            "[#{BindCall.class(return_value)}]"
           end
-        "#{scr.call_str} -> #{BindCall.inspect(return_value)}[#{return_type}]"
+        "#{scr.call_str} -> #{BindCall.inspect(return_value)}#{return_type}"
       end
     end
 

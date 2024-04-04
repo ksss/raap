@@ -150,7 +150,7 @@ module RaaP
       when Var
         obj.name
       # Object from which it can get strings that can be eval with `#inspect`
-      when Symbol, Integer, Float, Regexp, nil, true, false
+      when Symbol, Integer, Float, Regexp, Range, nil, true, false
         obj.inspect
       when String
         obj.inspect.gsub('"', "'") or raise
