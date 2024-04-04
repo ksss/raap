@@ -123,6 +123,10 @@ You can specify size of end.
 
 You can specify size of step like `Integer#step: (to: Integer, by: Integer)`.
 
+## First support is CLI
+
+In RaaP, usage through the CLI is the primary support focus, and efforts are made to maintain compatibility. The use of the library's code (such as `RaaP::Type`) does not guarantee compatibility.
+
 ## Achievements
 
 RaaP has already found many RBS mistakes and bug in CRuby during the development phase.
@@ -134,6 +138,8 @@ RaaP has already found many RBS mistakes and bug in CRuby during the development
 * https://github.com/ruby/rbs/pull/1769
 * https://github.com/ruby/rbs/pull/1770
 * https://github.com/ruby/rbs/pull/1771
+* https://github.com/ruby/rbs/pull/1779
+* https://github.com/ruby/rbs/pull/1783
 
 ## Development
 
