@@ -25,5 +25,5 @@ jobs:
         bundler-cache: true
     - name: Install RBS collection
       run: bundle exec rbs collection install --frozen
-    - name: Run the default task
-      run: bundle exec rake
+    - name: Type check
+      run: bundle exec steep check
