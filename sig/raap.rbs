@@ -56,9 +56,7 @@ module RaaP
 
     type property_result = [Integer, Symbol, ::RBS::MethodType, StringIO?]
     def run: () -> self
-    def run_by: (tag: String) -> Array[Array[property_result]]
-    def run_by_instance: (tag: String) -> Array[Array[property_result]]
-    def run_by_singleton: (tag: String) -> Array[Array[property_result]]
+    def run_by: (kind: (:instance | :singleton), tag: String) -> Array[Array[property_result]]
     def run_by_type_name: (tag: String) -> Array[Array[property_result]]
     def run_by_type_name_with_search: (tag: String) -> Array[Array[property_result]]
     def property: (receiver_type: Type, type_params_decl: Array[::RBS::AST::TypeParam], type_args: Array[::RBS::Types::t], method_name: Symbol, method_type: ::RBS::MethodType) -> property_result

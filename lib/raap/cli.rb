@@ -2,7 +2,6 @@
 
 module RaaP
   # $ raap Integer#pow
-  # $ raap -I sig RaaP::Type
   class CLI
     class << self
       attr_accessor :option
@@ -17,6 +16,7 @@ module RaaP
       :size_to,
       :size_by,
       :allow_private,
+      :skips,
       keyword_init: true
     )
 
@@ -29,11 +29,26 @@ module RaaP
       size_from: 0,
       size_to: 99,
       size_by: 1,
+      skips: [],
       allow_private: false,
     )
 
+    DEFAULT_SKIP = Set.new
+    %i[
+      fork system exec spawn `
+      abort exit exit! raise fail
+      load require require_relative
+      gem
+    ].each do |kernel_method|
+      DEFAULT_SKIP << "::Kernel##{kernel_method}"
+      DEFAULT_SKIP << "::Kernel.#{kernel_method}"
+    end
+
+    attr_accessor :argv, :skip
+
     def initialize(argv)
       @argv = argv
+      @skip = DEFAULT_SKIP
     end
 
     def load
@@ -65,6 +80,9 @@ module RaaP
         o.on('--allow-private', "default: #{CLI.option.allow_private}") do
           CLI.option.allow_private = true
         end
+        o.on('--skip tag', "skip case (e.g. `Foo#meth`)") do |tag|
+          CLI.option.skips << tag
+        end
       end.parse!(@argv)
 
       CLI.option.dirs.each do |dir|
@@ -76,6 +94,9 @@ module RaaP
       CLI.option.requires.each do |lib|
         require lib
       end
+      CLI.option.skips.each do |skip|
+        @skip << skip
+      end
 
       self
     end
@@ -85,9 +106,9 @@ module RaaP
       @argv.map do |tag|
         case
         when tag.include?('#')
-          run_by_instance(tag:)
+          run_by(kind: :instance, tag:)
         when tag.include?('.')
-          run_by_singleton(tag:)
+          run_by(kind: :singleton, tag:)
         when tag.end_with?('*')
           run_by_type_name_with_search(tag:)
         else
@@ -113,6 +134,45 @@ module RaaP
       self
     end
 
+    def run_by(kind:, tag:)
+      split = kind == :instance ? '#' : '.'
+      t, m = tag.split(split, 2)
+      t or raise
+      m or raise
+      type = RBS.parse_type(t)
+      raise "cannot specified #{type.class}" unless type.respond_to?(:name)
+
+      type = __skip__ = type
+      type_name = type.name.absolute!
+      receiver_type = if kind == :instance
+                        Type.new(type_name)
+                      else
+                        Type.new("singleton(#{type_name})")
+                      end
+      method_name = m.to_sym
+      definition = if kind == :instance
+                     RBS.builder.build_instance(type_name)
+                   else
+                     RBS.builder.build_singleton(type_name)
+                   end
+      method = definition.methods[method_name]
+      raise "`#{tag}` not found" unless method
+
+      if @skip.include?("#{type_name}#{split}#{method_name}")
+        raise "`#{type_name}#{split}#{method_name}` is a method to be skipped"
+      end
+
+      type_params_decl = definition.type_params_decl
+      type_args = type.args
+
+      RaaP.logger.info("# #{type}")
+      [
+        method.method_types.map do |method_type|
+          property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
+        end
+      ]
+    end
+
     def run_by_instance(tag:)
       t, m = tag.split('#', 2)
       t or raise
@@ -128,6 +188,9 @@ module RaaP
       type_args = type.args
       method = definition.methods[method_name]
       raise "`#{tag}` is not found" unless method
+      if @skip.include?("#{type.name.absolute!}##{method_name}")
+        raise "`#{type.name}##{method_name}` is a method to be skipped"
+      end
 
       RaaP.logger.debug("# #{type}")
       [
@@ -145,13 +208,19 @@ module RaaP
       raise "cannot specified #{type.class}" unless type.respond_to?(:name)
 
       type = __skip__ = type
-      receiver_type = Type.new("singleton(#{type.name})")
+      type_name = type.name.absolute!
+      receiver_type = Type.new("singleton(#{type_name})")
       method_name = m.to_sym
-      definition = RBS.builder.build_singleton(type.name)
+      definition = RBS.builder.build_singleton(type_name)
       method = definition.methods[method_name]
+      raise "`#{tag}` not found" unless method
+
+      if @skip.include?("#{type_name}.#{method_name}")
+        raise "`#{type_name}.#{method_name}` is a method to be skipped"
+      end
+
       type_params_decl = definition.type_params_decl
       type_args = type.args
-      raise "`#{tag}` not found" unless method
 
       RaaP.logger.info("# #{type}")
       [
@@ -185,9 +254,9 @@ module RaaP
       definition = RBS.builder.build_singleton(type_name)
       type_params_decl = definition.type_params_decl
       definition.methods.filter_map do |method_name, method|
+        next if @skip.include?("#{type_name.absolute!}.#{method_name}")
         next unless method.accessibility == :public
         next if method.defined_in != type_name
-        next if method_name == :fork || method_name == :spawn # TODO: skip solution
 
         RaaP.logger.info("# #{type_name}.#{method_name}")
         ret << method.method_types.map do |method_type|
@@ -198,9 +267,9 @@ module RaaP
       definition = RBS.builder.build_instance(type_name)
       type_params_decl = definition.type_params_decl
       definition.methods.filter_map do |method_name, method|
+        next if @skip.include?("#{type_name.absolute!}##{method_name}")
         next unless method.accessibility == :public
         next if method.defined_in != type_name
-        next if method_name == :fork || method_name == :spawn # TODO: skip solution
 
         RaaP.logger.info("# #{type_name}##{method_name}")
         ret << method.method_types.map do |method_type|
