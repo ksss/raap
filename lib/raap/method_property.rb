@@ -79,8 +79,9 @@ module RaaP
       stats.skip += 1
       Result::Skip.new(symbolic_call:, exception:)
     rescue NameError => e
+      RaaP.logger.error("[#{e.class}] #{e.detailed_message}")
       msg = e.name.nil? ? '' : "for `#{BindCall.to_s(e.receiver)}::#{e.name}`"
-      RaaP.logger.error("Implementation is not found #{msg} maybe.")
+      RaaP.logger.warn("Implementation is not found #{msg} maybe.")
       RaaP.logger.debug(e.backtrace&.join("\n"))
       stats.break = true
       throw :break
