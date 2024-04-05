@@ -2,7 +2,7 @@
 
 module RaaP
   module Result
-    module CalledStr
+    class Success < Data.define(:symbolic_call, :return_value)
       def called_str
         scr = SymbolicCaller.new(symbolic_call)
         return_type =
@@ -16,15 +16,32 @@ module RaaP
       end
     end
 
-    Success = Data.define(:symbolic_call, :return_value)
-    Success.include CalledStr
-    Failure = Data.define(:symbolic_call, :return_value, :exception) do
+    class Failure < Data.define(:symbolic_call, :return_value, :exception)
       def initialize(exception: nil, **)
         super
       end
+
+      def called_str
+        scr = SymbolicCaller.new(symbolic_call)
+        return_type =
+          if exception
+            "raised #{exception.class}"
+          else
+            case return_value
+            when nil then 'nil'
+            when true, false then "#{BindCall.inspect(return_value)}[bool]"
+            else
+              "#{BindCall.inspect(return_value)}[#{BindCall.class(return_value)}]"
+            end
+          end
+        "#{scr.call_str} -> #{return_type}"
+      end
     end
-    Failure.include CalledStr
-    Skip = Data.define(:symbolic_call, :exception)
-    Exception = Data.define(:symbolic_call, :exception)
+
+    class Skip < Data.define(:symbolic_call, :exception)
+    end
+
+    class Exception < Data.define(:symbolic_call, :exception)
+    end
   end
 end

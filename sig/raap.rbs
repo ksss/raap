@@ -132,25 +132,18 @@ module RaaP
   end
 
   module Result
-    interface _MethodValueReturnValue
-      def symbolic_call: () -> symbolic_call
-      def return_value: () -> untyped
-    end
-    module CalledStr : _MethodValueReturnValue
-      def called_str: () -> String
-    end
     class Success < Data
       def self.new: (symbolic_call: symbolic_call, return_value: untyped) -> instance
       attr_reader symbolic_call: symbolic_call
       attr_reader return_value: untyped
-      include CalledStr
+      def called_str: () -> String
     end
     class Failure < Data
       def self.new: (symbolic_call: symbolic_call, return_value: untyped, ?exception: ::Exception?) -> instance
       attr_reader symbolic_call: symbolic_call
       attr_reader return_value: untyped
       attr_reader exception: ::Exception?
-      include CalledStr
+      def called_str: () -> String
     end
     class Skip < Data
       def self.new: (symbolic_call: symbolic_call?, exception: ::Exception) -> instance
