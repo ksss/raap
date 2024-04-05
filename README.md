@@ -55,7 +55,7 @@ Finally, you get the perfect RBS!
 
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add raap
+    $ bundle add raap --require false
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
