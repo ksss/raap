@@ -118,7 +118,7 @@ module RaaP
         ret.each do |methods|
           methods.select { |status,| status == 1 }.each do |_, method_name, method_type, reason|
             i += 1
-            puts "\x1b[41m#\x1b[m #{i}) Failure:"
+            puts "\e[41m\e[1m#\e[m\e[1m #{i}) Failure:\e[m"
             puts
             puts "def #{method_name}: #{method_type}"
             puts "  in #{method_type.location}"
