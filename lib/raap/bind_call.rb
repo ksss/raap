@@ -34,6 +34,8 @@ module RaaP
             obj.inspect
           end
         end
+      rescue NoMethodError
+        "#<#{self.class(obj)}>"
       end
     end
   end

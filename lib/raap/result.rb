@@ -2,21 +2,46 @@
 
 module RaaP
   module Result
+    module ReturnValueWithType
+      def return_value_with_type
+        return_type = case return_value
+                      when nil
+                        ''
+                      when true, false
+                        "[bool]"
+                      when Enumerator
+                        elem = begin
+                          return_value.peek
+                        rescue StopIteration
+                          nil
+                        end
+                        ret = if return_value.size == Float::INFINITY
+                                nil
+                              else
+                                return_value.each {
+                                  # empty
+                                }.tap { return_value.rewind }
+                              end
+                        "[Enumerator[#{BindCall.class(elem)}, #{BindCall.class(ret)}]]"
+                      else
+                        "[#{BindCall.class(return_value)}]"
+                      end
+        "#{BindCall.inspect(return_value)}#{return_type}"
+      end
+    end
+
     class Success < Data.define(:symbolic_call, :return_value)
+      include ReturnValueWithType
+
       def called_str
         scr = SymbolicCaller.new(symbolic_call)
-        return_type =
-          case return_value
-          when nil then ''
-          when true, false then '[bool]'
-          else
-            "[#{BindCall.class(return_value)}]"
-          end
-        "#{scr.call_str} -> #{BindCall.inspect(return_value)}#{return_type}"
+        "#{scr.call_str} -> #{return_value_with_type}"
       end
     end
 
     class Failure < Data.define(:symbolic_call, :return_value, :exception)
+      include ReturnValueWithType
+
       def initialize(exception: nil, **)
         super
       end
@@ -27,12 +52,7 @@ module RaaP
           if exception
             "raised #{exception.class}"
           else
-            case return_value
-            when nil then 'nil'
-            when true, false then "#{BindCall.inspect(return_value)}[bool]"
-            else
-              "#{BindCall.inspect(return_value)}[#{BindCall.class(return_value)}]"
-            end
+            return_value_with_type
           end
         "#{scr.call_str} -> #{return_type}"
       end
