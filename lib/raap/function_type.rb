@@ -35,7 +35,7 @@ module RaaP
     def build_args_type
       reqs = @fun.required_positionals.map { |param| Type.new(param.type) }
       tras = @fun.trailing_positionals.map { |param| Type.new(param.type) }
-      sampled_optional_positionals = @fun.optional_positionals.sample(Random.rand(@fun.optional_positionals.length + 1))
+      sampled_optional_positionals = @fun.optional_positionals.take(Random.rand(@fun.optional_positionals.length + 1))
       opts = sampled_optional_positionals.map { |param| Type.new(param.type) }
       rest = []
       if (param = @fun.rest_positionals)

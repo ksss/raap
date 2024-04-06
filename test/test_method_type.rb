@@ -19,6 +19,14 @@ class TestMethodType < Minitest::Test
     assert block.nil?
   end
 
+  def test_pick_arguments_with_optional_positionals
+    forall("(?Integer, ?String, ?Symbol) -> void") do |int, str, sym|
+      assert_instance_of(Integer, int) if int
+      assert_instance_of(String, str) if str
+      assert_instance_of(Symbol, sym) if sym
+    end
+  end
+
   def test_to_symbolic_call
     args, _, _ = MethodType.new("(Array[Test::C]) -> void").arguments_to_symbolic_call(size: 0)
     assert_equal [[]], args
