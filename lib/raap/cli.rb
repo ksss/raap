@@ -313,6 +313,7 @@ module RaaP
           puts 'F'
           if (e = f.exception)
             RaaP.logger.debug { "Failure: [#{e.class}] #{e.message}" }
+            RaaP.logger.debug { e.backtrace.join("\n") }
           end
           RaaP.logger.debug { PP.pp(f.symbolic_call, ''.dup) }
           reason = StringIO.new
