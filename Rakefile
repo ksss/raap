@@ -8,4 +8,10 @@ Minitest::TestTask.create
 
 RuboCop::RakeTask.new
 
-task default: :test
+namespace :steep do
+  task :check do
+    sh "bundle exec steep check"
+  end
+end
+
+task default: [:test, :rubocop, 'steep:check']
