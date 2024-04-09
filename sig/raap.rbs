@@ -60,9 +60,9 @@ module RaaP
 
     type property_result = [Integer, Symbol, ::RBS::MethodType, StringIO?]
     def run: () -> self
-    def run_by: (kind: (:instance | :singleton), tag: String) -> Array[Array[property_result]]
-    def run_by_type_name: (tag: String) -> Array[Array[property_result]]
-    def run_by_type_name_with_search: (tag: String) -> Array[Array[property_result]]
+    def run_by: (kind: (:instance | :singleton), tag: String) -> Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
+    def run_by_type_name: (tag: String) -> Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
+    def run_by_type_name_with_search: (tag: String) -> Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
     def property: (receiver_type: Type, type_params_decl: Array[::RBS::AST::TypeParam], type_args: Array[::RBS::Types::t], method_name: Symbol, method_type: ::RBS::MethodType) -> property_result
   end
 
@@ -129,6 +129,7 @@ module RaaP
     def self.env: () -> ::RBS::Environment
     def self.loader: () -> ::RBS::EnvironmentLoader
     def self.parse_type: (String) -> ::RBS::Types::t
+    def self.find_alias_decl: (::RBS::TypeName, Symbol) -> ::RBS::AST::Members::Alias?
   end
 
   module Result

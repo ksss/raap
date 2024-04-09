@@ -1,6 +1,7 @@
 module Test
   class Property
     def method_property1: () -> bool
+    alias alias method_property1
   end
 
   class Sleep

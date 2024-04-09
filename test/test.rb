@@ -12,6 +12,10 @@ module Test
         raise
       end
     end
+
+    # It testing the error indication by making a mistake on purpose.
+    def integer_only = 1
+    alias alias integer_only
   end
 
   class Sleep

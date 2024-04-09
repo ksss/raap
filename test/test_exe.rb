@@ -14,6 +14,21 @@ class TestExe < Minitest::Test
     end
   end
 
+  def test_alias_stdout
+    orig = $stdout
+    $stdout = StringIO.new
+    RaaP::CLI.new([
+      "--log-level", "info",
+      "--timeout", "1",
+      "--size-to", "10",
+      "Test::Property#alias"
+    ]).load.run
+    assert_match "def alias: () -> bool", $stdout.string
+    assert_match "  in test/test.rbs:4:4...4:32", $stdout.string
+  ensure
+    $stdout = orig
+  end
+
   def test_exe_with_search
     RaaP::CLI.new([
       "--log-level", "info",

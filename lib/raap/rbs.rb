@@ -19,5 +19,18 @@ module RaaP
 
       ::RBS::Parser.parse_type(type, require_eof: true) or raise
     end
+
+    def self.find_alias_decl(type_name, method_name)
+      env.class_decls[type_name].decls.each do |d|
+        d.decl.members.each do |member|
+          case member
+          when ::RBS::AST::Members::Alias
+            return member if member.new_name == method_name
+          end
+        end
+      end
+
+      nil
+    end
   end
 end

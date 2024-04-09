@@ -116,12 +116,21 @@ module RaaP
         end
       end.each do |ret|
         ret.each do |methods|
-          methods.select { |status,| status == 1 }.each do |_, method_name, method_type, reason|
+          methods => { method:, properties: }
+          properties.select { |status,| status == 1 }.each do |_, method_name, method_type, reason|
             i += 1
+            location = if method.alias_of
+                         alias_decl = RBS.find_alias_decl(method.defined_in, method_name)
+                         raise "alias decl not found: #{method_name}" unless alias_decl
+
+                         alias_decl.location
+                       else
+                         method_type.location
+                       end
             puts "\e[41m\e[1m#\e[m\e[1m #{i}) Failure:\e[m"
             puts
             puts "def #{method_name}: #{method_type}"
-            puts "  in #{method_type.location}"
+            puts "  in #{location}"
             puts
             puts "## Reason"
             puts
@@ -169,9 +178,12 @@ module RaaP
 
       RaaP.logger.info("# #{type}")
       [
-        method.method_types.map do |method_type|
-          property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
-        end
+        {
+          method:,
+          properties: method.method_types.map do |method_type|
+            property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
+          end
+        }
       ]
     end
 
@@ -204,9 +216,12 @@ module RaaP
         next if method.defined_in != type_name
 
         RaaP.logger.info("# #{type_name}.#{method_name}")
-        ret << method.method_types.map do |method_type|
-          property(receiver_type: Type.new("singleton(#{type.name})"), type_params_decl:, type_args:, method_type:, method_name:)
-        end
+        ret << {
+          method:,
+          properties: method.method_types.map do |method_type|
+            property(receiver_type: Type.new("singleton(#{type.name})"), type_params_decl:, type_args:, method_type:, method_name:)
+          end
+        }
       end
 
       definition = RBS.builder.build_instance(type_name)
@@ -217,9 +232,12 @@ module RaaP
         next if method.defined_in != type_name
 
         RaaP.logger.info("# #{type_name}##{method_name}")
-        ret << method.method_types.map do |method_type|
-          property(receiver_type: Type.new(type.name), type_params_decl:, type_args:, method_type:, method_name:)
-        end
+        ret << {
+          method:,
+          properties: method.method_types.map do |method_type|
+            property(receiver_type: Type.new(type.name), type_params_decl:, type_args:, method_type:, method_name:)
+          end
+        }
       end
 
       ret
