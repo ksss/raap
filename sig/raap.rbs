@@ -138,6 +138,10 @@ module RaaP
 
     module ReturnValueWithType : _ReturnValue
       def return_value_with_type: () -> String
+
+      private
+
+      def return_value_to_type: (untyped) -> String
     end
 
     class Success < Data

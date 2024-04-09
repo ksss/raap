@@ -4,29 +4,41 @@ module RaaP
   module Result
     module ReturnValueWithType
       def return_value_with_type
-        return_type = case return_value
-                      when nil
-                        ''
-                      when true, false
-                        "[bool]"
-                      when Enumerator
-                        elem = begin
-                          return_value.peek
-                        rescue StopIteration
-                          nil
-                        end
-                        ret = if return_value.size == Float::INFINITY
-                                nil
-                              else
-                                return_value.each {
-                                  # empty
-                                }.tap { return_value.rewind }
-                              end
-                        "[Enumerator[#{BindCall.class(elem)}, #{BindCall.class(ret)}]]"
-                      else
-                        "[#{BindCall.class(return_value)}]"
-                      end
-        "#{BindCall.inspect(return_value)}#{return_type}"
+        return_type = return_value_to_type(return_value)
+        type = if return_type.empty? || return_type == 'nil'
+                 ''
+               else
+                 "[#{return_type}]"
+               end
+        "#{BindCall.inspect(return_value)}#{type}"
+      end
+
+      private
+
+      def return_value_to_type(val)
+        case val
+        when nil
+          'nil'
+        when true, false
+          "bool"
+        when Enumerator
+          elem = begin
+            return_value_to_type(val.peek)
+          rescue StopIteration
+            # empty
+            'untyped'
+          end
+          ret = if val.size == Float::INFINITY
+                  'bot'
+                else
+                  val.each {
+                    # empty
+                  }.tap { val.rewind }.then { return_value_to_type(_1) }
+                end
+          "Enumerator[#{elem}, #{ret}]"
+        else
+          "#{BindCall.class(val)}"
+        end
       end
     end
 

@@ -33,7 +33,7 @@ class TestResult < Minitest::Test
     sc = [:call, [], :each, [], {}, nil]
     s = Success.new(symbolic_call: sc, return_value: [].each)
     assert_equal <<~CODE.chomp, s.called_str
-      [].each() -> #<Enumerator: []:each>[Enumerator[NilClass, Array]]
+      [].each() -> #<Enumerator: []:each>[Enumerator[untyped, Array]]
     CODE
   end
 
@@ -41,7 +41,7 @@ class TestResult < Minitest::Test
     sc = [:call, [1], :cycle, [1], {}, nil]
     s = Success.new(symbolic_call: sc, return_value: [1].cycle(1))
     assert_equal <<~CODE.chomp, s.called_str
-      [1].cycle(1) -> #<Enumerator: [1]:cycle(1)>[Enumerator[Integer, NilClass]]
+      [1].cycle(1) -> #<Enumerator: [1]:cycle(1)>[Enumerator[Integer, nil]]
     CODE
   end
 
@@ -49,7 +49,7 @@ class TestResult < Minitest::Test
     sc = [:call, [1], :cycle, [], {}, nil]
     s = Success.new(symbolic_call: sc, return_value: [1].cycle)
     assert_equal <<~CODE.chomp, s.called_str
-      [1].cycle() -> #<Enumerator: [1]:cycle>[Enumerator[Integer, NilClass]]
+      [1].cycle() -> #<Enumerator: [1]:cycle>[Enumerator[Integer, bot]]
     CODE
   end
 
