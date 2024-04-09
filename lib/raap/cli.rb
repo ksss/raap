@@ -144,8 +144,9 @@ module RaaP
 
       type = __skip__ = type
       type_name = type.name.absolute!
+      type_to_s = type.to_s.start_with?('::') ? type.to_s : "::#{type}"
       receiver_type = if kind == :instance
-                        Type.new(type_name)
+                        Type.new(type_to_s)
                       else
                         Type.new("singleton(#{type_name})")
                       end
@@ -155,6 +156,7 @@ module RaaP
                    else
                      RBS.builder.build_singleton(type_name)
                    end
+
       method = definition.methods[method_name]
       raise "`#{tag}` not found" unless method
 
@@ -229,6 +231,11 @@ module RaaP
         prefix = 'self.'
       else
         prefix = ''
+      end
+      type_params_decl.each_with_index do |_, i|
+        if rtype.instance_of?(::RBS::Types::ClassInstance)
+          rtype.args[i] = type_args[i] || ::RBS::Types::Bases::Any.new(location: nil)
+        end
       end
       RaaP.logger.info("## def #{prefix}#{method_name}: #{method_type}")
       status = 0
