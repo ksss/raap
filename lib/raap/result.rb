@@ -21,6 +21,13 @@ module RaaP
           'nil'
         when true, false
           "bool"
+        when Array
+          elem = if val.empty?
+                   'untyped'
+                 else
+                   return_value_to_type(val.first)
+                 end
+          "Array[#{elem}]"
         when Enumerator
           elem = begin
             return_value_to_type(val.peek)
