@@ -39,6 +39,16 @@ module Test
       yield @head
       @tail.each(&block)
     end
+
+    def to_a
+      a = []
+      each { |e| a << e }
+      a
+    end
+
+    def inspect
+      "Test::List{#{to_a.join(', ')}}"
+    end
   end
 
   class CSelf

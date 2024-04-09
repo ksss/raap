@@ -9,7 +9,7 @@ module Test
 
   class List[T]
     attr_reader head: T?
-    attr_reader tail: List[T]?
+    attr_reader tail: self?
 
     def add: (T) -> self
     def each: () { (T) -> void } -> void
