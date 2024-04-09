@@ -173,63 +173,6 @@ module RaaP
       ]
     end
 
-    def run_by_instance(tag:)
-      t, m = tag.split('#', 2)
-      t or raise
-      m or raise
-      type = RBS.parse_type(t)
-      type = __skip__ = type
-      raise "cannot specified #{type}" unless type.respond_to?(:name)
-
-      receiver_type = Type.new(type.to_s)
-      method_name = m.to_sym
-      definition = RBS.builder.build_instance(type.name)
-      type_params_decl = definition.type_params_decl
-      type_args = type.args
-      method = definition.methods[method_name]
-      raise "`#{tag}` is not found" unless method
-      if @skip.include?("#{type.name.absolute!}##{method_name}")
-        raise "`#{type.name}##{method_name}` is a method to be skipped"
-      end
-
-      RaaP.logger.debug("# #{type}")
-      [
-        method.method_types.map do |method_type|
-          property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
-        end
-      ]
-    end
-
-    def run_by_singleton(tag:)
-      t, m = tag.split('.', 2)
-      t or raise
-      m or raise
-      type = RBS.parse_type(t)
-      raise "cannot specified #{type.class}" unless type.respond_to?(:name)
-
-      type = __skip__ = type
-      type_name = type.name.absolute!
-      receiver_type = Type.new("singleton(#{type_name})")
-      method_name = m.to_sym
-      definition = RBS.builder.build_singleton(type_name)
-      method = definition.methods[method_name]
-      raise "`#{tag}` not found" unless method
-
-      if @skip.include?("#{type_name}.#{method_name}")
-        raise "`#{type_name}.#{method_name}` is a method to be skipped"
-      end
-
-      type_params_decl = definition.type_params_decl
-      type_args = type.args
-
-      RaaP.logger.info("# #{type}")
-      [
-        method.method_types.map do |method_type|
-          property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
-        end
-      ]
-    end
-
     def run_by_type_name_with_search(tag:)
       first, _last = tag.split('::')
       ret = []
