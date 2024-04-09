@@ -140,6 +140,9 @@ RaaP has already found many RBS mistakes and bug in CRuby during the development
 * https://github.com/ruby/rbs/pull/1771
 * https://github.com/ruby/rbs/pull/1779
 * https://github.com/ruby/rbs/pull/1783
+* https://github.com/ruby/rbs/pull/1789
+* https://github.com/ruby/rbs/pull/1790
+* https://github.com/ruby/rbs/pull/1793
 
 ## Development
 
