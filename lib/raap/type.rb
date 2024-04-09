@@ -28,7 +28,7 @@ module RaaP
     end
 
     def self.random
-      Type.new("Integer | Float | Rational | Complex | String | Symbol | bool | Encoding | BasicObject")
+      Type.new("Integer | Float | Rational | Complex | String | Symbol | bool | Encoding | BasicObject | nil | Time")
     end
 
     def self.random_without_basic_object
