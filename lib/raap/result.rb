@@ -28,6 +28,10 @@ module RaaP
                    return_value_to_type(val.first)
                  end
           "Array[#{elem}]"
+        when Hash
+          key = val.empty? ? 'untyped' : return_value_to_type(val.keys.first)
+          value = val.empty? ? 'untyped' : return_value_to_type(val.values.first)
+          "Hash[#{key}, #{value}]"
         when Enumerator
           elem = begin
             return_value_to_type(val.peek)

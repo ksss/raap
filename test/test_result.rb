@@ -25,6 +25,14 @@ class TestResult < Minitest::Test
     assert_equal "[1, 2, 3][Array[Integer]]", ReturnType.new([1, 2, 3]).return_value_with_type
   end
 
+  def test_return_value_with_type_hash_empty
+    assert_equal "{}[Hash[untyped, untyped]]", ReturnType.new({}).return_value_with_type
+  end
+
+  def test_return_value_with_type_hash_symbol_integer
+    assert_equal "{:a => 1}[Hash[Symbol, Integer]]", ReturnType.new({ a: 1 }).return_value_with_type
+  end
+
   def test_return_value_with_type_enumerator_empty
     assert_equal "#<Enumerator: []:each>[Enumerator[untyped, Array[untyped]]]", ReturnType.new([].each).return_value_with_type
   end
