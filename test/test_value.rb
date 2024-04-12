@@ -41,6 +41,11 @@ class TestValue < Minitest::Test
     assert_raises(TypeError) do
       Intersection.new("bool")
     end
+
+    refute intersection.respond_to?(:not_defined)
+    assert_raises(NoMethodError) do
+      intersection.not_defined
+    end
   end
 
   def test_module

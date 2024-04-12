@@ -26,12 +26,16 @@ module RaaP
             return child.__send__(name, *args, **kwargs, &block)
           end
         end
+
+        super
       end
 
-      def respond_to?(...)
+      def respond_to?(name, include_all = false)
         @children.any? do |type|
-          BindCall.respond_to?(type, ...)
+          BindCall.respond_to?(type, name, include_all)
         end
+
+        super
       end
     end
   end
