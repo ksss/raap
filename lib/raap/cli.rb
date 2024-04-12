@@ -26,6 +26,11 @@ module RaaP
       DEFAULT_SKIP << "::Kernel##{kernel_method}"
       DEFAULT_SKIP << "::Kernel.#{kernel_method}"
     end
+    %i[
+      delete unlink chmod lchmod chown lchown
+      link mkfifo new open rename truncate
+    ].each { |m| DEFAULT_SKIP << "::File.#{m}" }
+    %i[flock truncate].each { |m| DEFAULT_SKIP << "::File##{m}" }
 
     attr_accessor :option, :argv, :skip, :results
 
