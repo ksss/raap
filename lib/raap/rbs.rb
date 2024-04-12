@@ -20,6 +20,12 @@ module RaaP
       ::RBS::Parser.parse_type(type, require_eof: true) or raise
     end
 
+    def self.parse_method_type(method_type)
+      raise ArgumentError, "empty method type" if method_type == ""
+
+      ::RBS::Parser.parse_method_type(method_type, require_eof: true) or raise
+    end
+
     def self.find_alias_decl(type_name, method_name)
       env.class_decls[type_name].decls.each do |d|
         d.decl.members.each do |member|

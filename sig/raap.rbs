@@ -129,6 +129,7 @@ module RaaP
     def self.env: () -> ::RBS::Environment
     def self.loader: () -> ::RBS::EnvironmentLoader
     def self.parse_type: (String) -> ::RBS::Types::t
+    def self.parse_method_type: (String) -> ::RBS::MethodType
     def self.find_alias_decl: (::RBS::TypeName, Symbol) -> ::RBS::AST::Members::Alias?
   end
 

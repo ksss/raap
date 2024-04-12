@@ -120,16 +120,16 @@ module RaaP
           properties.select { |status,| status == 1 }.each do |_, method_name, method_type, reason|
             i += 1
             location = if method.alias_of
-                         alias_decl = RBS.find_alias_decl(method.defined_in, method_name)
-                         raise "alias decl not found: #{method_name}" unless alias_decl
-
+                         alias_decl = RBS.find_alias_decl(method.defined_in, method_name) or raise "alias decl not found: #{method_name}"
                          alias_decl.location
                        else
                          method_type.location
                        end
+            prefix = method.defs.first.member.kind == :instance ? '' : 'self.'
+
             puts "\e[41m\e[1m#\e[m\e[1m #{i}) Failure:\e[m"
             puts
-            puts "def #{method_name}: #{method_type}"
+            puts "def #{prefix}#{method_name}: #{method_type}"
             puts "  in #{location}"
             puts
             puts "## Reason"
@@ -287,9 +287,9 @@ module RaaP
           reason = StringIO.new
           reason.puts "Failed in case of `#{f.called_str}`"
           reason.puts
-          reason.puts "### call stack:"
+          reason.puts "### Repro"
           reason.puts
-          reason.puts "```"
+          reason.puts "```rb"
           reason.puts SymbolicCaller.new(f.symbolic_call).to_lines.join("\n")
           reason.puts "```"
           status = 1
