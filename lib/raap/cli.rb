@@ -3,10 +3,6 @@
 module RaaP
   # $ raap Integer#pow
   class CLI
-    class << self
-      attr_accessor :option
-    end
-
     Option = Struct.new(
       :dirs,
       :requires,
@@ -20,19 +16,6 @@ module RaaP
       keyword_init: true
     )
 
-    # defaults
-    self.option = Option.new(
-      dirs: [],
-      requires: [],
-      libraries: [],
-      timeout: 3,
-      size_from: 0,
-      size_to: 99,
-      size_by: 1,
-      skips: [],
-      allow_private: false,
-    )
-
     DEFAULT_SKIP = Set.new
     %i[
       fork system exec spawn `
@@ -44,65 +27,84 @@ module RaaP
       DEFAULT_SKIP << "::Kernel.#{kernel_method}"
     end
 
-    attr_accessor :argv, :skip
+    attr_accessor :option, :argv, :skip, :results
 
     def initialize(argv)
+      # defaults
+      @option = Option.new(
+        dirs: [],
+        requires: [],
+        libraries: [],
+        timeout: 3,
+        size_from: 0,
+        size_to: 99,
+        size_by: 1,
+        skips: [],
+        allow_private: false,
+      )
       @argv = argv
-      @skip = DEFAULT_SKIP
+      @skip = DEFAULT_SKIP.dup
+      @results = []
     end
 
     def load
       OptionParser.new do |o|
         o.on('-I', '--include PATH') do |path|
-          CLI.option.dirs << path
+          @option.dirs << path
         end
         o.on('--library lib', 'load rbs library') do |lib|
-          CLI.option.libraries << lib
+          @option.libraries << lib
         end
         o.on('--require lib', 'require ruby library') do |lib|
-          CLI.option.requires << lib
+          @option.requires << lib
         end
         o.on('--log-level level', "default: warn") do |arg|
           RaaP.logger.level = arg
         end
-        o.on('--timeout sec', Integer, "default: #{CLI.option.timeout}") do |arg|
-          CLI.option.timeout = arg
+        o.on('--timeout sec', Integer, "default: #{@option.timeout}") do |arg|
+          @option.timeout = arg
         end
-        o.on('--size-from int', Integer, "default: #{CLI.option.size_from}") do |arg|
-          CLI.option.size_from = arg
+        o.on('--size-from int', Integer, "default: #{@option.size_from}") do |arg|
+          @option.size_from = arg
         end
-        o.on('--size-to int', Integer, "default: #{CLI.option.size_to}") do |arg|
-          CLI.option.size_to = arg
+        o.on('--size-to int', Integer, "default: #{@option.size_to}") do |arg|
+          @option.size_to = arg
         end
-        o.on('--size-by int', Integer, "default: #{CLI.option.size_by}") do |arg|
-          CLI.option.size_by = arg
+        o.on('--size-by int', Integer, "default: #{@option.size_by}") do |arg|
+          @option.size_by = arg
         end
-        o.on('--allow-private', "default: #{CLI.option.allow_private}") do
-          CLI.option.allow_private = true
+        o.on('--allow-private', "default: #{@option.allow_private}") do
+          @option.allow_private = true
         end
         o.on('--skip tag', "skip case (e.g. `Foo#meth`)") do |tag|
-          CLI.option.skips << tag
+          @option.skips << tag
         end
       end.parse!(@argv)
 
-      CLI.option.dirs.each do |dir|
+      @option.dirs.each do |dir|
         RaaP::RBS.loader.add(path: Pathname(dir))
       end
-      CLI.option.libraries.each do |lib|
+      @option.libraries.each do |lib|
         RaaP::RBS.loader.add(library: lib, version: nil)
       end
-      CLI.option.requires.each do |lib|
+      @option.requires.each do |lib|
         require lib
       end
-      CLI.option.skips.each do |skip|
+      @option.skips.each do |skip|
         @skip << skip
       end
+      @skip.freeze
 
       self
     end
 
     def run
-      i = 0
+      Signal.trap(:INT) do
+        puts "Interrupted by SIGINT"
+        report
+        exit 1
+      end
+
       @argv.map do |tag|
         case
         when tag.include?('#')
@@ -114,33 +116,41 @@ module RaaP
         else
           run_by_type_name(tag:)
         end
-      end.each do |ret|
-        ret.each do |methods|
-          methods => { method:, properties: }
-          properties.select { |status,| status == 1 }.each do |_, method_name, method_type, reason|
-            i += 1
-            location = if method.alias_of
-                         alias_decl = RBS.find_alias_decl(method.defined_in, method_name) or raise "alias decl not found: #{method_name}"
-                         alias_decl.location
-                       else
-                         method_type.location
-                       end
-            prefix = method.defs.first.member.kind == :instance ? '' : 'self.'
-
-            puts "\e[41m\e[1m#\e[m\e[1m #{i}) Failure:\e[m"
-            puts
-            puts "def #{prefix}#{method_name}: #{method_type}"
-            puts "  in #{location}"
-            puts
-            puts "## Reason"
-            puts
-            puts reason&.string
-            puts
-          end
-        end
       end
 
-      self
+      report
+    end
+
+    private
+
+    def report
+      i = 0
+      exit_status = 0
+      @results.each do |ret|
+        ret => { method:, properties: }
+        properties.select { |status,| status == 1 }.each do |_, method_name, method_type, reason|
+          i += 1
+          location = if method.alias_of
+                       alias_decl = RBS.find_alias_decl(method.defined_in, method_name) or raise "alias decl not found: #{method_name}"
+                       alias_decl.location
+                     else
+                       method_type.location
+                     end
+          prefix = method.defs.first.member.kind == :instance ? '' : 'self.'
+
+          puts "\e[41m\e[1m#\e[m\e[1m #{i}) Failure:\e[m"
+          puts
+          puts "def #{prefix}#{method_name}: #{method_type}"
+          puts "  in #{location}"
+          puts
+          puts "## Reason"
+          puts
+          puts reason&.string
+          puts
+          exit_status = 1
+        end
+      end
+      exit_status
     end
 
     def run_by(kind:, tag:)
@@ -177,25 +187,21 @@ module RaaP
       type_args = type.args
 
       RaaP.logger.info("# #{type}")
-      [
-        {
-          method:,
-          properties: method.method_types.map do |method_type|
-            property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
-          end
-        }
-      ]
+      @results << {
+        method:,
+        properties: method.method_types.map do |method_type|
+          property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
+        end
+      }
     end
 
     def run_by_type_name_with_search(tag:)
       first, _last = tag.split('::')
-      ret = []
       RBS.env.class_decls.each do |name, _entry|
         if ['', '::'].any? { |pre| name.to_s.match?(/\A#{pre}#{first}\b/) }
-          ret << run_by_type_name(tag: name.to_s)
+          run_by_type_name(tag: name.to_s)
         end
       end
-      ret.flatten(1)
     end
 
     def run_by_type_name(tag:)
@@ -206,8 +212,6 @@ module RaaP
       type_name = type.name.absolute!
       type_args = type.args
 
-      ret = []
-
       definition = RBS.builder.build_singleton(type_name)
       type_params_decl = definition.type_params_decl
       definition.methods.filter_map do |method_name, method|
@@ -216,7 +220,7 @@ module RaaP
         next if method.defined_in != type_name
 
         RaaP.logger.info("# #{type_name}.#{method_name}")
-        ret << {
+        @results << {
           method:,
           properties: method.method_types.map do |method_type|
             property(receiver_type: Type.new("singleton(#{type.name})"), type_params_decl:, type_args:, method_type:, method_name:)
@@ -232,15 +236,13 @@ module RaaP
         next if method.defined_in != type_name
 
         RaaP.logger.info("# #{type_name}##{method_name}")
-        ret << {
+        @results << {
           method:,
           properties: method.method_types.map do |method_type|
             property(receiver_type: Type.new(type.name), type_params_decl:, type_args:, method_type:, method_name:)
           end
         }
       end
-
-      ret
     end
 
     def property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
@@ -269,8 +271,8 @@ module RaaP
           instance_type: ::RBS::Types::ClassInstance.new(name: rtype.name, args: type_args, location: nil),
           class_type: ::RBS::Types::ClassSingleton.new(name: rtype.name, location: nil),
         ),
-        size_step: CLI.option.size_from.step(to: CLI.option.size_to, by: CLI.option.size_by),
-        timeout: CLI.option.timeout,
+        size_step: @option.size_from.step(to: @option.size_to, by: @option.size_by),
+        timeout: @option.timeout,
         allow_private: true,
       ).run do |called|
         case called

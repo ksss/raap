@@ -48,22 +48,27 @@ module RaaP
       attr_accessor skips: ::Array[String]
     end
 
+    type property_result = [Integer, Symbol, ::RBS::MethodType, StringIO?]
+
     DEFAULT_SKIP: ::Set[String]
 
     @argv: Array[String]
+    @results:  Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
 
     def self.option: () -> Option
     def self.option=: (Option) -> void
 
     def initialize: (Array[String]) -> void
     def load: () -> self
+    def run: () -> Integer
 
-    type property_result = [Integer, Symbol, ::RBS::MethodType, StringIO?]
-    def run: () -> self
-    def run_by: (kind: (:instance | :singleton), tag: String) -> Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
-    def run_by_type_name: (tag: String) -> Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
-    def run_by_type_name_with_search: (tag: String) -> Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
+    private
+
+    def run_by: (kind: (:instance | :singleton), tag: String) -> void
+    def run_by_type_name: (tag: String) -> void
+    def run_by_type_name_with_search: (tag: String) -> void
     def property: (receiver_type: Type, type_params_decl: Array[::RBS::AST::TypeParam], type_args: Array[::RBS::Types::t], method_name: Symbol, method_type: ::RBS::MethodType) -> property_result
+    def report: () -> Integer
   end
 
   class FunctionType
