@@ -91,7 +91,7 @@ module RaaP
           if !args.empty?
             # The reproduction code is kept short and executable.
             if [Value::Interface, Value::Intersection].include?(receiver_value)
-              if !args.all? { |a| a.free_variables.empty? }
+              if args.all? { |a| a.respond_to?(:free_variables) } && !args.all? { |a| a.free_variables.empty? }
                 # FIXME: Type arguments are not yet supported.
                 args.each do |a|
                   lines << "# Free variables: #{a.free_variables.to_a.join(', ')}"
