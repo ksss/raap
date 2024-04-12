@@ -88,7 +88,20 @@ module RaaP
           var_eq = '' if is_last
 
           arguments = []
-          arguments << args.map { |a| printable(a) } if !args.empty?
+          if !args.empty?
+            # The reproduction code is kept short and executable.
+            if [Value::Interface, Value::Intersection].include?(receiver_value)
+              if !args.all? { |a| a.free_variables.empty? }
+                # FIXME: Type arguments are not yet supported.
+                args.each do |a|
+                  lines << "# Free variables: #{a.free_variables.to_a.join(', ')}"
+                end
+              end
+              arguments << args.map { |a| printable(a.to_s) }
+            else
+              arguments << args.map { |a| printable(a) }
+            end
+          end
           arguments << kwargs.map { |k, v| "#{k}: #{printable(v)}" }.join(', ') if !kwargs.empty?
           block_str = block ? " { }" : ""
 

@@ -132,4 +132,36 @@ class TestSymbolicCaller < Minitest::Test
       #{expect}.then()
     CODE
   end
+
+  def test_intersection
+    type = ::RBS::Types::Intersection.new(
+      types: [
+        RaaP::RBS.parse_type("Object"),
+        RaaP::RBS.parse_type("_Each[Integer]"),
+      ],
+      location: nil
+    )
+    sc = SymbolicCaller.new([:call, RaaP::Value::Intersection, :new, [type], {}, nil])
+    assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
+      RaaP::Value::Intersection.new('Object & _Each[Integer]')
+    CODE
+  end
+
+  def test_intersection_with_variable
+    type = ::RBS::Types::Intersection.new(
+      types: [
+        ::RBS::Types::ClassInstance.new(
+          name: TypeName("Array"),
+          args: [::RBS::Types::Variable.new(name: :T, location: nil)],
+          location: nil
+        )
+      ],
+      location: nil
+    )
+    sc = SymbolicCaller.new([:call, RaaP::Value::Intersection, :new, [type], {}, nil])
+    assert_equal <<~CODE.chomp, sc.to_lines.join("\n")
+      # Free variables: T
+      RaaP::Value::Intersection.new('Array[T]')
+    CODE
+  end
 end

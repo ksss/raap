@@ -105,24 +105,25 @@ module RaaP
       raise TypeError, "size should be Integer" unless size.is_a?(Integer)
       raise ArgumentError, "negative size" if size.negative?
 
-      stringable =
-        if type.each_type.find { |t| t.instance_of?(::RBS::Types::Variable) }
-          type
-        else
-          type.to_s
-        end
-
       case type
       when ::RBS::Types::Tuple
         type.types.map { |t| Type.new(t).to_symbolic_call(size:) }
       when ::RBS::Types::Union
         type.types.sample&.then { |t| Type.new(t).to_symbolic_call(size:) }
       when ::RBS::Types::Intersection
-        [:call, Value::Intersection, :new, [stringable], { size: }, nil]
+        if type.free_variables.empty?
+          [:call, Value::Intersection, :new, [type.to_s], { size: }, nil]
+        else
+          [:call, Value::Intersection, :new, [type], { size: }, nil]
+        end
       when ::RBS::Types::Interface
-        [:call, Value::Interface, :new, [stringable], { size: }, nil]
+        if type.free_variables.empty?
+          [:call, Value::Interface, :new, [type.to_s], { size: }, nil]
+        else
+          [:call, Value::Interface, :new, [type], { size: }, nil]
+        end
       when ::RBS::Types::Variable
-        [:call, Value::Variable, :new, [stringable], {}, nil]
+        [:call, Value::Variable, :new, [type.to_s], {}, nil]
       when ::RBS::Types::Bases::Void
         [:call, Value::Void, :new, [], {}, nil]
       when ::RBS::Types::Bases::Top
