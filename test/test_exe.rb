@@ -44,7 +44,7 @@ class TestExe < Minitest::Test
     assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
       "--timeout", "1",
-      "--size-by", "1",
+      "--size-by", "10",
       "Test::List",
     ]).load.run
   end
@@ -53,7 +53,7 @@ class TestExe < Minitest::Test
     assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
       "--timeout", "1",
-      "--size-by", "1",
+      "--size-by", "10",
       "::Array#compact!",
     ]).load.run
   end
@@ -62,8 +62,17 @@ class TestExe < Minitest::Test
     assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
       "--timeout", "1",
-      "--size-by", "1",
+      "--size-by", "10",
       "::Array[Integer?]#compact!",
+    ]).load.run
+  end
+
+  def test_block_to_value
+    assert_equal 0, RaaP::CLI.new([
+      "--log-level", "info",
+      "--timeout", "1",
+      "--size-by", "10",
+      "::Enumerable[Integer]#max_by",
     ]).load.run
   end
 
