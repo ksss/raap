@@ -18,7 +18,7 @@ module RaaP
   self.logger = ::Logger.new($stdout, formatter: proc { |severity, _datetime, _progname, msg|
     "[RaaP] #{severity}: #{msg}\n"
   })
-  self.logger.level = ::Logger::WARN
+  self.logger.level = ::Logger::INFO
 
   autoload :BindCall, "raap/bind_call"
   autoload :CLI, "raap/cli"
