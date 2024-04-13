@@ -266,7 +266,7 @@ module RaaP
       RaaP.logger.info("## def #{prefix}#{method_name}: #{method_type}")
       status = 0
       reason = nil
-      stats = MethodProperty.new(
+      prop = MethodProperty.new(
         receiver_type:,
         method_name:,
         method_type: MethodType.new(
@@ -280,7 +280,9 @@ module RaaP
         size_step: @option.size_from.step(to: @option.size_to, by: @option.size_by),
         timeout: @option.timeout,
         allow_private: true,
-      ).run do |called|
+      )
+      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      stats = prop.run do |called|
         case called
         in Result::Success => s
           print '.'
@@ -314,8 +316,11 @@ module RaaP
           RaaP.logger.debug(e.exception.backtrace.join("\n"))
         end
       end
+      end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       puts
-      stats_log = "success: #{stats.success}, skip: #{stats.skip}, exception: #{stats.exception}"
+      time_diff = end_time - start_time
+      time = ", time: #{(time_diff * 1000).round}ms"
+      stats_log = "success: #{stats.success}, skip: #{stats.skip}, exception: #{stats.exception}#{time}"
       RaaP.logger.info(stats_log)
 
       if status == 0 && stats.success.zero? && !stats.break
