@@ -49,13 +49,42 @@ class TestValue < Minitest::Test
   end
 
   def test_module
-    mod = Module.new("Comparable")
-    assert mod.object_id
-    assert_respond_to mod, :<=>
-
     assert_raises(TypeError) do
       Module.new("bool")
     end
+
+    mod = Module.new("::Test::ValueModule")
+    assert mod.object_id
+    assert_raises(NoMethodError) do
+      mod.not_defined
+    end
+  end
+
+  def test_module_with_self_type
+    mod = Module.new("::Test::ValueModuleWithBasicObject")
+    assert mod.__id__
+    assert_raises(NoMethodError) do
+      mod.object_id
+    end
+  end
+
+  def test_module_with_interface_and_no_args
+    mod = Module.new("::Test::ValueModuleWithInterface", size: 10)
+    count = 0
+    mod.each_t do
+      count += 1
+    end
+    assert_equal 10, count
+  end
+
+  def test_module_with_interface_and_args
+    mod = Module.new("::Test::ValueModuleWithInterface[Integer]", size: 10)
+    count = 0
+    mod.each_t do |int|
+      count += 1
+      assert_instance_of Integer, int
+    end
+    assert_equal 10, count
   end
 
   def test_top

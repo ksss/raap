@@ -195,7 +195,7 @@ module RaaP
           raise
         end
       else
-        [:call, Value::Module, :new, [type.to_s], {}, nil]
+        [:call, Value::Module, :new, [type.to_s], { size: }, nil]
       end
     end
 
@@ -336,7 +336,7 @@ module RaaP
     def temp_method_object
       o = Object.new
       m = 6.times.map { SIMPLE_SOURCE.sample }.join
-      o.define_singleton_method(m) {} # rubocop:disable Lint/EmptyBlock
+      o.define_singleton_method(m) {}
       o.method(m)
     end
   end

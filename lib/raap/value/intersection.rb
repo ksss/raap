@@ -21,21 +21,26 @@ module RaaP
       end
 
       def method_missing(name, *args, **kwargs, &block)
-        @children.each do |child|
-          if BindCall.respond_to?(child, name)
-            return child.__send__(name, *args, **kwargs, &block)
+        if respond_to?(name)
+          @children.each do |child|
+            if BindCall.respond_to?(child, name)
+              return child.__send__(name, *args, **kwargs, &block)
+            end
           end
+          ::Kernel.raise
+        else
+          super
         end
-
-        super
       end
 
       def respond_to?(name, include_all = false)
-        @children.any? do |type|
-          BindCall.respond_to?(type, name, include_all)
+        @children.any? do |child|
+          if BindCall.instance_of?(child, ::BasicObject)
+            BindCall.respond_to?(child, name, include_all)
+          else
+            child.respond_to?(name, include_all)
+          end
         end
-
-        super
       end
     end
   end

@@ -10,10 +10,10 @@ module RaaP
         end
         @size = size
 
-        definition = RBS.builder.build_interface(@type.name.absolute!)
-        definition.methods.each do |name, method|
+        @definition = RBS.builder.build_interface(@type.name.absolute!)
+        @definition.methods.each do |name, method|
           method_type = method.method_types.sample or Kernel.raise
-          type_params = definition.type_params_decl.concat(method_type.type_params.drop(definition.type_params_decl.length))
+          type_params = @definition.type_params_decl.concat(method_type.type_params.drop(@definition.type_params_decl.length))
           ts = TypeSubstitution.new(type_params, @type.args)
 
           subed_method_type = ts.method_type_sub(method_type, self_type:, instance_type:, class_type:)
@@ -42,12 +42,16 @@ module RaaP
         end
       end
 
+      def respond_to?(name, _include_all = false)
+        @definition.methods.has_key?(name.to_sym)
+      end
+
       def class
         Interface
       end
 
       def inspect
-        "#<interface @type=#{@type} @methods=#{RBS.builder.build_interface(@type.name.absolute!).methods.keys} @size=#{@size}>"
+        "#<interface @type=#{@type} @methods=#{@definition.methods.keys} @size=#{@size}>"
       end
     end
   end

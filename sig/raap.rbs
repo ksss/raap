@@ -7,7 +7,7 @@ module RaaP
 
   module BindCall
     def self.define_singleton_method: (untyped, Symbol) { (*untyped, **untyped) -> untyped } -> void
-    def self.respond_to?: (untyped, Symbol, ?bool) -> bool
+    def self.respond_to?: (untyped, untyped, ?boolish) -> bool
     def self.instance_of?: (untyped, Module) -> bool
     def self.is_a?: (untyped, Module) -> bool
     def self.extend: (untyped, Module) -> void
@@ -106,7 +106,7 @@ module RaaP
     private
 
     def call: (size: Integer, stats: Stats) -> (Result::Success | Result::Failure | Result::Skip | Result::Exception)
-    def check_return: (receiver_value: untyped, return_value: untyped) -> bool
+    def check_return: (receiver_value: untyped, return_value: untyped) -> ([Symbol] | [Symbol, Exception])
     def return_type: () -> RBS::Types::t
   end
 
@@ -293,8 +293,11 @@ module RaaP
       @type: ::RBS::Types::Interface
       @size: Integer
       @definition: ::RBS::Definition
+      @fixed_return_value: untyped
+      @fixed_block_arguments: Array[untyped]
 
       def initialize: (String | ::RBS::Types::Interface | String, ?size: Integer) -> void
+      def respond_to?: (Symbol, ?boolish) -> bool
       def inspect: () -> String
       def class: () -> class
     end
@@ -305,14 +308,18 @@ module RaaP
       @size: Integer
 
       def initialize: (::RBS::Types::Intersection | String, ?size: Integer) -> void
+      def respond_to?: (Symbol, ?boolish) -> bool
       def inspect: () -> String
       def class: () -> class
     end
 
-    class Module
-      attr_reader type: ::RBS::Types::ClassInstance
+    class Module < BasicObject
+      @type: ::RBS::Types::ClassInstance
+      @size: Integer
+      @self_type: untyped
 
-      def initialize: (::RBS::Types::ClassInstance | String) -> void
+      def initialize: (::RBS::Types::ClassInstance | String, ?size: Integer) -> void
+      def respond_to?: (Symbol, ?boolish) -> bool
       def inspect: () -> String
       def class: () -> class
     end

@@ -96,11 +96,14 @@ class TestType < Minitest::Test
   end
 
   def test_intersection
-    o = Type.new("_Each[Integer] & Object").pick
+    o = Type.new("Object & _Each[Integer]").pick(size: 10)
+    assert_respond_to o, :each
+
     a = []
     o.each do |i|
       a << i
     end
+    assert_equal 10, a.length
     assert(a.all? { |i| i.instance_of?(Integer) })
 
     assert_equal ["RaaP::Value::Intersection.new('_Each[Integer] & Object', size: 3)"],
@@ -108,11 +111,11 @@ class TestType < Minitest::Test
   end
 
   def test_module
-    assert Kernel === Type.new("Kernel").pick
-    assert Enumerable === Type.new("Enumerable").pick
-    assert Comparable === Type.new("Comparable").pick
-    assert_equal ["RaaP::Value::Module.new('Comparable')"],
-                 Type.new("Comparable").to_symbolic_caller.to_lines
+    assert_respond_to Type.new("Kernel").pick, :object_id # : BasicObject
+    assert_respond_to Type.new("Comparable").pick, :<=>   # : _WithSpaceshipOperator
+    assert_respond_to Type.new("Enumerable").pick, :each  # : _Each[Elem]
+    assert_equal ["RaaP::Value::Module.new('Comparable', size: 13)"],
+                 Type.new("Comparable").to_symbolic_caller(size: 13).to_lines
   end
 
   def test_variable

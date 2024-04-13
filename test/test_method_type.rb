@@ -46,7 +46,6 @@ class TestMethodType < Minitest::Test
         Test::Meth.new.arg1(int)
       end
     rescue Minitest::Assertion => e
-      puts e.message
       assert e
     end
   end

@@ -6,6 +6,8 @@ AllCops:
 
 Lint:
   Enabled: true
+Lint/EmptyBlock:
+  Enabled: false
 
 Style:
   Enabled: false
