@@ -17,7 +17,7 @@ class TestExe < Minitest::Test
   def test_exe_with_search
     assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
-      "--timeout", "1",
+      "--timeout", "0.5",
       "--size-by", "5",
       "--skip", "::Test::Property#alias",
       "Test::*"

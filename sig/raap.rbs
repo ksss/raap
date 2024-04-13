@@ -19,9 +19,9 @@ module RaaP
 
   class CLI
     class Option < ::Struct[untyped]
-      def self.new: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?skips: ::Array[::String]) -> instance
+      def self.new: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?skips: ::Array[::String]) -> instance
 
-      def self.[]: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?skips: ::Array[::String]) -> instance
+      def self.[]: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?skips: ::Array[::String]) -> instance
 
       def self.keyword_init?: () -> true
 
@@ -35,7 +35,7 @@ module RaaP
 
       attr_accessor libraries: ::Array[String]
 
-      attr_accessor timeout: (Integer | Float | nil)
+      attr_accessor timeout: (Float | nil)
 
       attr_accessor size_from: ::Integer
 
@@ -97,10 +97,10 @@ module RaaP
     @method_name: Symbol
     @method_type: MethodType
     @size_step: _Each[Integer]
-    @timeout: (Integer | Float | nil)
+    @timeout: (Float | nil)
     @allow_private: bool
 
-    def initialize: (receiver_type: Type, method_name: Symbol, method_type: MethodType, size_step: _Each[Integer], timeout: (Integer | Float | nil), ?allow_private: bool) -> void
+    def initialize: (receiver_type: Type, method_name: Symbol, method_type: MethodType, size_step: _Each[Integer], timeout: (Float | nil), ?allow_private: bool) -> void
     def run: () { (Result::Success | Result::Failure | Result::Skip | Result::Exception) -> void } -> Stats
 
     private

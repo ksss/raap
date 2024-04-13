@@ -67,7 +67,7 @@ module RaaP
         o.on('--log-level level', "default: warn") do |arg|
           RaaP.logger.level = arg
         end
-        o.on('--timeout sec', Integer, "default: #{@option.timeout}") do |arg|
+        o.on('--timeout sec', Float, "default: #{@option.timeout}") do |arg|
           @option.timeout = arg
         end
         o.on('--size-from int', Integer, "default: #{@option.size_from}") do |arg|
