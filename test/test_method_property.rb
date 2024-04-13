@@ -82,4 +82,21 @@ class TestMethodProperty < Minitest::Test
     end
     assert_equal 0, stats.exception
   end
+
+  def test_return_type_has_error
+    prop = MethodProperty.new(
+      receiver_type: Type.new("Array[Integer]"),
+      method_name: :max_by,
+      method_type: MethodType.new("(-10) -> Enumerator[untyped,untyped]"),
+      size_step: 0...10,
+      timeout: 1,
+    )
+    stats = prop.run do |called|
+      case called
+      in Result::Exception
+        # ok
+      end
+    end
+    assert_equal 10, stats.exception
+  end
 end

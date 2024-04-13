@@ -33,23 +33,32 @@ module RaaP
           value = val.empty? ? 'untyped' : return_value_to_type(val.values.first)
           "Hash[#{key}, #{value}]"
         when Enumerator
-          elem = begin
-            return_value_to_type(val.peek)
-          rescue StopIteration
-            # empty
-            'untyped'
-          end
-          ret = if val.size == Float::INFINITY
-                  'bot'
-                else
-                  val.each {
-                    # empty
-                  }.tap { val.rewind }.then { return_value_to_type(_1) }
-                end
+          elem =
+            begin
+              return_value_to_type(val.peek)
+            rescue StandardError
+              'untyped'
+            end
+          ret =
+            if val.size == Float::INFINITY
+              'bot'
+            else
+              begin
+                val.each {}
+                   .tap { val.rewind }
+                   .then { return_value_to_type(_1) }
+              rescue StandardError
+                'untyped'
+              end
+            end
           "Enumerator[#{elem}, #{ret}]"
         else
           "#{BindCall.class(val)}"
         end
+      rescue StandardError => e
+        RaaP.logger.debug("[#{e.class}] #{e.exception.detailed_message}")
+        RaaP.logger.debug(e.exception.backtrace&.join("\n"))
+        "raised #{e.class} with check return_type"
       end
     end
 

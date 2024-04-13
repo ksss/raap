@@ -23,7 +23,20 @@ module RaaP
         Timeout.timeout(@timeout) do
           catch(:break) do
             @size_step.each do |size|
-              yield call(size:, stats:)
+              call(size:, stats:).tap do |ret|
+                case ret
+                when Result::Success
+                  stats.success += 1
+                when Result::Failure
+                  # no count
+                when Result::Skip
+                  stats.skip += 1
+                when Result::Exception
+                  stats.exception += 1
+                end
+
+                yield ret
+              end
             end
           end
         end
@@ -49,12 +62,12 @@ module RaaP
       symbolic_caller = SymbolicCaller.new(symbolic_call, allow_private: @allow_private)
       begin
         # ensure symbolic_call
-        check = false
+        check = [:failure]
         if return_type.instance_of?(::RBS::Types::Bases::Bottom)
           begin
             return_value = symbolic_caller.eval
           rescue StandardError, NotImplementedError
-            check = true
+            check = [:success]
             return_value = Value::Bottom.new
           rescue Exception => e # rubocop:disable Lint/RescueException
             RaaP.logger.error("[#{e.class}] class is not supported to check `bot` type")
@@ -64,11 +77,13 @@ module RaaP
           return_value = symbolic_caller.eval
           check = check_return(receiver_value:, return_value:)
         end
-        if check
-          stats.success += 1
+        case check
+        in [:success]
           Result::Success.new(symbolic_call:, return_value:)
-        else
+        in [:failure]
           Result::Failure.new(symbolic_call:, return_value:)
+        in [:exception, exception]
+          Result::Exception.new(symbolic_call:, exception:)
         end
       rescue TypeError => exception
         Result::Failure.new(symbolic_call:, return_value:, exception:)
@@ -76,7 +91,6 @@ module RaaP
 
     # not ensure symbolic_call
     rescue NoMethodError, NotImplementedError => exception
-      stats.skip += 1
       Result::Skip.new(symbolic_call:, exception:)
     rescue NameError => e
       RaaP.logger.error("[#{e.class}] #{e.detailed_message}")
@@ -86,11 +100,9 @@ module RaaP
       stats.break = true
       throw :break
     rescue SystemStackError => exception
-      stats.skip += 1
       RaaP.logger.info "Found recursive type definition."
       Result::Skip.new(symbolic_call:, exception:)
     rescue => exception
-      stats.exception += 1
       Result::Exception.new(symbolic_call:, exception:)
     end
 
@@ -98,7 +110,11 @@ module RaaP
       if BindCall.is_a?(receiver_value, Module)
         if BindCall.is_a?(return_type, ::RBS::Types::ClassSingleton)
           # ::RBS::Test::TypeCheck cannot support to check singleton class
-          return receiver_value == return_value
+          if receiver_value == return_value
+            [:success]
+          else
+            [:failure]
+          end
         end
 
         self_class = receiver_value
@@ -116,10 +132,14 @@ module RaaP
         unchecked_classes: []
       )
       begin
-        type_check.value(return_value, return_type)
+        if type_check.value(return_value, return_type)
+          [:success]
+        else
+          [:failure]
+        end
       rescue => e
-        RaaP.logger.error("Type check fail by `(#{e.class}) #{e.message}`")
-        false
+        RaaP.logger.debug("Type check fail by `(#{e.class}) #{e.message}`")
+        [:exception, e]
       end
     end
 
