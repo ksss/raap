@@ -177,5 +177,9 @@ module Test
     def each_t(&block)
       each(&block)
     end
+
+    def too_f
+      to_f
+    end
   end
 end

@@ -85,6 +85,8 @@ class TestValue < Minitest::Test
       assert_instance_of Integer, int
     end
     assert_equal 10, count
+
+    assert_instance_of Float, mod.too_f
   end
 
   def test_top

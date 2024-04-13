@@ -14,21 +14,24 @@ module RaaP
         @self_type = if one_instance_ancestors.nil? || one_instance_ancestors.empty?
                        ::Object.new
                      else
-                       a_instance = one_instance_ancestors.first or ::Kernel.raise
-                       if a_instance.args.empty?
-                         # : BasicObject
-                         Type.new(a_instance.name.to_s).pick(size:)
-                       else
-                         # : _Each[Integer]
-                         args = a_instance.args.zip(@type.args).map do |_var, instance|
-                           if instance
-                             instance.to_s
-                           else
-                             'untyped'
+                       one_instance_ancestors.map do |a_instance|
+                         if a_instance.args.empty?
+                           # : BasicObject
+                           a_instance.name.absolute!.to_s
+                         else
+                           # : _Each[Integer]
+                           args = a_instance.args.zip(@type.args).map do |_var, instance|
+                             if instance
+                               instance.to_s
+                             else
+                               'untyped'
+                             end
                            end
+                           "#{a_instance.name}[#{args.map(&:to_s).join(', ')}]"
                          end
-                         t = "Object & #{a_instance.name}[#{args.map(&:to_s).join(', ')}]"
-                         Type.new(t).pick(size:)
+                       end.then do |ts|
+                         ts << 'Object' if !ts.include?('::BasicObject')
+                         Type.new(ts.join(' & ')).pick(size:)
                        end
                      end
         const = ::Object.const_get(@type.name.absolute!.to_s)
