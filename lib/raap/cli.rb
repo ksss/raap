@@ -16,6 +16,7 @@ module RaaP
       keyword_init: true
     )
 
+    # Should skip methods has side effects
     DEFAULT_SKIP = Set.new
     %i[
       fork system exec spawn `

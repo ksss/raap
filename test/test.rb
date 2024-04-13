@@ -166,4 +166,16 @@ module Test
       self
     end
   end
+
+  module ValueModule
+  end
+
+  module ValueModuleWithBasicObject
+  end
+
+  module ValueModuleWithInterface
+    def each_t(&block)
+      each(&block)
+    end
+  end
 end

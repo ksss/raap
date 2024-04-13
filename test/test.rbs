@@ -117,4 +117,14 @@ module Test
     def initialize: (T) -> void
     def nest: (Nested[T]) -> self
   end
+
+  module ValueModule
+  end
+
+  module ValueModuleWithBasicObject : BasicObject
+  end
+
+  module ValueModuleWithInterface[T] : _Each[T]
+    def each_t: () { (T) -> void } -> void
+  end
 end
