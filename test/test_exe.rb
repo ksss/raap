@@ -71,7 +71,7 @@ class TestExe < Minitest::Test
     assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
       "--timeout", "1",
-      "--size-by", "10",
+      "--size-by", "2",
       "::Enumerable[Integer]#max_by",
     ]).load.run
   end
