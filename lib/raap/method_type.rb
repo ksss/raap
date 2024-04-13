@@ -44,7 +44,8 @@ module RaaP
       return nil if block.nil?
       return nil if (block.required == false) && [true, false].sample
 
-      Proc.new { Type.new(block.type.return_type).to_symbolic_call(size:) }
+      fixed_return_value = Type.new(block.type.return_type).to_symbolic_call(size:)
+      Proc.new { fixed_return_value }
     end
 
     def check_return(return_value)
