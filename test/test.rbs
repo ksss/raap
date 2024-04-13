@@ -124,7 +124,8 @@ module Test
   module ValueModuleWithBasicObject : BasicObject
   end
 
-  module ValueModuleWithInterface[T] : _Each[T]
+  module ValueModuleWithInterface[T] : _Each[T], _ToF
     def each_t: () { (T) -> void } -> void
+    def too_f: () -> Float
   end
 end
