@@ -1,5 +1,7 @@
 # RaaP
 
+![Jacket](https://raw.githubusercontent.com/ksss/raap/main/public/DALL%C2%B7E%202024-03-23%2000.02.29%20-%20Imagine%20a%20scene%20where%20the%20abstract%20concepts%20of%20Ruby%20programming%20and%20property-based%20testing%20blend%20harmoniously.%20Picture%20a%20large%2C%20glowing%20ruby%20crystal%2C%20.webp)
+
 ## RBS as a Property
 
 RaaP is a property based testing tool.
