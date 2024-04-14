@@ -3,7 +3,7 @@ PATH
   specs:
     raap (0.3.0)
       rbs (~> 3.0)
-      timeout
+      timeout (~> 0.4)
 
 GEM
   remote: https://rubygems.org/
