@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    raap (0.3.0)
+    raap (0.4.0)
       rbs (~> 3.0)
       timeout (~> 0.4)
 
