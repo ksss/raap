@@ -128,4 +128,9 @@ module Test
     def each_t: () { (T) -> void } -> void
     def too_f: () -> Float
   end
+
+  class BlockReturnVoid
+    def initialize: () { () -> void } -> void
+    def call: () -> void
+  end
 end

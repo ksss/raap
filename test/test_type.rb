@@ -208,6 +208,10 @@ class TestType < Minitest::Test
     assert_equal false, Type.new('false').pick
   end
 
+  def test_block_return_void
+    assert RaaP::BindCall.instance_of?(Type.new("Test::BlockReturnVoid").pick.call, RaaP::Value::Void)
+  end
+
   # TODO
   # def test_nested
   #   assert_instance_of Test::Nested, Type.new("Test::Nested").pick

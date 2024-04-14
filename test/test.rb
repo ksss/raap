@@ -182,4 +182,14 @@ module Test
       to_f
     end
   end
+
+  class BlockReturnVoid
+    def initialize(&block)
+      @block = block
+    end
+
+    def call
+      @block.call
+    end
+  end
 end
