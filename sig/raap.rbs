@@ -118,7 +118,6 @@ module RaaP
     def pick_arguments: (?size: Integer) -> [Array[untyped], Hash[Symbol, untyped], ::Proc?]
     def arguments_to_symbolic_call: (?size: Integer) -> [Array[untyped], Hash[Symbol, untyped], ::Proc?]
     def pick_block: (?size: Integer) -> ::Proc?
-    def block_to_symbolic_call: (?size: Integer) -> ::Proc?
     def check_return: (untyped) -> bool
   end
 
