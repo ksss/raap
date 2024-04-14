@@ -133,4 +133,9 @@ module Test
     def initialize: () { () -> void } -> void
     def call: () -> void
   end
+
+  class BlockReturnLiteral
+    def initialize: () { () -> :literal! } -> void
+    def call: () -> :literal!
+  end
 end

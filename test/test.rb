@@ -192,4 +192,14 @@ module Test
       @block.call
     end
   end
+
+  class BlockReturnLiteral
+    def initialize(&block)
+      @block = block
+    end
+
+    def call
+      @block.call
+    end
+  end
 end
