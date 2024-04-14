@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'raap'
 
 exit RaaP::CLI.new(ARGV).load.run
