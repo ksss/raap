@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rbs", "~> 3.0"
   spec.add_dependency "timeout"
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end
