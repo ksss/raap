@@ -50,7 +50,7 @@ module RaaP
     private
 
     def call(size:, stats:)
-      if @method_type.rbs.each_type.find { |t| t.instance_of?(::RBS::Types::Bases::Any) }
+      if @method_type.rbs.type.each_type.find { |t| t.instance_of?(::RBS::Types::Bases::Any) }
         RaaP.logger.info { "Skip type check since `#{@method_type.rbs}` includes `untyped`" }
         stats.break = true
         throw :break

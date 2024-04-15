@@ -99,4 +99,41 @@ class TestMethodProperty < Minitest::Test
     end
     assert_equal 10, stats.exception
   end
+
+  def test_skip_if_include_untyped
+    prop = MethodProperty.new(
+      receiver_type: Type.new("Test::SkipIfIncludeUntyped"),
+      method_name: :u,
+      method_type: MethodType.new("(untyped) -> untyped"),
+      size_step: 0...100,
+      timeout: 1,
+    )
+    stats = prop.run {}
+    assert_equal 0, stats.success
+
+    prop = MethodProperty.new(
+      receiver_type: Type.new("Test::SkipIfIncludeUntyped"),
+      method_name: :u,
+      method_type: MethodType.new("(__todo__) -> __todo__"),
+      size_step: 0...100,
+      timeout: 1,
+    )
+    stats = prop.run {}
+    assert_equal 0, stats.success
+
+    prop = MethodProperty.new(
+      receiver_type: Type.new("Test::SkipIfIncludeUntyped"),
+      method_name: :u,
+      method_type: MethodType.new("() { (untyped) -> untyped } -> void"),
+      size_step: 0...10,
+      timeout: 1,
+    )
+    stats = prop.run do |called|
+      case called
+      in Result::Success
+        # ok
+      end
+    end
+    assert_equal 10, stats.success
+  end
 end

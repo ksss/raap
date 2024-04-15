@@ -202,4 +202,9 @@ module Test
       @block.call
     end
   end
+
+  class SkipIfIncludeUntyped
+    def u(&block)
+    end
+  end
 end
