@@ -62,7 +62,7 @@ module RaaP
         o.on('--require lib', 'require ruby library') do |lib|
           @option.requires << lib
         end
-        o.on('--log-level level', "default: warn") do |arg|
+        o.on('--log-level level', "default: info") do |arg|
           RaaP.logger.level = arg
         end
         o.on('--timeout sec', Float, "default: #{@option.timeout}") do |arg|
