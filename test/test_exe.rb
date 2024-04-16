@@ -62,7 +62,7 @@ class TestExe < Minitest::Test
 
   def test_block_to_value
     assert_equal 0, RaaP::CLI.new([
-      "--log-level", "info",
+      "--log-level", "warn",
       "--timeout", "1",
       "--size-by", "2",
       "::Enumerable[Integer]#max_by",
