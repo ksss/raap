@@ -19,8 +19,10 @@ class TestExe < Minitest::Test
       "--log-level", "info",
       "--timeout", "0.5",
       "--size-by", "5",
-      "--skip", "::Test::Property#alias",
-      "Test::*"
+      "Test::*",
+      "!Test::Property#alias",
+      "!Test::List",
+      "!Test::SkipPrefix#should_skip",
     ]).load.run
   end
 
@@ -38,15 +40,6 @@ class TestExe < Minitest::Test
     assert_match "  in test/test.rbs:4:4...4:32", $stdout.string
   ensure
     $stdout = orig
-  end
-
-  def test_exe_without_args
-    assert_equal 0, RaaP::CLI.new([
-      "--log-level", "info",
-      "--timeout", "1",
-      "--size-by", "10",
-      "Test::List",
-    ]).load.run
   end
 
   def test_exe_array_compact
@@ -76,11 +69,20 @@ class TestExe < Minitest::Test
     ]).load.run
   end
 
+  def test_exe_without_args
+    assert_equal 0, RaaP::CLI.new([
+      "--log-level", "info",
+      "--timeout", "1",
+      "--size-by", "20",
+      "Test::List",
+    ]).load.run
+  end
+
   def test_exe_with_args
     assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
       "--timeout", "1",
-      "--size-to", "10",
+      "--size-to", "20",
       "Test::List[Integer]",
     ]).load.run
   end

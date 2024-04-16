@@ -19,15 +19,15 @@ module RaaP
 
   class CLI
     class Option < ::Struct[untyped]
-      def self.new: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?skips: ::Array[::String]) -> instance
+      def self.new: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool) -> instance
 
-      def self.[]: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?skips: ::Array[::String]) -> instance
+      def self.[]: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool) -> instance
 
       def self.keyword_init?: () -> true
 
-      def self.members: () -> [ :dirs, :requires, :library, :timeout, :size_from, :size_to, :size_by, :allow_private, :skips]
+      def self.members: () -> [ :dirs, :requires, :library, :timeout, :size_from, :size_to, :size_by, :allow_private]
 
-      def members: () -> [ :dirs, :requires, :library, :timeout, :size_from, :size_to, :size_by, :allow_private, :skips]
+      def members: () -> [ :dirs, :requires, :library, :timeout, :size_from, :size_to, :size_by, :allow_private]
 
       attr_accessor dirs: ::Array[String]
 
@@ -44,8 +44,6 @@ module RaaP
       attr_accessor size_by: ::Integer
 
       attr_accessor allow_private: bool
-
-      attr_accessor skips: ::Array[String]
     end
 
     type property_result = [Integer, Symbol, ::RBS::MethodType, StringIO?]
@@ -53,7 +51,9 @@ module RaaP
     DEFAULT_SKIP: ::Set[String]
 
     @argv: Array[String]
+    @option: Option
     @results:  Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
+    @skip: ::Set[::String]
 
     def self.option: () -> Option
     def self.option=: (Option) -> void

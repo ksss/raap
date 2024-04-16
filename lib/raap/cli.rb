@@ -12,7 +12,6 @@ module RaaP
       :size_to,
       :size_by,
       :allow_private,
-      :skips,
       keyword_init: true
     )
 
@@ -45,7 +44,6 @@ module RaaP
         size_from: 0,
         size_to: 99,
         size_by: 1,
-        skips: [],
         allow_private: false,
       )
       @argv = argv
@@ -82,9 +80,6 @@ module RaaP
         o.on('--allow-private', "default: #{@option.allow_private}") do
           @option.allow_private = true
         end
-        o.on('--skip tag', "skip case (e.g. `Foo#meth`)") do |tag|
-          @option.skips << tag
-        end
       end.parse!(@argv)
 
       @option.dirs.each do |dir|
@@ -96,10 +91,6 @@ module RaaP
       @option.requires.each do |lib|
         require lib
       end
-      @option.skips.each do |skip|
-        @skip << skip
-      end
-      @skip.freeze
 
       self
     end
@@ -111,7 +102,20 @@ module RaaP
         exit 1
       end
 
-      @argv.map do |tag|
+      # search !tag
+      @argv.each do |tag|
+        if tag.start_with?('!') && (tag.include?('#') || tag.include?('.'))
+          t = tag[1..] or raise
+          at = "::#{t}" unless t.start_with?('::')
+          at or raise
+          @skip << at
+        end
+      end
+      @skip.freeze
+
+      @argv.each do |tag|
+        next if tag.start_with?('!')
+
         case
         when tag.include?('#')
           run_by(kind: :instance, tag:)
@@ -204,7 +208,11 @@ module RaaP
     def run_by_type_name_with_search(tag:)
       first, _last = tag.split('::')
       RBS.env.class_decls.each do |name, _entry|
-        if ['', '::'].any? { |pre| name.to_s.match?(/\A#{pre}#{first}\b/) }
+        if ['', '::'].any? { |pre| name.to_s.start_with?("#{pre}#{first}") }
+          if @skip.include?(name.to_s)
+            RaaP.logger.info("Skip #{name}")
+            next
+          end
           run_by_type_name(tag: name.to_s)
         end
       end
@@ -220,8 +228,11 @@ module RaaP
 
       definition = RBS.builder.build_singleton(type_name)
       type_params_decl = definition.type_params_decl
-      definition.methods.filter_map do |method_name, method|
-        next if @skip.include?("#{type_name.absolute!}.#{method_name}")
+      definition.methods.each do |method_name, method|
+        if @skip.include?("#{type_name.absolute!}.#{method_name}")
+          RaaP.logger.info("Skip #{"#{type_name.absolute!}.#{method_name}"}")
+          next
+        end
         next unless method.accessibility == :public
         next if method.defined_in != type_name
 
@@ -236,8 +247,11 @@ module RaaP
 
       definition = RBS.builder.build_instance(type_name)
       type_params_decl = definition.type_params_decl
-      definition.methods.filter_map do |method_name, method|
-        next if @skip.include?("#{type_name.absolute!}##{method_name}")
+      definition.methods.each do |method_name, method|
+        if @skip.include?("#{type_name.absolute!}##{method_name}")
+          RaaP.logger.info("Skip #{"#{type_name.absolute!}.#{method_name}"}")
+          next
+        end
         next unless method.accessibility == :public
         next if method.defined_in != type_name
 
@@ -258,6 +272,8 @@ module RaaP
       else
         prefix = ''
       end
+
+      # type_args delegate to self_type
       type_params_decl.each_with_index do |_, i|
         if rtype.instance_of?(::RBS::Types::ClassInstance)
           rtype.args[i] = type_args[i] || ::RBS::Types::Bases::Any.new(location: nil)
