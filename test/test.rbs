@@ -138,4 +138,13 @@ module Test
     def initialize: () { () -> :literal! } -> void
     def call: () -> :literal!
   end
+
+  class SkipIfIncludeUntyped
+    def u: () { (untyped) -> untyped } -> void
+  end
+
+  class SkipPrefix
+    def should_not_skip: () -> :ok
+    def should_skip: () -> bot
+  end
 end

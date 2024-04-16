@@ -202,4 +202,14 @@ module Test
       @block.call
     end
   end
+
+  class SkipIfIncludeUntyped
+    def u(&block)
+    end
+  end
+
+  class SkipPrefix
+    def should_not_skip = :ok
+    def should_skip = raise("Should not run!")
+  end
 end
