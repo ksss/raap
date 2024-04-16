@@ -35,7 +35,7 @@ module RaaP
                        end
                      end
         const = ::Object.const_get(@type.name.absolute!.to_s)
-        BindCall.extend(@self_type, const)
+        BindCall.extend(self, const)
       end
 
       def method_missing(name, *args, **kwargs, &block)
