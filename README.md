@@ -70,6 +70,15 @@ $ raap 'MyClass'                  # Run only RBS of MyClass
 $ raap 'MyClass::*'               # Run each class under MyClass
 $ raap 'MyClass.singleton_method' # Run only MyClass.singleton_method
 $ raap 'MyClass#instance_method'  # Run only MyClass#instance_method
+$ raap 'MyClass' '!MyClass#skip'  # Run method MyClass without #skip
+```
+
+```
+$ cat test/raap.txt
+MyClass
+!MyClass#skip
+
+$ raap $(cat test/raap.txt)   # You can manage the methods to be tested in a file
 ```
 
 ## Size
@@ -103,11 +112,15 @@ You can specify to load specify PATH as RBS.
 
 ### `--library lib`
 
-You can specify to load RBS library
+You can specify to load RBS library.
 
 ### `--require lib`
 
-You can specify require Ruby library
+You can specify require Ruby library.
+
+### `--log-level level`
+
+You can specify log level (debug, info, warn or error).
 
 ### `--timeout sec`
 
@@ -124,6 +137,11 @@ You can specify size of end.
 ### `--size-by int`
 
 You can specify size of step like `Integer#step: (to: Integer, by: Integer)`.
+
+### `--allow-private`
+
+By default, raap only validates public methods.
+However, by setting this option, it is possible to intentionally validate private methods in the RBS.
 
 ## First support is CLI
 
