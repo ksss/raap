@@ -30,8 +30,10 @@ module RaaP
                            "#{a_instance.name}[#{args.map(&:to_s).join(', ')}]"
                          end
                        end.then do |ts|
-                         ts << 'Object' if !ts.include?('::BasicObject')
-                         Type.new(ts.join(' & ')).pick(size:)
+                         if !ts.include?('::BasicObject') || ts.any? { |t| t.split('::').last&.start_with?('_') }
+                           ts.unshift('Object')
+                         end
+                         Type.new(ts.uniq.join(' & ')).pick(size:)
                        end
                      end
         const = ::Object.const_get(@type.name.absolute!.to_s)
