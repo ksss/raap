@@ -306,7 +306,7 @@ module RaaP
         in Result::Failure => f
           puts 'F'
           if (e = f.exception)
-            RaaP.logger.debug { "Failure: [#{e.class}] #{e.message}" }
+            RaaP.logger.info { "Failure: [#{e.class}] #{e.message}" }
             RaaP.logger.debug { e.backtrace.join("\n") }
           end
           RaaP.logger.debug { PP.pp(f.symbolic_call, ''.dup) }
@@ -323,12 +323,12 @@ module RaaP
         in Result::Skip => s
           print 'S'
           RaaP.logger.debug { "\n```\n#{SymbolicCaller.new(s.symbolic_call).to_lines.join("\n")}\n```" }
-          RaaP.logger.debug("Skip: #{s.exception.detailed_message}")
+          RaaP.logger.info("Skip: #{s.exception.detailed_message}")
           RaaP.logger.debug(s.exception.backtrace.join("\n"))
         in Result::Exception => e
           print 'E'
           RaaP.logger.debug { "\n```\n#{SymbolicCaller.new(e.symbolic_call).to_lines.join("\n")}\n```" }
-          RaaP.logger.debug("Exception: #{e.exception.detailed_message}")
+          RaaP.logger.info("Exception: #{e.exception.detailed_message}")
           RaaP.logger.debug(e.exception.backtrace.join("\n"))
         end
       end
