@@ -279,7 +279,7 @@ module RaaP
         ),
         size_step: @option.size_from.step(to: @option.size_to, by: @option.size_by),
         timeout: @option.timeout,
-        allow_private: true,
+        allow_private: @option.allow_private,
       )
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       stats = prop.run do |called|
