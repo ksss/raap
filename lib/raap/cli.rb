@@ -102,9 +102,6 @@ module RaaP
         exit 1
       end
 
-      # Remove comment
-      @argv.delete_if { |arg| arg.empty? || arg.start_with?('#') }
-
       # Search skip tag
       @argv.each do |tag|
         if tag.start_with?('!') && (tag.include?('#') || tag.include?('.'))
