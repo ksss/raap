@@ -102,16 +102,13 @@ module RaaP
         exit 1
       end
 
-      # Remove comment
-      @argv.delete_if { |arg| arg.empty? || arg.start_with?('#') }
-
       # Search skip tag
       @argv.each do |tag|
         if tag.start_with?('!') && (tag.include?('#') || tag.include?('.'))
           t = tag[1..] or raise
-          at = "::#{t}" unless t.start_with?('::')
-          at or raise
-          @skip << at
+          t = "::#{t}" unless t.start_with?('::')
+          t or raise
+          @skip << t
         end
       end
       @skip.freeze
@@ -277,9 +274,9 @@ module RaaP
       end
 
       # type_args delegate to self_type
-      type_params_decl.each_with_index do |_, i|
+      type_params_decl.each_with_index do |param, i|
         if rtype.instance_of?(::RBS::Types::ClassInstance)
-          rtype.args[i] = type_args[i] || ::RBS::Types::Bases::Any.new(location: nil)
+          rtype.args[i] = type_args[i] || param.upper_bound || ::RBS::Types::Bases::Any.new(location: nil)
         end
       end
       RaaP.logger.info("## def #{prefix}#{method_name}: #{method_type}")
@@ -326,12 +323,12 @@ module RaaP
         in Result::Skip => s
           print 'S'
           RaaP.logger.debug { "\n```\n#{SymbolicCaller.new(s.symbolic_call).to_lines.join("\n")}\n```" }
-          RaaP.logger.info("Skip: #{s.exception.detailed_message}")
+          RaaP.logger.debug("Skip: #{s.exception.detailed_message}")
           RaaP.logger.debug(s.exception.backtrace.join("\n"))
         in Result::Exception => e
           print 'E'
           RaaP.logger.debug { "\n```\n#{SymbolicCaller.new(e.symbolic_call).to_lines.join("\n")}\n```" }
-          RaaP.logger.info("Exception: #{e.exception.detailed_message}")
+          RaaP.logger.debug("Exception: #{e.exception.detailed_message}")
           RaaP.logger.debug(e.exception.backtrace.join("\n"))
         end
       end

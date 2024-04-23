@@ -21,6 +21,9 @@ module RaaP
     end
 
     def method_type_sub(method_type, self_type: nil, instance_type: nil, class_type: nil)
+      self_type = self_type.is_a?(::String) ? RBS.parse_type(self_type) : self_type
+      instance_type = instance_type.is_a?(::String) ? RBS.parse_type(instance_type) : instance_type
+      class_type = class_type.is_a?(::String) ? RBS.parse_type(class_type) : class_type
       sub = build
       ::RBS::MethodType.new(
         type_params: [],
