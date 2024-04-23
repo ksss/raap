@@ -326,12 +326,12 @@ module RaaP
         in Result::Skip => s
           print 'S'
           RaaP.logger.debug { "\n```\n#{SymbolicCaller.new(s.symbolic_call).to_lines.join("\n")}\n```" }
-          RaaP.logger.info("Skip: #{s.exception.detailed_message}")
+          RaaP.logger.debug("Skip: #{s.exception.detailed_message}")
           RaaP.logger.debug(s.exception.backtrace.join("\n"))
         in Result::Exception => e
           print 'E'
           RaaP.logger.debug { "\n```\n#{SymbolicCaller.new(e.symbolic_call).to_lines.join("\n")}\n```" }
-          RaaP.logger.info("Exception: #{e.exception.detailed_message}")
+          RaaP.logger.debug("Exception: #{e.exception.detailed_message}")
           RaaP.logger.debug(e.exception.backtrace.join("\n"))
         end
       end
