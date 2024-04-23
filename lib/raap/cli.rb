@@ -109,9 +109,9 @@ module RaaP
       @argv.each do |tag|
         if tag.start_with?('!') && (tag.include?('#') || tag.include?('.'))
           t = tag[1..] or raise
-          at = "::#{t}" unless t.start_with?('::')
-          at or raise
-          @skip << at
+          t = "::#{t}" unless t.start_with?('::')
+          t or raise
+          @skip << t
         end
       end
       @skip.freeze
