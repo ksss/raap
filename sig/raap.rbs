@@ -6,7 +6,7 @@ module RaaP
   def self.logger=: (::Logger) -> void
 
   module BindCall
-    def self.define_singleton_method: (untyped, Symbol) { (*untyped, **untyped) -> untyped } -> void
+    def self.define_method: (untyped, Symbol) { (*untyped, **untyped) -> untyped } -> void
     def self.respond_to?: (untyped, untyped, ?boolish) -> bool
     def self.instance_of?: (untyped, Module) -> bool
     def self.is_a?: (untyped, Module) -> bool
@@ -220,7 +220,7 @@ module RaaP
 
     def initialize: (::Array[::RBS::AST::TypeParam], ::Array[::RBS::Types::t]) -> void
     def build: () -> ::RBS::Substitution
-    def method_type_sub: (::RBS::MethodType, ?self_type: ::RBS::Types::ClassInstance?, ?instance_type: ::RBS::Types::ClassInstance?, ?class_type: ::RBS::Types::ClassSingleton?) -> ::RBS::MethodType
+    def method_type_sub: (::RBS::MethodType, ?self_type: ::RBS::Types::t?, ?instance_type: ::RBS::Types::ClassInstance?, ?class_type: ::RBS::Types::ClassSingleton?) -> ::RBS::MethodType
 
     private
 
@@ -228,7 +228,7 @@ module RaaP
       def map_type: { (untyped) -> untyped } -> untyped
     end
 
-    def sub: (_MapType search, self_type: ::RBS::Types::ClassInstance?, instance_type: ::RBS::Types::ClassInstance?, class_type: ::RBS::Types::ClassSingleton?) -> untyped
+    def sub: (_MapType search, self_type: ::RBS::Types::t?, instance_type: ::RBS::Types::t?, class_type: ::RBS::Types::t?) -> untyped
   end
 
   class Type
@@ -245,6 +245,7 @@ module RaaP
     def self.register: (String) { () [self: instance] -> Sized[untyped] } -> void
     def self.random: () -> Type
     def self.random_without_basic_object: () -> Type
+    def self.call_new_from: (Module, ::RBS::Types::ClassInstance, size: Integer) -> symbolic_call
 
     attr_reader type: ::RBS::Types::t
     attr_reader range: Range[untyped]
@@ -292,9 +293,8 @@ module RaaP
       @type: ::RBS::Types::Interface
       @size: Integer
       @definition: ::RBS::Definition
-      @fixed_return_value: untyped
-      @fixed_block_arguments: Array[untyped]
 
+      def self.define_method_from_interface: (Class base_class, String | ::RBS::Types::Interface type, ?size: Integer) -> void
       def initialize: (String | ::RBS::Types::Interface | String, ?size: Integer) -> void
       def respond_to?: (Symbol, ?boolish) -> bool
       def inspect: () -> String

@@ -1,7 +1,7 @@
 module RaaP
   module BindCall
     class << self
-      def define_singleton_method(...) = ::Object.instance_method(:define_singleton_method).bind_call(...)
+      def define_method(...) = ::Module.instance_method(:define_method).bind_call(...)
       def respond_to?(...) = ::Kernel.instance_method(:respond_to?).bind_call(...)
       def instance_of?(...) = ::Kernel.instance_method(:instance_of?).bind_call(...)
       def is_a?(...) = ::Kernel.instance_method(:is_a?).bind_call(...)

@@ -3,43 +3,69 @@
 module RaaP
   module Value
     class Interface < BasicObject
-      def initialize(type, size: 3, self_type: nil, instance_type: nil, class_type: nil)
-        @type = type.is_a?(::String) ? RBS.parse_type(type) : type
-        unless @type.instance_of?(::RBS::Types::Interface)
-          ::Kernel.raise ::TypeError, "not an interface type: #{@type}"
-        end
-        @size = size
+      class << self
+        def define_method_from_interface(base_class, type, size: 3)
+          type = type.is_a?(::String) ? RBS.parse_type(type) : type
+          unless type.instance_of?(::RBS::Types::Interface)
+            ::Kernel.raise ::TypeError, "not an interface type: #{type}"
+          end
+          self_type = type
 
-        @definition = RBS.builder.build_interface(@type.name.absolute!)
-        @definition.methods.each do |name, method|
-          method_type = method.method_types.sample or Kernel.raise
-          type_params = @definition.type_params_decl.concat(method_type.type_params.drop(@definition.type_params_decl.length))
-          ts = TypeSubstitution.new(type_params, @type.args)
+          # Referring to Steep
+          instance_type = ::RBS::Types::ClassInstance.new(name: TypeName("::Object"), args: [], location: nil)
+          class_type = ::RBS::Types::ClassSingleton.new(name: TypeName("::Object"), location: nil)
 
-          subed_method_type = ts.method_type_sub(method_type, self_type:, instance_type:, class_type:)
+          definition = RBS.builder.build_interface(type.name.absolute!)
+          definition.methods.each do |name, method|
+            method_type = method.method_types.sample or ::Kernel.raise
+            type_params = definition.type_params_decl.concat(method_type.type_params.drop(definition.type_params_decl.length))
+            ts = TypeSubstitution.new(type_params, type.args)
+            subed_method_type = ts.method_type_sub(method_type, self_type:, instance_type:, class_type:)
 
-          BindCall.define_singleton_method(self, name) do |*_, &b|
-            # @type var b: Proc?
-            @fixed_return_value ||= Type.new(subed_method_type.type.return_type).pick(size:)
-            if subed_method_type.block
-              @fixed_block_arguments ||= size.times.map do
-                fun_type = FunctionType.new(subed_method_type.block.type)
-                fun_type.pick_arguments(size:)
+            BindCall.define_method(base_class, name) do |*_, &b|
+              @fixed_return_value ||= {}
+              @fixed_return_value[name] ||= if self_type == subed_method_type.type.return_type
+                                              self
+                                            else
+                                              Type.new(subed_method_type.type.return_type).pick(size:)
+                                            end
+              # @type var b: Proc?
+              if b
+                @fixed_block_arguments ||= {}
+                @fixed_block_arguments[name] ||= if subed_method_type.block
+                                                   size.times.map do
+                                                     FunctionType.new(subed_method_type.block.type)
+                                                                 .pick_arguments(size:)
+                                                   end
+                                                 else
+                                                   []
+                                                 end
+                @fixed_block_arguments[name].each do |a, kw|
+                  b.call(*a, **kw)
+                end
               end
-            else
-              @fixed_block_arguments = []
+              @fixed_return_value[name]
             end
-            if b
-              unless subed_method_type.block
-                Kernel.raise "block of `#{@type.name}##{name}` was called. But block signature not defined."
-              end
-              @fixed_block_arguments.each do |a, kw|
-                b.call(*a, **kw)
-              end
-            end
-            @fixed_return_value
           end
         end
+
+        def new(type, size: 3)
+          temp_class = ::Class.new(Interface) do |c|
+            define_method_from_interface(c, type, size:)
+          end
+          instance = temp_class.allocate
+          instance.__send__(:initialize, type, size:)
+          instance
+        end
+      end
+
+      def initialize(type, size: 3)
+        @type = type.is_a?(::String) ? RBS.parse_type(type) : type
+        unless @type.instance_of?(::RBS::Types::Interface)
+          ::Kernel.raise ::TypeError, "not an interface type: #{type}"
+        end
+        @definition = RBS.builder.build_interface(@type.name.absolute!)
+        @size = size
       end
 
       def respond_to?(name, _include_all = false)
@@ -51,7 +77,7 @@ module RaaP
       end
 
       def inspect
-        "#<interface @type=#{@type} @methods=#{@definition.methods.keys} @size=#{@size}>"
+        "#<interface @type=`#{@type}` @methods=#{@definition.methods.keys} @size=#{@size}>"
       end
     end
   end

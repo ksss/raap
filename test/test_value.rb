@@ -11,20 +11,18 @@ class TestValue < Minitest::Test
   end
 
   def test_interface
-    assert RaaP::BindCall.instance_of?(Interface.new("Test::_Interface").void, RaaP::Value::Void)
-
-    assert_raises(TypeError) do
-      Interface.new("bool")
-    end
-  end
-
-  def test_interface_with_self_type
-    [Integer, Float, String, Symbol].each do |klass|
-      interface = Interface.new("Test::_Interface", self_type: klass.name)
-      first_return = interface.selfie
-      assert_instance_of klass, first_return
-      assert_equal first_return, interface.selfie
-    end
+    interface = Interface.new("Test::_Interface")
+    assert_equal :sym, interface.lit
+    assert RaaP::BindCall.instance_of?(interface.void, RaaP::Value::Void)
+    assert RaaP::BindCall.is_a?(interface.selfie, RaaP::Value::Interface)
+    assert RaaP::BindCall.instance_of?(interface.instance, Object)
+    assert RaaP::BindCall.instance_of?(interface.klass, Class)
+    # check cache
+    assert_equal :sym, interface.lit
+    assert RaaP::BindCall.instance_of?(interface.void, RaaP::Value::Void)
+    assert RaaP::BindCall.is_a?(interface.selfie, RaaP::Value::Interface)
+    assert RaaP::BindCall.instance_of?(interface.instance, Object)
+    assert RaaP::BindCall.instance_of?(interface.klass, Class)
 
     assert_raises(TypeError) do
       Interface.new("bool")
@@ -46,6 +44,14 @@ class TestValue < Minitest::Test
     assert_raises(NoMethodError) do
       intersection.not_defined
     end
+  end
+
+  def test_math_acos
+    intersection = Intersection.new("Numeric & _ToF", size: 0)
+    # Math methods argument must be Numeric instance
+    assert Math.sin(intersection)
+    assert Math.cos(intersection)
+    assert Math.tan(intersection)
   end
 
   def test_module

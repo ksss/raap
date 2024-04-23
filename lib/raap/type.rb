@@ -39,6 +39,30 @@ module RaaP
       end
     end
 
+    def self.call_new_from(base, type, size:)
+      type_name = type.name.absolute!
+      definition = RBS.builder.build_singleton(type_name)
+      snew = definition.methods[:new]
+      if snew
+        # class
+        rbs_method_type = snew.method_types.sample or raise
+        type_params = definition.type_params_decl.concat(rbs_method_type.type_params.drop(definition.type_params_decl.length))
+        ts = TypeSubstitution.new(type_params, type.args)
+        maped_rbs_method_type = ts.method_type_sub(rbs_method_type)
+        method_type = MethodType.new(maped_rbs_method_type)
+
+        begin
+          args, kwargs, block = method_type.arguments_to_symbolic_call(size:)
+          [:call, base, :new, args, kwargs, block]
+        rescue
+          $stderr.puts "Fail with `#{rbs_method_type}`"
+          raise
+        end
+      else
+        [:call, Value::Module, :new, [type.to_s], { size: }, nil]
+      end
+    end
+
     # Special class case
     register("::Array") do
       instance = __skip__ = type
@@ -141,9 +165,11 @@ module RaaP
         in nil then Type.new(RBS.builder.expand_alias2(type.name, type.args)).to_symbolic_call(size:)
         end
       when ::RBS::Types::Bases::Class
-        raise "cannot resolve `class` type"
+        RaaP.logger.warn("Unresolved `class` type, use Object instead.")
+        Object
       when ::RBS::Types::Bases::Instance
-        raise "cannot resolve `instance` type"
+        RaaP.logger.warn("Unresolved `instance` type, use Object.new instead.")
+        Object.new
       when ::RBS::Types::Bases::Self
         raise "cannot resolve `self` type"
       when ::RBS::Types::ClassSingleton
@@ -175,28 +201,7 @@ module RaaP
     def to_symbolic_call_from_initialize(type, size:)
       type_name = type.name.absolute!
       const = Object.const_get(type_name.to_s)
-      definition = RBS.builder.build_singleton(type_name)
-      snew = definition.methods[:new]
-      if snew
-        # class
-        rbs_method_type = snew.method_types.sample or raise
-        type_params = definition.type_params_decl.concat(rbs_method_type.type_params.drop(definition.type_params_decl.length))
-        ts = TypeSubstitution.new(type_params, type.args)
-        maped_rbs_method_type = ts.method_type_sub(rbs_method_type)
-        method_type = MethodType.new(maped_rbs_method_type)
-
-        begin
-          try(times: 5, size:) do |size|
-            args, kwargs, block = method_type.arguments_to_symbolic_call(size:)
-            [:call, const, :new, args, kwargs, block]
-          end
-        rescue
-          $stderr.puts "Fail with `#{rbs_method_type}`"
-          raise
-        end
-      else
-        [:call, Value::Module, :new, [type.to_s], { size: }, nil]
-      end
+      Type.call_new_from(const, type, size:)
     end
 
     def parse(type)
@@ -208,31 +213,6 @@ module RaaP
       else
         type
       end
-    end
-
-    def try(times:, size:)
-      # @type var error: Exception?
-      ret = error = nil
-      times.times do
-        ret = yield size
-        if ret
-          error = nil
-          break
-        end
-      rescue => e
-        size += 1
-        error = e
-        next
-      end
-
-      if error
-        $stderr.puts
-        $stderr.puts "=== Catch error when generating type `#{type}`. Please check your RBS or RaaP bug. ==="
-        $stderr.puts "(#{error.class}) #{error.message}"
-        raise error
-      end
-
-      ret
     end
 
     def integer
