@@ -27,8 +27,8 @@ module RaaP
       sub = build
       ::RBS::MethodType.new(
         type_params: [],
-        type: method_type.type.sub(sub).then { |ty| sub(ty, self_type:, instance_type:, class_type:) },
-        block: method_type.block&.sub(sub)&.then { |bl| sub(bl, self_type:, instance_type:, class_type:) },
+        type: method_type.type.sub(sub).then { |ty| sub(ty, self_type: self_type, instance_type: instance_type, class_type: class_type) },
+        block: method_type.block&.sub(sub)&.then { |bl| sub(bl, self_type: self_type, instance_type: instance_type, class_type: class_type) },
         location: method_type.location
       )
     end
@@ -49,7 +49,7 @@ module RaaP
         when ::RBS::Types::Bases::Class
           class_type || ty
         else
-          sub(ty, self_type:, instance_type:, class_type:)
+          sub(ty, self_type: self_type, instance_type: instance_type, class_type: class_type)
         end
       end
     end

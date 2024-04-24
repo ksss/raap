@@ -52,7 +52,7 @@ class TestMethodType < Minitest::Test
 
   def test_pick_arguments_with_rest_positionals_and_trailings
     10.times do |size|
-      args, _, _ = MethodType.new("(*Integer, String) -> void").pick_arguments(size:)
+      args, _, _ = MethodType.new("(*Integer, String) -> void").pick_arguments(size: size)
       assert args.length > 0
       trailing = args.pop
       assert(args.all? { |int| int.instance_of?(Integer) })
@@ -72,7 +72,7 @@ class TestMethodType < Minitest::Test
   def test_pick_arguments_with_rest_keywords
     presents = []
     10.times do |size|
-      _, kwargs, _ = MethodType.new("(foo: Integer, **String) -> void").pick_arguments(size:)
+      _, kwargs, _ = MethodType.new("(foo: Integer, **String) -> void").pick_arguments(size: size)
       assert kwargs.length > 0
       assert kwargs[:foo].instance_of?(Integer)
       rest = kwargs.except(:foo)

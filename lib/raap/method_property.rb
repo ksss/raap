@@ -2,7 +2,7 @@
 
 module RaaP
   class MethodProperty
-    class Stats < Struct.new(:success, :skip, :exception, :break)
+    class Stats < Struct.new(:success, :skip, :exception, :break, keyword_init: true)
       def initialize(success: 0, skip: 0, exception: 0, break: false)
         super
       end
@@ -23,7 +23,7 @@ module RaaP
         Timeout.timeout(@timeout) do
           catch(:break) do
             @size_step.each do |size|
-              call(size:, stats:).tap do |ret|
+              call(size: size, stats: stats).tap do |ret|
                 case ret
                 when Result::Success
                   stats.success += 1
@@ -55,8 +55,8 @@ module RaaP
         stats.break = true
         throw :break
       end
-      receiver_value = @receiver_type.to_symbolic_call(size:)
-      args, kwargs, block = @method_type.arguments_to_symbolic_call(size:)
+      receiver_value = @receiver_type.to_symbolic_call(size: size)
+      args, kwargs, block = @method_type.arguments_to_symbolic_call(size: size)
       # @type var symbolic_call: symbolic_call
       symbolic_call = [:call, receiver_value, @method_name, args, kwargs, block]
       symbolic_caller = SymbolicCaller.new(symbolic_call, allow_private: @allow_private)
@@ -77,23 +77,23 @@ module RaaP
           end
         else
           return_value = symbolic_caller.eval
-          check = check_return(receiver_value:, return_value:)
+          check = check_return(receiver_value: receiver_value, return_value: return_value)
         end
         case check
         in [:success]
-          Result::Success.new(symbolic_call:, return_value:)
+          Result::Success.new(symbolic_call: symbolic_call, return_value: return_value)
         in [:failure]
-          Result::Failure.new(symbolic_call:, return_value:)
+          Result::Failure.new(symbolic_call: symbolic_call, return_value: return_value)
         in [:exception, exception]
-          Result::Exception.new(symbolic_call:, exception:)
+          Result::Exception.new(symbolic_call: symbolic_call, exception: exception)
         end
       rescue TypeError => exception
-        Result::Failure.new(symbolic_call:, return_value:, exception:)
+        Result::Failure.new(symbolic_call: symbolic_call, return_value: return_value, exception: exception)
       end
 
     # not ensure symbolic_call
     rescue NoMethodError, NotImplementedError => exception
-      Result::Skip.new(symbolic_call:, exception:)
+      Result::Skip.new(symbolic_call: symbolic_call, exception: exception)
     rescue NameError => e
       RaaP.logger.error("[#{e.class}] #{e.detailed_message}")
       msg = e.name.nil? ? '' : "for `#{BindCall.to_s(e.receiver)}::#{e.name}`"
@@ -103,9 +103,9 @@ module RaaP
       throw :break
     rescue SystemStackError => exception
       RaaP.logger.info "Found recursive type definition."
-      Result::Skip.new(symbolic_call:, exception:)
+      Result::Skip.new(symbolic_call: symbolic_call, exception: exception)
     rescue => exception
-      Result::Exception.new(symbolic_call:, exception:)
+      Result::Exception.new(symbolic_call: symbolic_call, exception: exception)
     end
 
     def check_return(receiver_value:, return_value:)
@@ -126,8 +126,8 @@ module RaaP
         instance_class = BindCall.class(receiver_value)
       end
       type_check = ::RBS::Test::TypeCheck.new(
-        self_class:,
-        instance_class:,
+        self_class: self_class,
+        instance_class: instance_class,
         class_class: Module,
         builder: RBS.builder,
         sample_size: 100,

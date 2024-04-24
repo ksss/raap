@@ -118,13 +118,13 @@ module RaaP
 
         case
         when tag.include?('#')
-          run_by(kind: :instance, tag:)
+          run_by(kind: :instance, tag: tag)
         when tag.include?('.')
-          run_by(kind: :singleton, tag:)
+          run_by(kind: :singleton, tag: tag)
         when tag.end_with?('*')
-          run_by_type_name_with_search(tag:)
+          run_by_type_name_with_search(tag: tag)
         else
-          run_by_type_name(tag:)
+          run_by_type_name(tag: tag)
         end
       end
 
@@ -198,9 +198,10 @@ module RaaP
 
       RaaP.logger.info("# #{type}")
       @results << {
-        method:,
+        method: method,
         properties: method.method_types.map do |method_type|
-          property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
+          property(receiver_type: receiver_type, type_params_decl: type_params_decl, type_args: type_args, method_type: method_type,
+                   method_name: method_name)
         end
       }
     end
@@ -238,9 +239,10 @@ module RaaP
 
         RaaP.logger.info("# #{type_name}.#{method_name}")
         @results << {
-          method:,
+          method: method,
           properties: method.method_types.map do |method_type|
-            property(receiver_type: Type.new("singleton(#{type.name})"), type_params_decl:, type_args:, method_type:, method_name:)
+            property(receiver_type: Type.new("singleton(#{type.name})"), type_params_decl: type_params_decl, type_args: type_args,
+                     method_type: method_type, method_name: method_name)
           end
         }
       end
@@ -257,9 +259,10 @@ module RaaP
 
         RaaP.logger.info("# #{type_name}##{method_name}")
         @results << {
-          method:,
+          method: method,
           properties: method.method_types.map do |method_type|
-            property(receiver_type: Type.new(type.name), type_params_decl:, type_args:, method_type:, method_name:)
+            property(receiver_type: Type.new(type.name), type_params_decl: type_params_decl, type_args: type_args, method_type: method_type,
+                     method_name: method_name)
           end
         }
       end
@@ -283,12 +286,12 @@ module RaaP
       status = 0
       reason = nil
       prop = MethodProperty.new(
-        receiver_type:,
-        method_name:,
+        receiver_type: receiver_type,
+        method_name: method_name,
         method_type: MethodType.new(
           method_type,
-          type_params_decl:,
-          type_args:,
+          type_params_decl: type_params_decl,
+          type_args: type_args,
           self_type: rtype,
           instance_type: ::RBS::Types::ClassInstance.new(name: rtype.name, args: type_args, location: nil),
           class_type: ::RBS::Types::ClassSingleton.new(name: rtype.name, location: nil),

@@ -9,6 +9,7 @@ require 'logger'
 
 require_relative 'raap/version'
 require_relative 'raap/value'
+require_relative 'shims'
 
 module RaaP
   class << self
