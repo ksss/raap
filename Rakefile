@@ -5,8 +5,7 @@ require "minitest/test_task"
 require "rubocop/rake_task"
 
 Minitest::TestTask.create do |t|
-  base = File.expand_path(".", __dir__)
-  t.framework = "require \"test/test_helper\" ;#{t.framework}"
+  t.test_prelude = 'require "test/test_helper"'
 end
 
 RuboCop::RakeTask.new
