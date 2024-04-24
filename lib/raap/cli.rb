@@ -104,7 +104,7 @@ module RaaP
 
       # Search skip tag
       @argv.each do |tag|
-        if tag.start_with?('!') && (tag.include?('#') || tag.include?('.'))
+        if tag.start_with?('!')
           t = tag[1..] or raise
           t = "::#{t}" unless t.start_with?('::')
           t or raise

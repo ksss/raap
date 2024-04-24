@@ -14,6 +14,14 @@ class TestExe < Minitest::Test
     end
   end
 
+  def capture
+    orig = $stdout
+    $stdout = StringIO.new
+    yield $stdout
+  ensure
+    $stdout = orig
+  end
+
   def test_exe_with_search
     assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
@@ -23,23 +31,58 @@ class TestExe < Minitest::Test
       "!Test::Property#alias",
       "!Test::List",
       "!Test::SkipPrefix#should_skip",
+      "!Test::NameErrorLogging",
+      "!Test::TypeErrorIsFail",
+      "!Test::ExceptionWithBot",
     ]).load.run
   end
 
-  def test_alias_stdout
-    orig = $stdout
-    $stdout = StringIO.new
-    status = RaaP::CLI.new([
+  def test_skip_by_name_error
+    assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
-      "--timeout", "1",
-      "--size-to", "10",
-      "Test::Property#alias"
+      "--size-by", "5",
+      "Test::NameErrorLogging",
     ]).load.run
-    assert status == 1
-    assert_match "def alias: () -> bool", $stdout.string
-    assert_match "  in test/test.rbs:4:4...4:32", $stdout.string
+  end
+
+  def test_fail_type_error
+    capture do |io|
+      assert_equal 1, RaaP::CLI.new([
+        "--log-level", "info",
+        "--size-by", "1",
+        "Test::TypeErrorIsFail",
+      ]).load.run
+      assert_match "1) Failure:", io.string
+    end
+  end
+
+  def test_exception_with_bot
+    original_logger = RaaP.logger
+    RaaP.logger = Logger.new(io = StringIO.new)
+    assert_raises Test::TestException do
+      RaaP::CLI.new([
+        "--log-level", "info",
+        "--size-by", "1",
+        "Test::ExceptionWithBot",
+      ]).load.run
+    end
+    assert_match '[Test::TestException] class is not supported to check `bot` type', io.string
   ensure
-    $stdout = orig
+    RaaP.logger = original_logger
+  end
+
+  def test_alias_stdout
+    capture do |io|
+      status = RaaP::CLI.new([
+        "--log-level", "info",
+        "--timeout", "1",
+        "--size-to", "10",
+        "Test::Property#alias"
+      ]).load.run
+      assert status == 1
+      assert_match "def alias: () -> bool", io.string
+      assert_match "  in test/test.rbs:4:4...4:32", io.string
+    end
   end
 
   def test_exe_array_compact

@@ -148,4 +148,19 @@ module Test
     def should_not_skip: () -> :ok
     def should_skip: () -> bot
   end
+
+  class NameErrorLogging
+    def missing_method: () -> void
+  end
+
+  class TypeErrorIsFail
+    def type_error: () -> void
+  end
+
+  class TestException < Exception
+  end
+
+  class ExceptionWithBot
+    def exception: () -> bot
+  end
 end

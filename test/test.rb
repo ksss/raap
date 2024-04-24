@@ -212,4 +212,19 @@ module Test
     def should_not_skip = :ok
     def should_skip = raise("Should not run!")
   end
+
+  class TypeErrorIsFail
+    def type_error
+      raise TypeError
+    end
+  end
+
+  class TestException < Exception # rubocop:disable Lint/InheritException
+  end
+
+  class ExceptionWithBot
+    def exception
+      raise TestException
+    end
+  end
 end

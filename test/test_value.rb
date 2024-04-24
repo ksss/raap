@@ -104,6 +104,9 @@ class TestValue < Minitest::Test
     assert_equal "#<var T>", Variable.new("T").inspect
     assert_equal Variable, Variable.new("T").class
     assert_equal ::RBS::Types::Variable.new(name: :T, location: nil), Variable.new(:T).type
+    assert_raises TypeError do
+      Variable.new(1)
+    end
   end
 
   def test_void
