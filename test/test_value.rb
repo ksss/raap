@@ -12,6 +12,10 @@ class TestValue < Minitest::Test
 
   def test_interface
     interface = Interface.new("Test::_Interface")
+    assert interface.respond_to?(:lit)
+    assert interface.inspect
+    assert_equal RaaP::Value::Interface, interface.class
+
     assert_equal :sym, interface.lit
     assert RaaP::BindCall.instance_of?(interface.void, RaaP::Value::Void)
     assert RaaP::BindCall.is_a?(interface.selfie, RaaP::Value::Interface)
