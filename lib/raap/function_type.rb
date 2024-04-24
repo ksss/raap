@@ -7,12 +7,12 @@ module RaaP
     end
 
     def pick_arguments(size: 10)
-      SymbolicCaller.new(arguments_to_symbolic_call(size:)).eval
+      SymbolicCaller.new(arguments_to_symbolic_call(size: size)).eval
     end
 
     def arguments_to_symbolic_call(size: 10)
-      a = to_symbolic_call_recursive(build_args_type, size:)
-      k = to_symbolic_call_recursive(build_kwargs_type, size:)
+      a = to_symbolic_call_recursive(build_args_type, size: size)
+      k = to_symbolic_call_recursive(build_kwargs_type, size: size)
 
       [a, k]
     end
@@ -24,11 +24,11 @@ module RaaP
       when type.nil?
         nil
       when type.respond_to?(:each_pair)
-        type.each_pair.to_h { |k, v| [k, to_symbolic_call_recursive(v, size:)] }
+        type.each_pair.to_h { |k, v| [k, to_symbolic_call_recursive(v, size: size)] }
       when type.respond_to?(:each)
-        type.each.map { |v| to_symbolic_call_recursive(v, size:) }
+        type.each.map { |v| to_symbolic_call_recursive(v, size: size) }
       else
-        type.to_symbolic_call(size:)
+        type.to_symbolic_call(size: size)
       end
     end
 

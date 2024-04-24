@@ -35,7 +35,7 @@ module RaaP
                          if !ts.include?('::BasicObject') || ts.any? { |t| t.split('::').last&.start_with?('_') }
                            ts.unshift('Object')
                          end
-                         Type.new(ts.uniq.join(' & ')).pick(size:)
+                         Type.new(ts.uniq.join(' & ')).pick(size: size)
                        end
                      end
         const = ::Object.const_get(@type.name.absolute!.to_s)

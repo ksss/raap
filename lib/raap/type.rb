@@ -52,21 +52,21 @@ module RaaP
         method_type = MethodType.new(maped_rbs_method_type)
 
         begin
-          args, kwargs, block = method_type.arguments_to_symbolic_call(size:)
+          args, kwargs, block = method_type.arguments_to_symbolic_call(size: size)
           [:call, base, :new, args, kwargs, block]
         rescue
           $stderr.puts "Fail with `#{rbs_method_type}`"
           raise
         end
       else
-        [:call, Value::Module, :new, [type.to_s], { size: }, nil]
+        [:call, Value::Module, :new, [type.to_s], { size: size }, nil]
       end
     end
 
     # Special class case
     register("::Array") do
       instance = __skip__ = type
-      t = instance.args[0] ? Type.new(instance.args[0], range:) : Type.random
+      t = instance.args[0] ? Type.new(instance.args[0], range: range) : Type.random
       array(t)
     end
     register("::Binding") { sized { binding } }
@@ -87,7 +87,7 @@ module RaaP
     register("::NilClass") { sized { nil } }
     register("::Proc") { sized { Proc.new {} } }
     register("::Rational") { rational }
-    register("::Regexp") { sized { |size| Regexp.new(string.pick(size:)) } }
+    register("::Regexp") { sized { |size| Regexp.new(string.pick(size: size)) } }
     register("::String") { string }
     register("::Struct") { sized { Struct.new(:foo, :bar).new } }
     register("::Symbol") { symbol }
@@ -118,11 +118,11 @@ module RaaP
     end
 
     def pick(size: 10)
-      to_symbolic_caller(size:).eval
+      to_symbolic_caller(size: size).eval
     end
 
     def to_symbolic_caller(size: 10)
-      SymbolicCaller.new(to_symbolic_call(size:))
+      SymbolicCaller.new(to_symbolic_call(size: size))
     end
 
     def to_symbolic_call(size: 10)
@@ -131,20 +131,20 @@ module RaaP
 
       case type
       when ::RBS::Types::Tuple
-        type.types.map { |t| Type.new(t).to_symbolic_call(size:) }
+        type.types.map { |t| Type.new(t).to_symbolic_call(size: size) }
       when ::RBS::Types::Union
-        type.types.sample&.then { |t| Type.new(t).to_symbolic_call(size:) }
+        type.types.sample&.then { |t| Type.new(t).to_symbolic_call(size: size) }
       when ::RBS::Types::Intersection
         if type.free_variables.empty?
-          [:call, Value::Intersection, :new, [type.to_s], { size: }, nil]
+          [:call, Value::Intersection, :new, [type.to_s], { size: size }, nil]
         else
-          [:call, Value::Intersection, :new, [type], { size: }, nil]
+          [:call, Value::Intersection, :new, [type], { size: size }, nil]
         end
       when ::RBS::Types::Interface
         if type.free_variables.empty?
-          [:call, Value::Interface, :new, [type.to_s], { size: }, nil]
+          [:call, Value::Interface, :new, [type.to_s], { size: size }, nil]
         else
-          [:call, Value::Interface, :new, [type], { size: }, nil]
+          [:call, Value::Interface, :new, [type], { size: size }, nil]
         end
       when ::RBS::Types::Variable
         [:call, Value::Variable, :new, [type.to_s], {}, nil]
@@ -162,7 +162,7 @@ module RaaP
       when ::RBS::Types::Alias
         case gen = GENERATORS[type.name.absolute!.to_s]
         in Proc then instance_exec(&gen)
-        in nil then Type.new(RBS.builder.expand_alias2(type.name, type.args)).to_symbolic_call(size:)
+        in nil then Type.new(RBS.builder.expand_alias2(type.name, type.args)).to_symbolic_call(size: size)
         end
       when ::RBS::Types::Bases::Class
         RaaP.logger.warn("Unresolved `class` type, use Object instead.")
@@ -176,19 +176,19 @@ module RaaP
         Object.const_get(type.name.to_s)
       when ::RBS::Types::ClassInstance
         case gen = GENERATORS[type.name.absolute!.to_s]
-        in Proc then instance_exec(&gen).pick(size:)
-        in nil then to_symbolic_call_from_initialize(type, size:)
+        in Proc then instance_exec(&gen).pick(size: size)
+        in nil then to_symbolic_call_from_initialize(type, size: size)
         end
       when ::RBS::Types::Record
         type.fields.transform_values { |t| Type.new(t).to_symbolic_call(size: size / 2) }
       when ::RBS::Types::Proc
-        Proc.new { Type.new(type.type.return_type).to_symbolic_call(size:) }
+        Proc.new { Type.new(type.type.return_type).to_symbolic_call(size: size) }
       when ::RBS::Types::Literal
         type.literal
       when ::RBS::Types::Bases::Bool
-        bool.pick(size:)
+        bool.pick(size: size)
       when ::RBS::Types::Bases::Any
-        Type.random.to_symbolic_call(size:)
+        Type.random.to_symbolic_call(size: size)
       when ::RBS::Types::Bases::Nil
         nil
       else
@@ -201,7 +201,7 @@ module RaaP
     def to_symbolic_call_from_initialize(type, size:)
       type_name = type.name.absolute!
       const = Object.const_get(type_name.to_s)
-      Type.call_new_from(const, type, size:)
+      Type.call_new_from(const, type, size: size)
     end
 
     def parse(type)
@@ -216,7 +216,7 @@ module RaaP
     end
 
     def integer
-      sized { |size| float.pick(size:).round }
+      sized { |size| float.pick(size: size).round }
     end
 
     def none_zero_integer
@@ -240,16 +240,16 @@ module RaaP
 
     def rational
       sized do |size|
-        a = integer.pick(size:)
-        b = none_zero_integer.pick(size:)
+        a = integer.pick(size: size)
+        b = none_zero_integer.pick(size: size)
         [:call, Kernel, :Rational, [a, b], {}, nil]
       end
     end
 
     def complex
       sized do |size|
-        a = integer.pick(size:)
-        b = none_zero_integer.pick(size:)
+        a = integer.pick(size: size)
+        b = none_zero_integer.pick(size: size)
         [:call, Kernel, :Complex, [a, b], {}, nil]
       end
     end
@@ -274,13 +274,13 @@ module RaaP
 
     def symbol
       sized do |size|
-        string.pick(size:).to_sym
+        string.pick(size: size).to_sym
       end
     end
 
     def array(type)
       sized do |size|
-        Array.new(integer.pick(size:).abs) do
+        Array.new(integer.pick(size: size).abs) do
           type.to_symbolic_call(size: size / 2)
         end
       end
@@ -291,7 +291,7 @@ module RaaP
     def dict(key_type, value_type)
       sized do |size|
         csize = size / 2
-        Array.new(integer.pick(size:).abs).to_h do
+        Array.new(integer.pick(size: size).abs).to_h do
           [
             key_type.to_symbolic_call(size: csize),
             value_type.to_symbolic_call(size: csize)

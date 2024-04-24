@@ -121,8 +121,8 @@ module RaaP
       symbolic_call
     end
 
-    def walk(&)
-      _walk(@symbolic_call, true, &)
+    def walk(&block)
+      _walk(@symbolic_call, true, &block)
     end
 
     def _walk(symbolic_call, is_last, &block)

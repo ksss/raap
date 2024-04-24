@@ -29,11 +29,11 @@ module RaaP
           end
 
           interfaces.each do |interface|
-            Interface.define_method_from_interface(self, interface, size:)
+            Interface.define_method_from_interface(self, interface, size: size)
           end
         end
         type = ::RBS::Types::ClassInstance.new(name: TypeName(base.name), args: [], location: nil)
-        SymbolicCaller.new(Type.call_new_from(c, type, size:)).eval
+        SymbolicCaller.new(Type.call_new_from(c, type, size: size)).eval
       end
     end
   end

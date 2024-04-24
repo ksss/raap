@@ -20,17 +20,17 @@ module RaaP
       params = (type_params_decl + rbs.type_params).uniq
       ts = TypeSubstitution.new(params, type_args)
 
-      @rbs = ts.method_type_sub(rbs, self_type:, instance_type:, class_type:)
+      @rbs = ts.method_type_sub(rbs, self_type: self_type, instance_type: instance_type, class_type: class_type)
       @fun_type = FunctionType.new(@rbs.type)
     end
 
     def pick_arguments(size: 10)
-      SymbolicCaller.new(arguments_to_symbolic_call(size:)).eval
+      SymbolicCaller.new(arguments_to_symbolic_call(size: size)).eval
     end
 
     def arguments_to_symbolic_call(size: 10)
-      args, kwargs = @fun_type.arguments_to_symbolic_call(size:)
-      block = pick_block(size:)
+      args, kwargs = @fun_type.arguments_to_symbolic_call(size: size)
+      block = pick_block(size: size)
 
       [args, kwargs, block]
     end
@@ -40,7 +40,7 @@ module RaaP
       return nil if block.nil?
       return nil if (block.required == false) && [true, false].sample
 
-      fixed_return_value = Type.new(block.type.return_type).pick(size:)
+      fixed_return_value = Type.new(block.type.return_type).pick(size: size)
       Proc.new { fixed_return_value }
     end
 

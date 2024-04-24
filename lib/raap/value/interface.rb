@@ -20,14 +20,14 @@ module RaaP
             method_type = method.method_types.sample or ::Kernel.raise
             type_params = definition.type_params_decl.concat(method_type.type_params.drop(definition.type_params_decl.length))
             ts = TypeSubstitution.new(type_params, type.args)
-            subed_method_type = ts.method_type_sub(method_type, self_type:, instance_type:, class_type:)
+            subed_method_type = ts.method_type_sub(method_type, self_type: self_type, instance_type: instance_type, class_type: class_type)
 
             BindCall.define_method(base_class, name) do |*_, &b|
               @fixed_return_value ||= {}
               @fixed_return_value[name] ||= if self_type == subed_method_type.type.return_type
                                               self
                                             else
-                                              Type.new(subed_method_type.type.return_type).pick(size:)
+                                              Type.new(subed_method_type.type.return_type).pick(size: size)
                                             end
               # @type var b: Proc?
               if b
@@ -35,7 +35,7 @@ module RaaP
                 @fixed_block_arguments[name] ||= if subed_method_type.block
                                                    size.times.map do
                                                      FunctionType.new(subed_method_type.block.type)
-                                                                 .pick_arguments(size:)
+                                                                 .pick_arguments(size: size)
                                                    end
                                                  else
                                                    []
@@ -51,10 +51,10 @@ module RaaP
 
         def new(type, size: 3)
           temp_class = ::Class.new(Interface) do |c|
-            define_method_from_interface(c, type, size:)
+            define_method_from_interface(c, type, size: size)
           end
           instance = temp_class.allocate
-          instance.__send__(:initialize, type, size:)
+          instance.__send__(:initialize, type, size: size)
           instance
         end
       end
