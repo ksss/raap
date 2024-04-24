@@ -29,4 +29,6 @@ jobs:
     - name: Install RBS collection
       run: bundle exec rbs collection install --frozen
     - name: Run the default task
+      env:
+        COVERAGE: "1"
       run: bundle exec rake test

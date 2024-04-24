@@ -4,7 +4,10 @@ require "bundler/gem_tasks"
 require "minitest/test_task"
 require "rubocop/rake_task"
 
-Minitest::TestTask.create
+Minitest::TestTask.create do |t|
+  base = File.expand_path(".", __dir__)
+  t.framework = "require \"test/test_helper\" ;#{t.framework}"
+end
 
 RuboCop::RakeTask.new
 
