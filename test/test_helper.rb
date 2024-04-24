@@ -16,26 +16,24 @@ if ENV['COVERAGE']
         total_missed = total.count { |l| l == 0 }
         total_percent = total_cov.fdiv(total.length)
 
-        cov.transform_keys! { |key| key.sub(snip, '\1') }
-        cov.transform_values! do |ary|
+        summary = cov.dup
+        summary.transform_keys! { |key| key.sub(snip, '\1') }
+        summary.transform_values! do |ary|
           ary = ary.compact
           ary.count { |l| l > 0 }.fdiv(ary.length)
         end
-        max_length = cov.keys.max_by(&:length).length
+        max_length = summary.keys.max_by(&:length).length
 
         puts
-        puts "# Minimum Coverage (Total: %.2f %%)" % (total_percent * 100)
+        puts "# Minimum Coverage"
         puts
+        puts "All Files ( %4.2f %% covered at %.1f hits/line )" % [total_percent * 100, total.sum.fdiv(total.length)]
+        puts "%d files in total." % cov.length
         puts "%d relevant lines, %d lines covered and %d lines missed. ( %.2f %% )" % [total.length, total_cov, total_missed, total_percent * 100]
         puts
-        covs = cov.to_a
-        Dir["#{target}/**/*.rb"].each do |path|
-          key = path.sub(snip, '\1')
-          covs << [key, 0.0] unless cov.has_key?(key)
-        end
-        puts "| %-#{max_length}s |      cov |" % ["path"]
+        puts "| %-#{max_length}s |  covered |" % ["File"]
         puts "|:%-#{max_length}s-|---------:|" % ["-" * max_length]
-        covs.sort_by { |k, v| v }.each do |k, v|
+        summary.sort_by { |k, v| v }.each do |k, v|
           puts "| %-#{max_length}s | %6.2f %% |" % [k, v * 100]
         end
       end
