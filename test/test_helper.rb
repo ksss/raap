@@ -11,6 +11,11 @@ if ENV['COVERAGE']
         target = File.expand_path("../lib", __dir__)
         snip = "#{File.expand_path("..", __dir__)}/"
         cov = Coverage.result.select { |d| d.match?(target) }
+        total = cov.values.flatten.compact
+        total_cov = total.count { |l| l > 0 }
+        total_missed = total.count { |l| l == 0 }
+        total_percent = total_cov.fdiv(total.length)
+
         cov.transform_keys! { |key| key.sub(snip, '\1') }
         cov.transform_values! do |ary|
           ary = ary.compact
@@ -19,7 +24,9 @@ if ENV['COVERAGE']
         max_length = cov.keys.max_by(&:length).length
 
         puts
-        puts "# Minimum Coverage"
+        puts "# Minimum Coverage (Total: %.2f %%)" % (total_percent * 100)
+        puts
+        puts "%d relevant lines, %d lines covered and %d lines missed. ( %.2f %% )" % [total.length, total_cov, total_missed, total_percent * 100]
         puts
         covs = cov.to_a
         Dir["#{target}/**/*.rb"].each do |path|
