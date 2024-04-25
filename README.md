@@ -70,7 +70,7 @@ $ raap 'MyClass'                  # Run only RBS of MyClass
 $ raap 'MyClass::*'               # Run each class under MyClass
 $ raap 'MyClass.singleton_method' # Run only MyClass.singleton_method
 $ raap 'MyClass#instance_method'  # Run only MyClass#instance_method
-$ raap 'MyClass' '!MyClass#skip'  # Run method MyClass without #skip
+$ raap 'MyClass' '!MyClass#skip'  # Run methods MyClass without #skip
 ```
 
 ```
@@ -80,6 +80,13 @@ MyClass
 
 $ raap $(cat test/raap.txt)   # You can manage the methods to be tested in a file
 ```
+
+## Log level definition
+
+- error: Information on status of inability to continue execution.
+- warn: Information on partial corrections required.
+- info: A somewhat visualized representation of the execution state.
+- debug: All information including stack traces.
 
 ## Size
 

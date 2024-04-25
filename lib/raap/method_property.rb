@@ -95,7 +95,7 @@ module RaaP
     rescue NoMethodError, NotImplementedError => exception
       Result::Skip.new(symbolic_call: symbolic_call, exception: exception)
     rescue NameError => e
-      RaaP.logger.error("[#{e.class}] #{e.detailed_message}")
+      RaaP.logger.warn("[#{e.class}] #{e.detailed_message}")
       msg = e.name.nil? ? '' : "for `#{BindCall.to_s(e.receiver)}::#{e.name}`"
       RaaP.logger.warn("Implementation is not found #{msg} maybe.")
       RaaP.logger.debug(e.backtrace&.join("\n"))
