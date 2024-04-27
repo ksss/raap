@@ -69,11 +69,11 @@ module RaaP
       t = instance.args[0] ? Type.new(instance.args[0], range: range) : Type.random
       array(t)
     end
-    register("::Binding") { sized { binding } }
+    register("::Binding") { binding }
     register("::Complex") { complex }
-    register("::Data") { sized { Data.define } }
+    register("::Data") { Data.define }
     register("::Encoding") { encoding }
-    register("::FalseClass") { sized { false } }
+    register("::FalseClass") { false }
     register("::Float") { float }
     register("::Hash") do
       instance = __skip__ = type
@@ -82,18 +82,18 @@ module RaaP
       dict(key, value)
     end
     register("::Integer") { integer }
-    register("::IO") { sized { $stdout } }
-    register("::Method") { sized { temp_method_object } }
-    register("::NilClass") { sized { nil } }
-    register("::Proc") { sized { Proc.new {} } }
+    register("::IO") { $stdout }
+    register("::Method") { temp_method_object }
+    register("::NilClass") { nil }
+    register("::Proc") { Proc.new {} }
     register("::Rational") { rational }
     register("::Regexp") { sized { |size| Regexp.new(string.pick(size: size)) } }
     register("::String") { string }
-    register("::Struct") { sized { Struct.new(:foo, :bar).new } }
+    register("::Struct") { Struct.new(:foo, :bar).new }
     register("::Symbol") { symbol }
-    register("::Time") { sized { [:call, Time, :now, [], {}, nil] } }
-    register("::TrueClass") { sized { true } }
-    register("::UnboundMethod") { sized { temp_method_object.unbind } }
+    register("::Time") { [:call, Time, :now, [], {}, nil] }
+    register("::TrueClass") { true }
+    register("::UnboundMethod") { temp_method_object.unbind }
 
     attr_reader :type
     attr_reader :range
@@ -176,7 +176,7 @@ module RaaP
         Object.const_get(type.name.to_s)
       when ::RBS::Types::ClassInstance
         case gen = GENERATORS[type.name.absolute!.to_s]
-        in Proc then instance_exec(&gen).pick(size: size)
+        in Proc then pick_by_generator(gen, size: size)
         in nil then to_symbolic_call_from_initialize(type, size: size)
         end
       when ::RBS::Types::Record
@@ -186,7 +186,7 @@ module RaaP
       when ::RBS::Types::Literal
         type.literal
       when ::RBS::Types::Bases::Bool
-        bool.pick(size: size)
+        bool
       when ::RBS::Types::Bases::Any
         Type.random.to_symbolic_call(size: size)
       when ::RBS::Types::Bases::Nil
@@ -197,6 +197,16 @@ module RaaP
     end
 
     private
+
+    def pick_by_generator(gen, size:)
+      ret = instance_exec(&gen)
+      case ret
+      when Sized
+        ret.pick(size: size)
+      else
+        ret
+      end
+    end
 
     def to_symbolic_call_from_initialize(type, size:)
       type_name = type.name.absolute!
@@ -301,16 +311,12 @@ module RaaP
     end
 
     def encoding
-      sized do
-        e = Encoding.list.sample or raise
-        [:call, Encoding, :find, [e.name], {}, nil]
-      end
+      e = Encoding.list.sample or raise
+      [:call, Encoding, :find, [e.name], {}, nil]
     end
 
     def bool
-      sized do
-        Random.rand(2) == 0
-      end
+      Random.rand(2) == 0
     end
 
     def temp_method_object
