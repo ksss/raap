@@ -75,6 +75,7 @@ module RaaP
     register("::Data") { Data.define }
     register("::Encoding") { encoding }
     register("::FalseClass") { false }
+    register("::File") { File.open("/dev/null") }
     register("::Float") { float }
     register("::Hash") do
       instance = __skip__ = type
