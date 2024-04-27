@@ -24,6 +24,7 @@ module RaaP
     def self.register(type_name, &block)
       raise ArgumentError, "block is required" unless block
 
+      type_name = "::#{type_name}" if !type_name.start_with?("::")
       GENERATORS[type_name] = __skip__ = block
     end
 
