@@ -242,7 +242,7 @@ module RaaP
     GENERATORS: Hash[String, ^() -> Sized[untyped]]
     SIMPLE_SOURCE: Array[String]
 
-    def self.register: (String) { () [self: instance] -> Sized[untyped] } -> void
+    def self.register: (String) { () [self: instance] -> untyped } -> void
     def self.random: () -> Type
     def self.random_without_basic_object: () -> Type
     def self.call_new_from: (Module, ::RBS::Types::ClassInstance, size: Integer) -> symbolic_call
@@ -278,8 +278,8 @@ module RaaP
     def symbol: () -> Sized[Symbol]
     def array: (Type) -> Sized[Array[untyped]]
     def dict: (Type, Type) -> Sized[Hash[untyped, untyped]]
-    def encoding: () -> Sized[symbolic_call]
-    def bool: () -> Sized[bool]
+    def encoding: () -> symbolic_call
+    def bool: () -> bool
     def temp_method_object: () -> ::Method
   end
 
