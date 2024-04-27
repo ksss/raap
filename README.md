@@ -157,14 +157,14 @@ However, this simplifies the preliminary preparation.
 
 ```rb
 $ cat preload.rb
-require 'foo/bar'
+require 'aws-sdk-s3'
 
-# Register initialize of `Foo::Bar` class.
-RaaP::Type.register("Foo::Bar") do
-  Foo::Bar.new(stub: true)
+# Register initialize of `Aws::S3::Client` class.
+RaaP::Type.register("Aws::S3::Client") do
+  [:call, Aws::S3::Client, :new, [], { stub_responses: true }, nil]
 end
 
-$ raap --preload preload.rb 'Foo::Bar'
+$ raap --preload preload.rb 'Aws::S3::Client#get_object'
 ```
 
 ## First support is CLI
