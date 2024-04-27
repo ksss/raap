@@ -150,6 +150,23 @@ You can specify size of step like `Integer#step: (to: Integer, by: Integer)`.
 By default, raap only validates public methods.
 However, by setting this option, it is possible to intentionally validate private methods in the RBS.
 
+### `--preload path`
+
+Simply call `Kernel.load`.
+However, this simplifies the preliminary preparation.
+
+```rb
+$ cat preload.rb
+require 'foo/bar'
+
+# Register initialize of `Foo::Bar` class.
+RaaP::Type.register("Foo::Bar") do
+  Foo::Bar.new(stub: true)
+end
+
+$ raap --preload preload.rb 'Foo::Bar'
+```
+
 ## First support is CLI
 
 In RaaP, usage through the CLI is the primary support focus, and efforts are made to maintain compatibility. The use of the library's code (such as `RaaP::Type`) does not guarantee compatibility.

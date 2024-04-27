@@ -80,6 +80,9 @@ module RaaP
         o.on('--allow-private', "default: #{@option.allow_private}") do
           @option.allow_private = true
         end
+        o.on('--preload path', 'Kernel.load path') do |path|
+          Kernel.load path
+        end
       end.parse!(@argv)
 
       @option.dirs.each do |dir|
