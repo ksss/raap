@@ -1,6 +1,6 @@
 # RaaP
 
-<img src="https://raw.githubusercontent.com/ksss/raap/main/public/jacket.webp" width=400/>
+<img src="https://raw.githubusercontent.com/ksss/raap/main/public/jacket.webp" width=500/>
 
 ## RBS as a Property
 
@@ -13,6 +13,10 @@ It generates random values for the method arguments for each type, and then call
 The return value of the method is checked to see if it matches the type, if not, the test fails.
 
 If you write an RBS, it becomes a test case.
+
+## Example
+
+<img src="https://raw.githubusercontent.com/ksss/raap/main/public/example.webp" width=500/>
 
 ## Concept
 
