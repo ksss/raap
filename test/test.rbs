@@ -163,4 +163,17 @@ module Test
   class ExceptionWithBot
     def exception: () -> bot
   end
+
+  class Coverage
+    def one_line: (Integer, Symbol) -> [Integer, Symbol]
+    def two_lines:
+      [T] (a: Symbol,
+        ?b: Integer?,
+          **T) -> void
+    def three_lines: () -> (:a |
+    :b
+                      | :c)
+
+    def block: () { (::Integer x) -> 1 } -> 1
+  end
 end

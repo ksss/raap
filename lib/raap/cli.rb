@@ -12,6 +12,7 @@ module RaaP
       :size_to,
       :size_by,
       :allow_private,
+      :coverage,
       keyword_init: true
     )
 
@@ -44,6 +45,7 @@ module RaaP
         size_from: 0,
         size_to: 99,
         size_by: 1,
+        coverage: true,
         allow_private: false,
       )
       @argv = argv
@@ -82,6 +84,9 @@ module RaaP
         end
         o.on('--preload path', 'Kernel.load path') do |path|
           Kernel.load path
+        end
+        o.on('--[no-]coverage', "Show coverage for RBS (default: #{@option.coverage})") do |arg|
+          @option.coverage = arg
         end
       end.parse!(@argv)
 
@@ -303,6 +308,7 @@ module RaaP
         timeout: @option.timeout,
         allow_private: @option.allow_private,
       )
+      RaaP::Coverage.start(method_type) if @option.coverage
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       stats = prop.run do |called|
         case called
@@ -340,6 +346,9 @@ module RaaP
       end
       end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       puts
+      RaaP::Coverage.show($stdout) if @option.coverage
+      puts
+
       time_diff = end_time - start_time
       time = ", time: #{(time_diff * 1000).round}ms"
       stats_log = "success: #{stats.success}, skip: #{stats.skip}, exception: #{stats.exception}#{time}"

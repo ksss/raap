@@ -227,4 +227,11 @@ module Test
       raise TestException
     end
   end
+
+  class Coverage
+    def one_line(int, sym) = [int, sym]
+    def two_lines(a:, b: nil, **rk) = a
+    def three_lines = [:a, :c].sample
+    def block = yield(1)
+  end
 end

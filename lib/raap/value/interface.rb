@@ -30,16 +30,13 @@ module RaaP
                                               Type.new(subed_method_type.type.return_type).pick(size: size)
                                             end
               # @type var b: Proc?
-              if b
+              if b && subed_method_type.block && subed_method_type.block.type.is_a?(::RBS::Types::Function)
                 @fixed_block_arguments ||= {}
-                @fixed_block_arguments[name] ||= if subed_method_type.block
-                                                   size.times.map do
-                                                     FunctionType.new(subed_method_type.block.type)
-                                                                 .pick_arguments(size: size)
-                                                   end
-                                                 else
-                                                   []
-                                                 end
+                @fixed_block_arguments[name] ||= size.times.map do
+                  FunctionType.new(subed_method_type.block.type)
+                              .pick_arguments(size: size)
+                end
+
                 @fixed_block_arguments[name].each do |a, kw|
                   b.call(*a, **kw)
                 end

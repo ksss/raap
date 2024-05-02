@@ -33,35 +33,93 @@ module RaaP
     end
 
     def build_args_type
-      reqs = @fun.required_positionals.map { |param| Type.new(param.type) }
-      tras = @fun.trailing_positionals.map { |param| Type.new(param.type) }
-      sampled_optional_positionals = @fun.optional_positionals.take(Random.rand(@fun.optional_positionals.length + 1))
-      opts = sampled_optional_positionals.map { |param| Type.new(param.type) }
+      reqs = @fun.required_positionals.map do |param|
+        build_type_with_coverage(param)
+      end
+      tras = @fun.trailing_positionals.map do |param|
+        build_type_with_coverage(param)
+      end
+
+      take_num = Random.rand(@fun.optional_positionals.length + 1)
+      opts = []
+      @fun.optional_positionals.each_with_index do |param, i|
+        if i < take_num
+          opts << build_type_with_coverage(param)
+        end
+      end
+
       rest = []
       if (param = @fun.rest_positionals)
-        rest = Array.new(Random.rand(0..3)) { Type.new(param.type) }
+        rest = Array.new(Random.rand(4)) { build_type_with_coverage(param) }
       end
+
       [reqs, opts, rest, tras].flatten
     end
 
     def build_kwargs_type
-      reqs = @fun.required_keywords.transform_values { |param| Type.new(param.type) }
+      reqs = @fun.required_keywords.transform_values do |param|
+        build_type_with_coverage(param)
+      end
       rand = Random.rand(@fun.optional_keywords.length + 1)
-      opts = @fun.optional_keywords.to_a.sample(rand).to_h { |name, param| [name, Type.new(param.type)] }
+      opts = @fun.optional_keywords.to_a.sample(rand).to_h do |name, param|
+        [name, build_type_with_coverage(param)]
+      end
       kwargs = reqs.to_h.merge(opts)
       if (param = @fun.rest_keywords)
-        keys = Array.new(Random.rand(0..3)) do
+        keys = Array.new(Random.rand(4)) do
           random_key = nil
           loop do
             # @type var random_key: Symbol
             random_key = Type.new("Symbol").pick(size: 6)
             break unless kwargs.key?(random_key)
           end
-          [random_key, Type.new(param.type)]
+          [random_key, build_type_with_coverage(param)]
         end
         kwargs.merge!(keys.to_h)
       end
       kwargs
+    end
+
+    def build_type_with_coverage(param)
+      case param.type
+      when ::RBS::Types::Optional
+        if Random.rand(2).zero?
+          # value
+          if param.type.location
+            Coverage.log(name: param.type.location.buffer.name, locs: [
+              param.type.location.start_loc,
+              param.type.location.end_loc.dup.tap { _1[1] -= 1 },
+            ])
+          end
+          Type.new(param.type.type)
+        else
+          # nil
+          if param.type.location
+            Coverage.log(name: param.type.location.buffer.name, locs: [
+              param.type.location.end_loc.dup.tap { _1[1] -= 1 },
+              param.type.location.end_loc,
+            ])
+          end
+          Type.new(::RBS::Types::Bases::Nil.new(location: nil))
+        end
+      when ::RBS::Types::Union
+        t = param.type.types.sample or raise
+        if t.location
+          Coverage.log(name: t.location.buffer.name, locs: [
+            t.location.start_loc,
+            t.location.end_loc
+          ])
+        end
+        Type.new(t)
+      else
+        if param.location
+          Coverage.log(name: param.location.buffer.name, locs: [
+            param.location.start_loc,
+            param.location.end_loc
+          ])
+        end
+        Type.new(param.type)
+      end
     end
   end
 end

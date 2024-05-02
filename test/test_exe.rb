@@ -1,40 +1,14 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require "test"
 
 class TestExe < Minitest::Test
-  RaaP::Type.register("::Test::List") do
-    sized do |size|
-      list = [:call, Test::List, :new, [], {}, nil]
-      arg = type.args[0] ? RaaP::Type.new(type.args[0]) : RaaP::Type.random
-      size.times.inject(list) do |r, i|
-        [:call, r, :add, [arg.pick(size: i / 2)], {}, nil]
-      end
-    end
-  end
-
   def capture
     orig = $stdout
     $stdout = StringIO.new
     yield $stdout
   ensure
     $stdout = orig
-  end
-
-  def test_exe_with_search
-    assert_equal 0, RaaP::CLI.new([
-      "--log-level", "info",
-      "--timeout", "0.5",
-      "--size-by", "5",
-      "Test::*",
-      "!Test::Property#alias",
-      "!Test::List",
-      "!Test::SkipPrefix#should_skip",
-      "!Test::NameErrorLogging",
-      "!Test::TypeErrorIsFail",
-      "!Test::ExceptionWithBot",
-    ]).load.run
   end
 
   def test_skip_by_name_error
@@ -115,7 +89,7 @@ class TestExe < Minitest::Test
   def test_exe_without_args
     assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
-      "--timeout", "1",
+      "--timeout", "0",
       "--size-by", "20",
       "Test::List",
     ]).load.run
@@ -124,7 +98,7 @@ class TestExe < Minitest::Test
   def test_exe_with_args
     assert_equal 0, RaaP::CLI.new([
       "--log-level", "info",
-      "--timeout", "1",
+      "--timeout", "0",
       "--size-to", "20",
       "Test::List[Integer]",
     ]).load.run

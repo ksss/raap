@@ -49,3 +49,13 @@ require "raap/minitest"
 require_relative './test'
 
 RaaP::RBS.loader.add(path: Pathname('test/test.rbs'))
+
+RaaP::Type.register("::Test::List") do
+  sized do |size|
+    list = [:call, Test::List, :new, [], {}, nil]
+    arg = type.args[0] ? RaaP::Type.new(type.args[0]) : RaaP::Type.random
+    size.times.inject(list) do |r, i|
+      [:call, r, :add, [arg.pick(size: i / 2)], {}, nil]
+    end
+  end
+end
