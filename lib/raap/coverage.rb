@@ -117,6 +117,9 @@ module RaaP
       def start(method_type)
         @logs = []
         @method_type = method_type
+        if @method_type.location.nil?
+          @logs = nil
+        end
       end
 
       def running?
@@ -134,6 +137,8 @@ module RaaP
       end
 
       def show(io)
+        return unless running?
+
         writer = Writer.new(@method_type, green_locs)
         writer.write(io)
       end
