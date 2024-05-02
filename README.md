@@ -16,7 +16,7 @@ If you write an RBS, it becomes a test case.
 
 ## Example
 
-<img src="https://raw.githubusercontent.com/ksss/raap/main/public/example.webp" width=500/>
+<img src="https://raw.githubusercontent.com/ksss/raap/main/public/example.webp" width=700/>
 
 ## Concept
 
