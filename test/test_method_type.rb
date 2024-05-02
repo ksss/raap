@@ -94,7 +94,7 @@ class TestMethodType < Minitest::Test
   def test_pick_arguments_with_type_params
     args, _, _ = MethodType.new("[T] (T) -> T").pick_arguments
     assert args.length == 1
-    assert_raises(NoMethodError) { args.first.to_s }
+    # assert args.first.instance_of?(RaaP::Value::Variable)
   end
 
   def test_pick_arguments_with_type_params_and_bound

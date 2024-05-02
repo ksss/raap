@@ -23,6 +23,7 @@ module RaaP
 
   autoload :BindCall, "raap/bind_call"
   autoload :CLI, "raap/cli"
+  autoload :Coverage, "raap/coverage"
   autoload :FunctionType, "raap/function_type"
   autoload :MethodProperty, "raap/method_property"
   autoload :MethodType, "raap/method_type"

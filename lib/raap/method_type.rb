@@ -2,7 +2,7 @@
 
 module RaaP
   class MethodType
-    attr_reader :rbs
+    attr_reader :rbs, :original_rbs
 
     def initialize(method, type_params_decl: [], type_args: [], self_type: nil, instance_type: nil, class_type: nil)
       rbs =
@@ -20,8 +20,10 @@ module RaaP
       params = (type_params_decl + rbs.type_params).uniq
       ts = TypeSubstitution.new(params, type_args)
 
+      @original_rbs = rbs
       @rbs = ts.method_type_sub(rbs, self_type: self_type, instance_type: instance_type, class_type: class_type)
-      @fun_type = FunctionType.new(@rbs.type)
+      function_or_untypedfunction = __skip__ = @rbs.type
+      @fun_type = FunctionType.new(function_or_untypedfunction)
     end
 
     def pick_arguments(size: 10)
@@ -40,8 +42,24 @@ module RaaP
       return nil if block.nil?
       return nil if (block.required == false) && [true, false].sample
 
+      block.type.each_param do |param|
+        if param.location
+          Coverage.log(name: param.location.buffer.name, locs: [
+            param.location.start_loc,
+            param.location.end_loc
+          ])
+        end
+      end
       fixed_return_value = Type.new(block.type.return_type).pick(size: size)
-      Proc.new { fixed_return_value }
+      Proc.new do
+        if block.type.return_type.location
+          Coverage.log(name: block.type.return_type.location.buffer.name, locs: [
+            block.type.return_type.location.start_loc,
+            block.type.return_type.location.end_loc
+          ])
+        end
+        fixed_return_value
+      end
     end
 
     def check_return(return_value)
