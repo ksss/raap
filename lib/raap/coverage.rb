@@ -129,7 +129,8 @@ module RaaP
       def log(name:, locs:)
         return unless running?
 
-        @logs << Log.new(name: name, locs: locs)
+        local_logs = logs or return
+        local_logs << Log.new(name: name, locs: locs)
       end
 
       def logs
@@ -146,10 +147,14 @@ module RaaP
       private
 
       def green_locs
-        @logs.select { |log| log.name == @method_type.location.buffer.name }
-             .map(&:locs)
-             .sort
-             .to_set
+        local_logs = logs
+        return Set.new unless local_logs
+
+        location = @method_type.location
+        local_logs.select { |log| log.name == location&.buffer&.name }
+                  .map(&:locs)
+                  .sort
+                  .to_set
       end
     end
   end

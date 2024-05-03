@@ -101,10 +101,13 @@ module RaaP
       def initialize: (name: String, locs: [::RBS::Buffer::loc, ::RBS::Buffer::loc]) -> void
     end
 
+    self.@logs: Array[Log]?
+    self.@method_type: ::RBS::MethodType
+
     def self.start: (::RBS::MethodType) -> void
     def self.running?: () -> bool
     def self.log: (name: String, locs: [::RBS::Buffer::loc, ::RBS::Buffer::loc]) -> void
-    def self.logs: () -> Array[Log]
+    def self.logs: () -> Array[Log]?
     def self.show: (IO) -> void
 
     private
