@@ -102,9 +102,9 @@ The coverage display can help you determine if a correction is needed.
 
 ### Meaning of colored types
 
-- 🟢 Green: The type used to generate and validate the value.
 - 🔴 Red: A type that has never been used to generate or validate a value.
 - 🟡 Yellow: It is systematically difficult to determine if the type was used or not. (FIXME)
+- 🟢 Green: The type used to generate and validate the value.
 
 ## Size
 
