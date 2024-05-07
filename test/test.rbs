@@ -176,7 +176,7 @@ module Test
 
     def block: () { (::Integer x) -> 1 } -> 1
     def all_variables: ((A | A), ?A, *A, A, a: A, ?b: A, **A) { (A) -> A } -> (0 | 1 | 2)
-    attr_reader a: (A? | Object)
+    attr_reader a: A? | Object
     def singleton: () -> singleton(Coverage)
   end
 end

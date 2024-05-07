@@ -132,9 +132,6 @@ module RaaP
       def start(method_type)
         @cov = Set.new
         @method_type = method_type
-        if @method_type.location.nil?
-          @cov = nil
-        end
       end
 
       def running?
