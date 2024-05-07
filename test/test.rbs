@@ -164,7 +164,7 @@ module Test
     def exception: () -> bot
   end
 
-  class Coverage
+  class Coverage[A]
     def one_line: (Integer, Symbol) -> [Integer, Symbol]
     def two_lines:
       [T] (a: Symbol,
@@ -175,5 +175,8 @@ module Test
                       | :c)
 
     def block: () { (::Integer x) -> 1 } -> 1
+    def all_variables: ((A | A), ?A, *A, A, a: A, ?b: A, **A) { (A) -> A } -> (0 | 1 | 2)
+    attr_reader a: (A? | Object)
+    def singleton: () -> singleton(Coverage)
   end
 end

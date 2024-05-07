@@ -8,6 +8,8 @@ Lint:
   Enabled: true
 Lint/EmptyBlock:
   Enabled: false
+Lint/SymbolConversion:
+  Enabled: false
 
 Style:
   Enabled: false

@@ -42,22 +42,13 @@ module RaaP
       return nil if block.nil?
       return nil if (block.required == false) && [true, false].sample
 
-      block.type.each_param do |param|
-        if param.location
-          Coverage.log(name: param.location.buffer.name, locs: [
-            param.location.start_loc,
-            param.location.end_loc
-          ])
-        end
-      end
       fixed_return_value = Type.new(block.type.return_type).pick(size: size)
       Proc.new do
-        if block.type.return_type.location
-          Coverage.log(name: block.type.return_type.location.buffer.name, locs: [
-            block.type.return_type.location.start_loc,
-            block.type.return_type.location.end_loc
-          ])
+        block.type.each_param.with_index do |_param, i|
+          Coverage.log("block_param_#{i}")
         end
+
+        Coverage.new_type_with_log("block_return", block.type.return_type)
         fixed_return_value
       end
     end

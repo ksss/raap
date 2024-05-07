@@ -3,90 +3,103 @@
 module RaaP
   module Coverage
     class Writer
-      def initialize(method_type, green_locs)
+      def initialize(method_type, cov)
         @method_type = method_type
-        @green_locs = green_locs
+        @cov = cov
+        @cur = 0
       end
 
       def write(io)
-        if (found = @method_type.each_type.find { |type| type.location.nil? })
-          RaaP.logger.info("Cannot show coverage, Because location of #{found} is nil")
+        RaaP.logger.debug { "Coverage: #{@cov}" }
+        ml = @method_type.location
+        unless ml
+          RaaP.logger.warn("No location information for `#{@method_type}`")
           return
         end
-
-        location = @method_type.location or raise
-        @cur = location.start_loc
-        @method_type.type.yield_self do |fun|
-          case fun
-          when ::RBS::Types::Function
-            fun.required_positionals.each    { |param| write_param(io, param, :abs) }
-            fun.optional_positionals.each    { |param| write_param(io, param, :opt) }
-            fun.rest_positionals&.yield_self { |param| write_param(io, param, :opt) }
-            fun.trailing_positionals.each    { |param| write_param(io, param, :abs) }
-            fun.required_keywords.each_value { |param| write_param(io, param, :abs) }
-            fun.optional_keywords.each_value { |param| write_param(io, param, :opt) }
-            fun.rest_keywords&.yield_self    { |param| write_param(io, param, :opt) }
-            # when ::RBS::Types::UntypedFunction
+        if ml.key?(:keyword)
+          # attr_{reader,writer,accessor}
+          phantom_member = RBS.parse_member(ml.source)
+          case phantom_member
+          when ::RBS::AST::Members::Attribute
+            unless phantom_member.location
+              RaaP.logger.warn("No location information for `#{phantom_member}`")
+              return
+            end
+            write_type(io, "return", phantom_member.type, :abs)
+            io.write(slice(@cur, @cur...phantom_member.location.end_pos))
+          else
+            RaaP.logger.error("#{phantom_member.class} is not supported")
+            return
           end
-        end
-        @method_type.block&.yield_self do |b|
-          b.type.each_param { |param| write_param(io, param, :opt) }
-          write_type(io, b.type.return_type, b.type.return_type.location, :abs)
-          # write_type(io, b.self_type) if b.self_type
-        end
-        write_type(io, @method_type.type.return_type, @method_type.type.return_type.location, :abs)
+        else
+          # def name: () -> type
+          phantom_method_type = RBS.parse_method_type(ml.source)
+          phantom_method_type.type.yield_self do |fun|
+            case fun
+            when ::RBS::Types::Function
+              fun.required_positionals.each_with_index { |param, i| write_param(io, "req_#{i}", param, :abs) }
+              fun.optional_positionals.each_with_index { |param, i| write_param(io, "opt_#{i}", param, :opt) }
+              fun.rest_positionals&.yield_self         { |param| write_param(io, "rest", param, :opt) }
+              fun.trailing_positionals.each_with_index { |param, i| write_param(io, "trail_#{i}", param, :abs) }
+              fun.required_keywords.each_with_index    { |(key, param), i| write_param(io, "keyreq_#{key}_#{i}", param, :abs) }
+              fun.optional_keywords.each_with_index    { |(key, param), i| write_param(io, "key_#{key}_#{i}", param, :opt) }
+              fun.rest_keywords&.yield_self            { |param| write_param(io, "keyrest", param, :opt) }
+              # when ::RBS::Types::UntypedFunction
+            end
+          end
 
-        io.write(slice_by_loc(@cur, location.end_loc))
+          phantom_method_type.block&.yield_self do |b|
+            b.type.each_param.with_index { |param, i| write_param(io, "block_param_#{i}", param, :opt) }
+            write_type(io, "block_return", b.type.return_type, :abs)
+          end
+          write_type(io, "return", phantom_method_type.type.return_type, :abs)
+          raise unless phantom_method_type.location
+
+          io.write(slice(@cur, @cur...phantom_method_type.location.end_pos))
+        end
+
         io.puts
       end
 
       private
 
-      def slice_by_loc(a, b)
-        location = @method_type.location or raise
-        mloc = location.start_loc
-        lines = location.source.lines
-        start_pos = lines.take(a[0] - mloc[0]).inject(0) { |r, line| r + line.length } + (a[1])
-        start_pos -= mloc[1] if a[0] == mloc[0]
-        end_pos = lines.take(b[0] - mloc[0]).inject(0) { |r, line| r + line.length } + (b[1])
-        end_pos -= mloc[1] if b[0] == mloc[0]
-        location.source[start_pos...end_pos] or raise
+      def slice(start, range)
+        ml = @method_type.location
+        raise unless ml
+
+        ml.source[start, range.end - range.begin] or raise
       end
 
-      def write_param(io, param, accuracy)
-        param.location or raise
-        write_type(io, param.type, param.location, accuracy)
+      def write_param(io, position, param, accuracy)
+        write_type(io, position, param.type, accuracy)
       end
 
-      def write_type(io, type, location, accuracy)
-        io.write(slice_by_loc(@cur, location.start_loc))
-        @cur = location.start_loc
+      def write_type(io, position, type, accuracy)
+        unless type.location
+          RaaP.logger.warn("No location information for `#{type}`")
+          return
+        end
+        io.write(slice(@cur, @cur...type.location.start_pos))
+        @cur = type.location.start_pos
         case type
         when ::RBS::Types::Tuple, ::RBS::Types::Union
-          type.types.each do |t|
+          name = type.class.name.split('::').last.downcase
+          type.types.each_with_index do |t, i|
             t.location or raise
-            io.write(slice_by_loc(@cur, t.location.start_loc))
-            @cur = t.location.end_loc
-            write_type(io, t, t.location, accuracy)
+            io.write(slice(@cur, @cur...t.location.start_pos)) # ( or [
+            @cur = t.location.start_pos
+            write_type(io, "#{position}_#{name}_#{i}", t, accuracy)
           end
         when ::RBS::Types::Optional
-          type.type.location or raise
-          sliced_loc = type.location.dup
-          sliced_loc.tap do |s|
-            s = __skip__ = s
-            # FIXME: Hackish, cut 1 character from back.
-            s.source
-            s.instance_eval { @source = @source[0...-1] }
-            s.end_loc
-            s.instance_eval { @end_loc = [@end_loc[0], @end_loc[1] - 1] }
-          end
-          write_type(io, type.type, sliced_loc, accuracy)
-          if @green_locs.include?([location.end_loc.dup.tap { _1[1] -= 1 }, location.end_loc])
+          write_type(io, "#{position}_optional_left", type.type, accuracy)
+          if @cov.include?("#{position}_optional_right".to_sym)
             io.write(green('?'))
           else
             io.write(red('?'))
           end
-          @cur = location.end_loc
+          raise unless type.location
+
+          @cur = type.location.end_pos
         when ::RBS::Types::Variable
           case accuracy
           when :abs
@@ -95,14 +108,18 @@ module RaaP
             # Variables are substed so raap don't know if they've been used.
             io.write(yellow(type.name.to_s))
           end
-          @cur = location.end_loc
+          raise unless type.location
+
+          @cur = type.location.end_pos
         else
-          if @green_locs.include?([location.start_loc, location.end_loc])
-            io.write(green(location.source))
+          raise unless type.location
+
+          if @cov.include?(position.to_sym)
+            io.write(green(type.location.source))
           else
-            io.write(red(location.source))
+            io.write(red(type.location.source))
           end
-          @cur = location.end_loc
+          @cur = type.location.end_pos
         end
       end
 
@@ -111,45 +128,59 @@ module RaaP
       def yellow(str) = "\e[93m#{str}\e[0m"
     end
 
-    Log = Data.define(:name, :locs)
-
     class << self
       def start(method_type)
-        @logs = []
+        @cov = Set.new
         @method_type = method_type
         if @method_type.location.nil?
-          @logs = nil
+          @cov = nil
         end
       end
 
       def running?
-        !!@logs
+        !!@cov
       end
 
-      def log(name:, locs:)
+      # position: req_0
+      # type: union_1
+      def log(position)
         return unless running?
 
-        @logs << Log.new(name: name, locs: locs)
+        cov << position.to_sym
       end
 
-      def logs
-        @logs
+      def cov
+        @cov or raise
       end
 
       def show(io)
         return unless running?
 
-        writer = Writer.new(@method_type, green_locs)
+        writer = Writer.new(@method_type, cov)
         writer.write(io)
       end
 
-      private
-
-      def green_locs
-        @logs.select { |log| log.name == @method_type.location.buffer.name }
-             .map(&:locs)
-             .sort
-             .to_set
+      def new_type_with_log(position, type)
+        case type
+        when ::RBS::Types::Tuple
+          # FIXME: Support Union in Tuple
+          type.types.each_with_index do |_t, i|
+            log("#{position}_tuple_#{i}")
+          end
+          Type.new(type)
+        when ::RBS::Types::Union
+          i = Random.rand(type.types.length)
+          new_type_with_log("#{position}_union_#{i}", type.types[i])
+        when ::RBS::Types::Optional
+          if Random.rand(2).zero?
+            new_type_with_log("#{position}_optional_left", type.type)
+          else
+            new_type_with_log("#{position}_optional_right", ::RBS::Types::Bases::Nil.new(location: nil))
+          end
+        else
+          log(position)
+          Type.new(type)
+        end
       end
     end
   end

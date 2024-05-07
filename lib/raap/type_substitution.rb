@@ -25,6 +25,10 @@ module RaaP
       instance_type = instance_type.is_a?(::String) ? RBS.parse_type(instance_type) : instance_type
       class_type = class_type.is_a?(::String) ? RBS.parse_type(class_type) : class_type
       sub = build
+      if sub.empty? && self_type.nil? && instance_type.nil? && class_type.nil?
+        return method_type
+      end
+
       ::RBS::MethodType.new(
         type_params: [],
         type: method_type.type.sub(sub).then { |ty| sub(ty, self_type: self_type, instance_type: instance_type, class_type: class_type) },
