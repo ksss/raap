@@ -92,6 +92,20 @@ $ raap $(cat test/raap.txt)   # You can manage the methods to be tested in a fil
 - info: A somewhat visualized representation of the execution state.
 - debug: All information including stack traces.
 
+## Coverage
+
+RaaP randomly selects a type and generates a value for optional and union types.
+
+By default, displays the coverage of the type that actually produced the value.
+
+The coverage display can help you determine if a correction is needed.
+
+### Meaning of colored types
+
+- 🟢 Green: The type used to generate and validate the value.
+- 🔴 Red: A type that has never been used to generate or validate a value.
+- 🟡 Yellow: It is systematically difficult to determine if the type was used or not. (FIXME)
+
 ## Size
 
 Random values are determined based on size.
