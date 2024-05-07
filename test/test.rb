@@ -229,9 +229,17 @@ module Test
   end
 
   class Coverage
+    attr_reader :a
+
+    def initialize
+      @a = 1
+    end
+
     def one_line(int, sym) = [int, sym]
     def two_lines(a:, b: nil, **rk) = a
     def three_lines = [:a, :c].sample
     def block = yield(1)
+    def all_variables(*) = 1
+    def singleton = Test::Coverage
   end
 end

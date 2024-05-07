@@ -78,41 +78,32 @@ module RaaP
     type accuracy = :abs | :opt
     class Writer
       @method_type: ::RBS::MethodType
-      @green_locs: ::Set[locs]
-      @cur: ::RBS::Buffer::loc
+      @cov: ::Set[Symbol]
+      @cur: Integer
 
-      def initialize: (::RBS::MethodType, Set[locs]) -> void
+      def initialize: (::RBS::MethodType, Set[Symbol]) -> void
       def write: (IO) -> void
 
       private
 
-      def slice_by_loc: (::RBS::Buffer::loc, ::RBS::Buffer::loc) -> String
-      def write_param: (IO, ::RBS::Types::Function::Param, accuracy) -> void
-      def write_type: (IO, ::RBS::Types::t, untyped, accuracy) -> void
+      def method_type_location: () -> ::RBS::Location[untyped, untyped]
+      def slice: (Integer, Range[Integer]) -> String
+      def write_param: (IO, String, ::RBS::Types::Function::Param, accuracy) -> void
+      def write_type: (IO, String, ::RBS::Types::t, accuracy) -> void
       def green: (String) -> String
       def red: (String) -> String
       def yellow: (String) -> String
     end
 
-    class Log
-      attr_reader name: String
-      attr_reader locs: [::RBS::Buffer::loc, ::RBS::Buffer::loc]
-
-      def initialize: (name: String, locs: [::RBS::Buffer::loc, ::RBS::Buffer::loc]) -> void
-    end
-
-    self.@logs: Array[Log]?
+    self.@cov: Set[Symbol]?
     self.@method_type: ::RBS::MethodType
 
     def self.start: (::RBS::MethodType) -> void
     def self.running?: () -> bool
-    def self.log: (name: String, locs: [::RBS::Buffer::loc, ::RBS::Buffer::loc]) -> void
-    def self.logs: () -> Array[Log]?
+    def self.log: (String | Symbol) -> void
+    def self.cov: () -> Set[Symbol]
     def self.show: (IO) -> void
-
-    private
-
-    def self.green_locs: () -> Set[[::RBS::Buffer::loc, ::RBS::Buffer::loc]]
+    def self.new_type_with_log: (String, ::RBS::Types::t) -> Type
   end
 
   class FunctionType
@@ -127,7 +118,7 @@ module RaaP
     def to_symbolic_call_recursive: (untyped, size: Integer) -> untyped
     def build_args_type: () -> Array[Type]
     def build_kwargs_type: () -> Hash[Symbol, Type]
-    def build_type_with_coverage: (::RBS::Types::Function::Param) -> Type
+    def build_type_with_coverage: (String, ::RBS::Types::Function::Param) -> Type
   end
 
   class MethodProperty
@@ -154,7 +145,7 @@ module RaaP
     def check_return: (receiver_value: untyped, return_value: untyped) -> ([Symbol] | [Symbol, Exception])
     def return_type: () -> RBS::Types::t
     def original_return_type: () -> RBS::Types::t
-    def coverage: (untyped, RBS::Types::t, RBS::Test::TypeCheck) -> void
+    def coverage: (String, untyped, RBS::Types::t, ?RBS::Test::TypeCheck?) -> void
   end
 
   class MethodType
@@ -182,6 +173,8 @@ module RaaP
     def self.loader: () -> ::RBS::EnvironmentLoader
     def self.parse_type: (String) -> ::RBS::Types::t
     def self.parse_method_type: (String) -> ::RBS::MethodType
+    def self.parse_member: (String) -> ::RBS::AST::Members::Attribute
+    def self._shift_location: (untyped, Integer) -> void
     def self.find_alias_decl: (::RBS::TypeName, Symbol) -> ::RBS::AST::Members::Alias?
   end
 

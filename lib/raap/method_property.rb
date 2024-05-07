@@ -67,8 +67,9 @@ module RaaP
           begin
             return_value = symbolic_caller.eval
           rescue StandardError, NotImplementedError
-            check = [:success]
             return_value = Value::Bottom.new
+            coverage("return", return_value, return_type)
+            check = [:success]
           rescue Timeout::ExitException
             raise
           rescue Exception => e # rubocop:disable Lint/RescueException
@@ -113,6 +114,7 @@ module RaaP
         if BindCall.is_a?(return_type, ::RBS::Types::ClassSingleton)
           # ::RBS::Test::TypeCheck cannot support to check singleton class
           if receiver_value == return_value
+            coverage("return", return_value, return_type)
             [:success]
           else
             [:failure]
@@ -135,7 +137,7 @@ module RaaP
       )
       begin
         if type_check.value(return_value, return_type)
-          coverage(return_value, original_return_type, type_check)
+          coverage("return", return_value, return_type, type_check)
           [:success]
         else
           [:failure]
@@ -150,45 +152,31 @@ module RaaP
       @method_type.rbs.type.return_type
     end
 
-    def original_return_type
-      @method_type.original_rbs.type.return_type
-    end
-
-    def coverage(return_value, return_type, type_check)
+    def coverage(position, return_value, return_type, type_check = nil)
       return unless Coverage.running?
-      return unless return_type.location
 
       case return_type
       when ::RBS::Types::Tuple
-        return_type.types.zip(return_value).each do |type, value|
-          if type_check.value(value, type)
-            coverage(value, type, type_check)
+        return_type.types.zip(return_value).each_with_index do |(type, value), i|
+          if type_check&.value(value, type)
+            coverage("#{position}_tuple_#{i}", value, type, type_check)
           end
         end
       when ::RBS::Types::Union
-        return_type.types.each do |type|
-          if type_check.value(return_value, type)
-            coverage(return_value, type, type_check)
+        return_type.types.each_with_index do |type, i|
+          if type_check&.value(return_value, type)
+            coverage("#{position}_union_#{i}", return_value, type, type_check)
+            break
           end
         end
       when ::RBS::Types::Optional
-        raise unless return_type.location
-
-        # @type var locs: [[Integer, Integer], [Integer, Integer]]
-        locs = if return_value.nil?
-                 # `?` is a last 1 character
-                 [return_type.location.end_loc.dup.tap { _1[1] -= 1 }, return_type.location.end_loc]
-               else
-                 [return_type.location.start_loc, return_type.location.end_loc.dup.tap { _1[1] -= 1 }]
-               end
-        Coverage.log(name: return_type.location.buffer.name, locs: locs)
+        if return_value.nil?
+          Coverage.log("#{position}_optional_right")
+        else
+          coverage("#{position}_optional_left", return_value, return_type.type, type_check)
+        end
       else
-        raise unless return_type.location
-
-        Coverage.log(
-          name: return_type.location.buffer.name,
-          locs: [return_type.location.start_loc, return_type.location.end_loc]
-        )
+        Coverage.log(position)
       end
     end
   end
