@@ -51,6 +51,8 @@ module RaaP
       @argv = argv
       @skip = DEFAULT_SKIP.dup
       @results = []
+      @start_time = 0.0
+      @end_time = 0.0
     end
 
     def load
@@ -121,6 +123,8 @@ module RaaP
       end
       @skip.freeze
 
+      @start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
       @argv.each do |tag|
         next if tag.start_with?('!')
 
@@ -135,6 +139,8 @@ module RaaP
           run_by_type_name(tag: tag)
         end
       end
+
+      @end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
       report
     end
@@ -168,6 +174,14 @@ module RaaP
           exit_status = 1
         end
       end
+      total_time = @end_time - @start_time
+      time = if total_time < 1
+               "#{(total_time * 1000).round}ms"
+             else
+               "#{total_time.round(3)}s"
+             end
+      puts
+      puts "Total time #{time}"
       exit_status
     end
 

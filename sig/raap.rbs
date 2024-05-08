@@ -56,6 +56,8 @@ module RaaP
     @option: Option
     @results:  Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
     @skip: ::Set[::String]
+    @start_time: Float
+    @end_time: Float
 
     def self.option: () -> Option
     def self.option=: (Option) -> void
