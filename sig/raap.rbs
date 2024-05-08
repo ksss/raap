@@ -330,19 +330,19 @@ module RaaP
       def class: () -> class
     end
 
-    class Interface < BasicObject
+    class Interface
       @type: ::RBS::Types::Interface
       @size: Integer
       @definition: ::RBS::Definition
 
-      def self.define_method_from_interface: (Class base_class, String | ::RBS::Types::Interface type, ?size: Integer) -> void
+      def self.define_method_from_interface: (::Module base_class, String | ::RBS::Types::Interface type, ?size: Integer) -> void
       def initialize: (String | ::RBS::Types::Interface | String, ?size: Integer) -> void
       def respond_to?: (Symbol, ?boolish) -> bool
       def inspect: () -> String
       def class: () -> class
     end
 
-    class Intersection < BasicObject
+    module Intersection
       @type: ::RBS::Types::Intersection
       @children: Array[Type]
       @size: Integer
@@ -369,7 +369,7 @@ module RaaP
       def class: () -> class
     end
 
-    class Variable < BasicObject
+    class Variable
       attr_reader type: ::RBS::Types::Variable
 
       def initialize: (::RBS::Types::Variable | String | Symbol) -> void

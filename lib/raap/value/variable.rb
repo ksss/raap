@@ -2,7 +2,7 @@
 
 module RaaP
   module Value
-    class Variable < BasicObject
+    class Variable
       attr_reader :type
 
       def initialize(type)
