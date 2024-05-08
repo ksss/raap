@@ -92,6 +92,8 @@ module RaaP
           end
         when ::RBS::Types::Optional
           write_type(io, "#{position}_optional_left", type.type, accuracy)
+          io.write(slice(@cur, @cur...(type.location.end_pos - 1)))
+          @cur = type.location.end_pos - 1
           if @cov.include?("#{position}_optional_right".to_sym)
             io.write(green('?'))
           else

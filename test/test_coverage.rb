@@ -243,4 +243,23 @@ class TestCoverage < Minitest::Test
     Coverage.show(io = StringIO.new)
     assert_equal "() -> (#{g "String"}#{g ??} | #{g "Integer"}#{g ??})\n", io.string
   end
+
+  def test_show_return_optional_with_union
+    Coverage.start(::RBS::Parser.parse_method_type("() -> (String | Integer)?"))
+
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{r "String"} | #{r "Integer"})#{r ??}\n", io.string
+
+    Coverage.log(:return_optional_right)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{r "String"} | #{r "Integer"})#{g ??}\n", io.string
+
+    Coverage.log(:return_optional_left_union_1)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{r "String"} | #{g "Integer"})#{g ??}\n", io.string
+
+    Coverage.log(:return_optional_left_union_0)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{g "String"} | #{g "Integer"})#{g ??}\n", io.string
+  end
 end
