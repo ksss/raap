@@ -91,6 +91,8 @@ module RaaP
             write_type(io, "#{position}_#{name}_#{i}", t, accuracy)
           end
         when ::RBS::Types::Optional
+          raise unless type.location
+
           write_type(io, "#{position}_optional_left", type.type, accuracy)
           io.write(slice(@cur, @cur...(type.location.end_pos - 1)))
           @cur = type.location.end_pos - 1
