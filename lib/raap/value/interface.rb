@@ -2,9 +2,9 @@
 
 module RaaP
   module Value
-    class Interface < BasicObject
+    class Interface
       class << self
-        def define_method_from_interface(base_class, type, size: 3)
+        def define_method_from_interface(base_mod, type, size: 3)
           type = type.is_a?(::String) ? RBS.parse_type(type) : type
           unless type.instance_of?(::RBS::Types::Interface)
             ::Kernel.raise ::TypeError, "not an interface type: #{type}"
@@ -22,7 +22,7 @@ module RaaP
             ts = TypeSubstitution.new(type_params, type.args)
             subed_method_type = ts.method_type_sub(method_type, self_type: self_type, instance_type: instance_type, class_type: class_type)
 
-            BindCall.define_method(base_class, name) do |*_, &b|
+            BindCall.define_method(base_mod, name) do |*_, &b|
               @fixed_return_value ||= {}
               @fixed_return_value[name] ||= if self_type == subed_method_type.type.return_type
                                               self
@@ -63,14 +63,6 @@ module RaaP
         end
         @definition = RBS.builder.build_interface(@type.name.absolute!)
         @size = size
-      end
-
-      def respond_to?(name, _include_all = false)
-        @definition.methods.has_key?(name.to_sym)
-      end
-
-      def class
-        Interface
       end
 
       def inspect

@@ -17,19 +17,18 @@ module RaaP
           raise ArgumentError, "intersection type must have at least one class instance type in `#{instances}`"
         end
 
-        base = instances.find { |c| c.is_a?(::Class) } || BasicObject
+        base = instances.find { |c| c.is_a?(::Class) } || Object
 
         c = Class.new(base) do
           instances.select { |i| !i.is_a?(::Class) }.each do |m|
             include(m)
           end
 
-          interfaces = type.types.select do |t|
-            t.instance_of?(::RBS::Types::Interface)
-          end
-
-          interfaces.each do |interface|
-            Interface.define_method_from_interface(self, interface, size: size)
+          type.types.each do |t|
+            case t
+            when ::RBS::Types::Interface
+              Interface.define_method_from_interface(self, t, size: size)
+            end
           end
         end
         type = ::RBS::Types::ClassInstance.new(name: TypeName(base.name), args: [], location: nil)

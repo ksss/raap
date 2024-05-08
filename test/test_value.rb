@@ -12,9 +12,12 @@ class TestValue < Minitest::Test
 
   def test_interface
     interface = Interface.new("Test::_Interface")
+
+    assert interface.respond_to?(:object_id)
+
     assert interface.respond_to?(:lit)
     assert interface.inspect
-    assert_equal RaaP::Value::Interface, interface.class
+    assert interface.is_a?(RaaP::Value::Interface)
 
     assert_equal :sym, interface.lit
     assert RaaP::BindCall.instance_of?(interface.void, RaaP::Value::Void)
@@ -34,6 +37,9 @@ class TestValue < Minitest::Test
   end
 
   def test_intersection
+    intersection = Intersection.new("_ToF & _ToI", size: 10)
+    assert intersection.object_id
+
     intersection = Intersection.new("Object & _Each[Integer]", size: 10)
     assert intersection.object_id
     intersection.each do |int|
@@ -107,6 +113,7 @@ class TestValue < Minitest::Test
   def test_variable
     assert_equal "#<var T>", Variable.new("T").inspect
     assert_equal Variable, Variable.new("T").class
+    assert Variable.new("T").object_id
     assert_equal ::RBS::Types::Variable.new(name: :T, location: nil), Variable.new(:T).type
     assert_raises TypeError do
       Variable.new(1)
