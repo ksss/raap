@@ -57,6 +57,10 @@ Then, you can start loop again.
 
 Finally, you get the perfect RBS!
 
+## Slide
+
+https://speakerdeck.com/ksss/raap
+
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
