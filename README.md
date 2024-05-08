@@ -173,6 +173,10 @@ However, by setting this option, it is possible to intentionally validate privat
 Simply call `Kernel.load`.
 However, this simplifies the preliminary preparation.
 
+#### Preload examples
+
+1) Check signature of aws-sdk-s3
+
 ```rb
 $ cat preload.rb
 require 'aws-sdk-s3'
@@ -182,7 +186,22 @@ RaaP::Type.register("Aws::S3::Client") do
   [:call, Aws::S3::Client, :new, [], { stub_responses: true }, nil]
 end
 
-$ raap --preload preload.rb 'Aws::S3::Client#get_object'
+$ raap --preload ./preload.rb 'Aws::S3::Client#get_object'
+```
+
+2) Output ruby coverage by simplecov
+
+```rb
+$ cat preload.rb
+require 'simplecov'
+
+SimpleCov.command_name 'raap'
+SimpleCov.start do
+  enable_coverage :branch
+  add_filter "/test/"
+end
+
+$ bundle exec raap --preload ./preload.rb -r my_class 'MyClass'
 ```
 
 ## First support is CLI
