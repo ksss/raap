@@ -17,8 +17,9 @@ class TestCoverage < Minitest::Test
     assert Set.new([:after]) == Coverage.cov
   end
 
-  def test_show_simple
+  def test_show_req
     Coverage.start(::RBS::Parser.parse_method_type("(String) -> String"))
+
     Coverage.show(io = StringIO.new)
     assert_equal "(#{r("String")}) -> #{r("String")}\n", io.string
 
@@ -31,8 +32,9 @@ class TestCoverage < Minitest::Test
     assert_equal "(#{g("String")}) -> #{g("String")}\n", io.string
   end
 
-  def test_show_req_0_union
+  def test_show_req_union
     Coverage.start(::RBS::Parser.parse_method_type("(String | Integer) -> String"))
+
     Coverage.show(io = StringIO.new)
     assert_equal "(#{r("String")} | #{r("Integer")}) -> #{r("String")}\n", io.string
 
@@ -45,8 +47,76 @@ class TestCoverage < Minitest::Test
     assert_equal "(#{g("String")} | #{g("Integer")}) -> #{r("String")}\n", io.string
   end
 
+  def test_show_opt
+    Coverage.start(::RBS::Parser.parse_method_type("(?String, ?Integer) -> void"))
+
+    Coverage.show(io = StringIO.new)
+    assert_equal "(?#{r "String"}, ?#{r "Integer"}) -> #{r "void"}\n", io.string
+
+    Coverage.log(:opt_0)
+    Coverage.show(io = StringIO.new)
+    assert_equal "(?#{g "String"}, ?#{r "Integer"}) -> #{r "void"}\n", io.string
+
+    Coverage.log(:opt_1)
+    Coverage.show(io = StringIO.new)
+    assert_equal "(?#{g "String"}, ?#{g "Integer"}) -> #{r "void"}\n", io.string
+  end
+
+  def test_show_rest
+    Coverage.start(::RBS::Parser.parse_method_type("(*String) -> void"))
+
+    Coverage.show(io = StringIO.new)
+    assert_equal "(*#{r "String"}) -> #{r "void"}\n", io.string
+
+    Coverage.log(:rest)
+    Coverage.show(io = StringIO.new)
+    assert_equal "(*#{g "String"}) -> #{r "void"}\n", io.string
+  end
+
+  def test_show_keyreq
+    Coverage.start(::RBS::Parser.parse_method_type("(a: String, b: Integer) -> void"))
+
+    Coverage.show(io = StringIO.new)
+    assert_equal "(a: #{r "String"}, b: #{r "Integer"}) -> #{r "void"}\n", io.string
+
+    Coverage.log(:keyreq_a)
+    Coverage.show(io = StringIO.new)
+    assert_equal "(a: #{g "String"}, b: #{r "Integer"}) -> #{r "void"}\n", io.string
+
+    Coverage.log(:keyreq_b)
+    Coverage.show(io = StringIO.new)
+    assert_equal "(a: #{g "String"}, b: #{g "Integer"}) -> #{r "void"}\n", io.string
+  end
+
+  def test_show_key
+    Coverage.start(::RBS::Parser.parse_method_type("(?a: String, ?b: Integer) -> void"))
+
+    Coverage.show(io = StringIO.new)
+    assert_equal "(?a: #{r "String"}, ?b: #{r "Integer"}) -> #{r "void"}\n", io.string
+
+    Coverage.log(:key_a)
+    Coverage.show(io = StringIO.new)
+    assert_equal "(?a: #{g "String"}, ?b: #{r "Integer"}) -> #{r "void"}\n", io.string
+
+    Coverage.log(:key_b)
+    Coverage.show(io = StringIO.new)
+    assert_equal "(?a: #{g "String"}, ?b: #{g "Integer"}) -> #{r "void"}\n", io.string
+  end
+
+  def test_show_keyrest
+    Coverage.start(::RBS::Parser.parse_method_type("(**String) -> void"))
+
+    Coverage.show(io = StringIO.new)
+    assert_equal "(**#{r "String"}) -> #{r "void"}\n", io.string
+
+    Coverage.log(:keyrest)
+    Coverage.show(io = StringIO.new)
+    assert_equal "(**#{g "String"}) -> #{r "void"}\n", io.string
+  end
+
   def test_show_block
     Coverage.start(::RBS::Parser.parse_method_type("() { (Integer, String) -> void } -> String"))
+
     Coverage.show(io = StringIO.new)
     assert_equal "() { (#{r("Integer")}, #{r("String")}) -> #{r("void")} } -> #{r("String")}\n", io.string
 
@@ -82,6 +152,7 @@ class TestCoverage < Minitest::Test
 
   def test_show_attr_reader_class_instance
     Coverage.start(attr_(:reader, "String"))
+
     Coverage.show(io = StringIO.new)
     assert_equal "attr_reader a: #{r("String")}\n", io.string
 
@@ -92,6 +163,7 @@ class TestCoverage < Minitest::Test
 
   def test_show_attr_reader_union
     Coverage.start(attr_(:reader, ":foo | :bar"))
+
     Coverage.show(io = StringIO.new)
     assert_equal "attr_reader a: #{r(":foo")} | #{r(":bar")}\n", io.string
 
@@ -106,6 +178,7 @@ class TestCoverage < Minitest::Test
 
   def test_show_attr_reader_optional
     Coverage.start(attr_(:reader, "String?"))
+
     Coverage.show(io = StringIO.new)
     assert_equal "attr_reader a: #{r "String"}#{r ??}\n", io.string
 

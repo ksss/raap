@@ -41,8 +41,8 @@ module RaaP
               fun.optional_positionals.each_with_index { |param, i| write_param(io, "opt_#{i}", param, :opt) }
               fun.rest_positionals&.yield_self         { |param| write_param(io, "rest", param, :opt) }
               fun.trailing_positionals.each_with_index { |param, i| write_param(io, "trail_#{i}", param, :abs) }
-              fun.required_keywords.each_with_index    { |(key, param), i| write_param(io, "keyreq_#{key}_#{i}", param, :abs) }
-              fun.optional_keywords.each_with_index    { |(key, param), i| write_param(io, "key_#{key}_#{i}", param, :opt) }
+              fun.required_keywords.each               { |key, param| write_param(io, "keyreq_#{key}", param, :abs) }
+              fun.optional_keywords.each               { |key, param| write_param(io, "key_#{key}", param, :opt) }
               fun.rest_keywords&.yield_self            { |param| write_param(io, "keyrest", param, :opt) }
               # when ::RBS::Types::UntypedFunction
             end
