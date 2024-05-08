@@ -190,4 +190,57 @@ class TestCoverage < Minitest::Test
     Coverage.show(io = StringIO.new)
     assert_equal "attr_reader a: #{g "String"}#{g ??}\n", io.string
   end
+
+  def test_show_return_union
+    Coverage.start(::RBS::Parser.parse_method_type("() -> (String | Integer)"))
+
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{r "String"} | #{r "Integer"})\n", io.string
+
+    Coverage.log(:return_union_0)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{g "String"} | #{r "Integer"})\n", io.string
+
+    Coverage.log(:return_union_1)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{g "String"} | #{g "Integer"})\n", io.string
+  end
+
+  def test_show_return_optional
+    Coverage.start(::RBS::Parser.parse_method_type("() -> String?"))
+
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> #{r "String"}#{r ??}\n", io.string
+
+    Coverage.log(:return_optional_left)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> #{g "String"}#{r ??}\n", io.string
+
+    Coverage.log(:return_optional_right)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> #{g "String"}#{g ??}\n", io.string
+  end
+
+  def test_show_return_union_with_optional
+    Coverage.start(::RBS::Parser.parse_method_type("() -> (String? | Integer?)"))
+
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{r "String"}#{r ??} | #{r "Integer"}#{r ??})\n", io.string
+
+    Coverage.log(:return_union_1_optional_right)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{r "String"}#{r ??} | #{r "Integer"}#{g ??})\n", io.string
+
+    Coverage.log(:return_union_1_optional_left)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{r "String"}#{r ??} | #{g "Integer"}#{g ??})\n", io.string
+
+    Coverage.log(:return_union_0_optional_left)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{g "String"}#{r ??} | #{g "Integer"}#{g ??})\n", io.string
+
+    Coverage.log(:return_union_0_optional_right)
+    Coverage.show(io = StringIO.new)
+    assert_equal "() -> (#{g "String"}#{g ??} | #{g "Integer"}#{g ??})\n", io.string
+  end
 end
