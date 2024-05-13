@@ -2,8 +2,9 @@
 
 module RaaP
   class FunctionType
-    def initialize(fun)
+    def initialize(fun, coverage: true)
       @fun = fun
+      @coverage = coverage
     end
 
     def pick_arguments(size: 10)
@@ -81,7 +82,11 @@ module RaaP
     end
 
     def build_type_with_coverage(position, param)
-      Coverage.new_type_with_log(position, param.type)
+      if @coverage
+        Coverage.new_type_with_log(position, param.type)
+      else
+        Type.new(param.type)
+      end
     end
   end
 end

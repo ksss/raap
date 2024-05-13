@@ -108,8 +108,9 @@ module RaaP
 
   class FunctionType
     @fun: ::RBS::Types::Function
+    @coverage: boolish
 
-    def initialize: (::RBS::Types::Function) -> void
+    def initialize: (::RBS::Types::Function, ?coverage: boolish) -> void
     def pick_arguments: (?size: Integer) -> [Array[untyped], Hash[Symbol, untyped]]
     def arguments_to_symbolic_call: (?size: Integer) -> [Array[untyped], Hash[Symbol, untyped]]
 
