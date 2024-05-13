@@ -33,7 +33,7 @@ module RaaP
               if b && subed_method_type.block && subed_method_type.block.type.is_a?(::RBS::Types::Function)
                 @fixed_block_arguments ||= {}
                 @fixed_block_arguments[name] ||= size.times.map do
-                  FunctionType.new(subed_method_type.block.type)
+                  FunctionType.new(subed_method_type.block.type, coverage: false)
                               .pick_arguments(size: size)
                 end
 
