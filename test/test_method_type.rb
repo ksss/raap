@@ -88,7 +88,7 @@ class TestMethodType < Minitest::Test
     assert args == []
     assert kwargs == {}
     assert block.instance_of?(Proc)
-    assert block.call.instance_of?(String)
+    assert block.call(1).instance_of?(String)
   end
 
   def test_pick_arguments_with_type_params
@@ -122,5 +122,43 @@ class TestMethodType < Minitest::Test
 
     block = MethodType.new("() { () -> self } -> void", self_type: "Integer").pick_block
     assert block.call.instance_of?(Integer)
+  end
+
+  def test_pick_block_parameters
+    RaaP::Coverage.start(RaaP::RBS.parse_method_type("() { () -> void } -> void"))
+    block = MethodType.new("() { () -> void } -> void").pick_block
+    assert block.call
+    assert_equal [], block.parameters
+    assert_equal 0, block.arity
+    assert_raises(ArgumentError) { block.call(1) }
+    assert Set.new([:block_return]), RaaP::Coverage.cov
+
+    RaaP::Coverage.start(RaaP::RBS.parse_method_type("() { (Integer) -> void } -> void"))
+    block = MethodType.new("() { (Integer) -> void } -> void").pick_block
+    assert_raises(ArgumentError) { block.call }
+    assert block.call(1)
+    assert_raises(TypeError) { block.call('a') }
+    assert_equal [[:req, :a]], block.parameters
+    assert_equal 1, block.arity
+    assert Set.new([:block_param_0, :block_return]), RaaP::Coverage.cov
+
+    RaaP::Coverage.start(RaaP::RBS.parse_method_type("() { (?Integer) -> void } -> void"))
+    block = MethodType.new("() { (?Integer) -> void } -> void").pick_block
+    assert block.call
+    assert block.call(1)
+    assert_raises(TypeError) { block.call('a') }
+    assert_equal [[:opt, :a]], block.parameters
+    assert_equal(-1, block.arity)
+    assert Set.new([:block_param_0, :block_return]), RaaP::Coverage.cov
+
+    RaaP::Coverage.start(RaaP::RBS.parse_method_type("() { (*Integer) -> void } -> void"))
+    block = MethodType.new("() { (*Integer) -> void } -> void").pick_block
+    assert block.call
+    assert block.call(1)
+    assert block.call(1, 2)
+    assert_raises(TypeError) { block.call('a') }
+    assert_equal [[:rest, :a]], block.parameters
+    assert_equal(-1, block.arity)
+    assert Set.new([:block_param_0, :block_return]), RaaP::Coverage.cov
   end
 end

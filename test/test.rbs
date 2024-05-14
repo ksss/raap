@@ -179,4 +179,8 @@ module Test
     attr_reader a: A? | Object
     def singleton: () -> singleton(Coverage)
   end
+
+  class BlockArgsCheck
+    def different_type: () { (Integer) -> void } -> void
+  end
 end

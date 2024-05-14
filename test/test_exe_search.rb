@@ -16,6 +16,7 @@ class TestExeSearch < Minitest::Test
       "!Test::TypeErrorIsFail",
       "!Test::ExceptionWithBot",
       "!Test::Coverage",
+      "!Test::BlockArgsCheck",
     ]).load.run
   end
 end

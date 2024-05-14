@@ -242,4 +242,10 @@ module Test
     def all_variables(*) = 1
     def singleton = Test::Coverage
   end
+
+  class BlockArgsCheck
+    def different_type
+      yield 'zzz'
+    end
+  end
 end

@@ -103,4 +103,10 @@ class TestExe < Minitest::Test
       "Test::List[Integer]",
     ]).load.run
   end
+
+  def test_exe_when_fail_block_params_type_mismatch
+    assert_equal 1, RaaP::CLI.new([
+      "Test::BlockArgsCheck#different_type",
+    ]).load.run
+  end
 end
