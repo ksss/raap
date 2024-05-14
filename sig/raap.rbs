@@ -75,7 +75,6 @@ module RaaP
 
   module Coverage
     type locs = [::RBS::Buffer::loc, ::RBS::Buffer::loc]
-    type accuracy = :abs | :opt
     class Writer
       @method_type: ::RBS::MethodType
       @cov: ::Set[Symbol]
@@ -88,11 +87,10 @@ module RaaP
 
       def method_type_location: () -> ::RBS::Location[untyped, untyped]
       def slice: (Integer, Range[Integer]) -> String
-      def write_param: (IO, String, ::RBS::Types::Function::Param, accuracy) -> void
-      def write_type: (IO, String, ::RBS::Types::t, accuracy) -> void
+      def write_param: (IO, String, ::RBS::Types::Function::Param) -> void
+      def write_type: (IO, String, ::RBS::Types::t) -> void
       def green: (String) -> String
       def red: (String) -> String
-      def yellow: (String) -> String
     end
 
     self.@cov: Set[Symbol]?

@@ -25,7 +25,7 @@ module RaaP
               RaaP.logger.warn("No location information for `#{phantom_member}`")
               return
             end
-            write_type(io, "return", phantom_member.type, :abs)
+            write_type(io, "return", phantom_member.type)
             io.write(slice(@cur, @cur...phantom_member.location.end_pos))
           else
             RaaP.logger.error("#{phantom_member.class} is not supported")
@@ -37,22 +37,22 @@ module RaaP
           phantom_method_type.type.yield_self do |fun|
             case fun
             when ::RBS::Types::Function
-              fun.required_positionals.each_with_index { |param, i| write_param(io, "req_#{i}", param, :abs) }
-              fun.optional_positionals.each_with_index { |param, i| write_param(io, "opt_#{i}", param, :opt) }
-              fun.rest_positionals&.yield_self         { |param| write_param(io, "rest", param, :opt) }
-              fun.trailing_positionals.each_with_index { |param, i| write_param(io, "trail_#{i}", param, :abs) }
-              fun.required_keywords.each               { |key, param| write_param(io, "keyreq_#{key}", param, :abs) }
-              fun.optional_keywords.each               { |key, param| write_param(io, "key_#{key}", param, :opt) }
-              fun.rest_keywords&.yield_self            { |param| write_param(io, "keyrest", param, :opt) }
+              fun.required_positionals.each_with_index { |param, i| write_param(io, "req_#{i}", param) }
+              fun.optional_positionals.each_with_index { |param, i| write_param(io, "opt_#{i}", param) }
+              fun.rest_positionals&.yield_self         { |param| write_param(io, "rest", param) }
+              fun.trailing_positionals.each_with_index { |param, i| write_param(io, "trail_#{i}", param) }
+              fun.required_keywords.each               { |key, param| write_param(io, "keyreq_#{key}", param) }
+              fun.optional_keywords.each               { |key, param| write_param(io, "key_#{key}", param) }
+              fun.rest_keywords&.yield_self            { |param| write_param(io, "keyrest", param) }
               # when ::RBS::Types::UntypedFunction
             end
           end
 
           phantom_method_type.block&.yield_self do |b|
-            b.type.each_param.with_index { |param, i| write_param(io, "block_param_#{i}", param, :opt) }
-            write_type(io, "block_return", b.type.return_type, :abs)
+            b.type.each_param.with_index { |param, i| write_param(io, "block_param_#{i}", param) }
+            write_type(io, "block_return", b.type.return_type)
           end
-          write_type(io, "return", phantom_method_type.type.return_type, :abs)
+          write_type(io, "return", phantom_method_type.type.return_type)
           raise unless phantom_method_type.location
 
           io.write(slice(@cur, @cur...phantom_method_type.location.end_pos))
@@ -70,11 +70,11 @@ module RaaP
         ml.source[start, range.end - range.begin] or raise
       end
 
-      def write_param(io, position, param, accuracy)
-        write_type(io, position, param.type, accuracy)
+      def write_param(io, position, param)
+        write_type(io, position, param.type)
       end
 
-      def write_type(io, position, type, accuracy)
+      def write_type(io, position, type)
         unless type.location
           RaaP.logger.warn("No location information for `#{type}`")
           return
@@ -88,29 +88,18 @@ module RaaP
             t.location or raise
             io.write(slice(@cur, @cur...t.location.start_pos)) # ( or [
             @cur = t.location.start_pos
-            write_type(io, "#{position}_#{name}_#{i}", t, accuracy)
+            write_type(io, "#{position}_#{name}_#{i}", t)
           end
         when ::RBS::Types::Optional
           raise unless type.location
 
-          write_type(io, "#{position}_optional_left", type.type, accuracy)
+          write_type(io, "#{position}_optional_left", type.type)
           io.write(slice(@cur, @cur...(type.location.end_pos - 1)))
           @cur = type.location.end_pos - 1
           if @cov.include?("#{position}_optional_right".to_sym)
             io.write(green('?'))
           else
             io.write(red('?'))
-          end
-          raise unless type.location
-
-          @cur = type.location.end_pos
-        when ::RBS::Types::Variable
-          case accuracy
-          when :abs
-            io.write(green(type.name.to_s))
-          when :opt
-            # Variables are substed so raap don't know if they've been used.
-            io.write(yellow(type.name.to_s))
           end
           raise unless type.location
 
@@ -129,7 +118,6 @@ module RaaP
 
       def green(str) = "\e[32m#{str}\e[0m"
       def red(str) = "\e[1;4;41m#{str}\e[0m"
-      def yellow(str) = "\e[93m#{str}\e[0m"
     end
 
     class << self
