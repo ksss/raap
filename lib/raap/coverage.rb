@@ -142,8 +142,6 @@ module RaaP
         !!@cov
       end
 
-      # position: req_0
-      # type: union_1
       def log(position)
         return unless running?
 
@@ -151,7 +149,7 @@ module RaaP
       end
 
       def cov
-        @cov or raise
+        @cov or raise("Coverage is not started")
       end
 
       def show(io)
@@ -162,25 +160,31 @@ module RaaP
       end
 
       def new_type_with_log(position, type)
+        log_with_type(position, type) do |t|
+          Type.new(t)
+        end
+      end
+
+      def log_with_type(position, type, &block)
         case type
         when ::RBS::Types::Tuple
           # FIXME: Support Union in Tuple
           type.types.each_with_index do |_t, i|
             log("#{position}_tuple_#{i}")
           end
-          Type.new(type)
+          block&.call(type)
         when ::RBS::Types::Union
           i = Random.rand(type.types.length)
-          new_type_with_log("#{position}_union_#{i}", type.types[i])
+          log_with_type("#{position}_union_#{i}", type.types[i], &block)
         when ::RBS::Types::Optional
           if Random.rand(2).zero?
-            new_type_with_log("#{position}_optional_left", type.type)
+            log_with_type("#{position}_optional_left", type.type, &block)
           else
-            new_type_with_log("#{position}_optional_right", ::RBS::Types::Bases::Nil.new(location: nil))
+            log_with_type("#{position}_optional_right", ::RBS::Types::Bases::Nil.new(location: nil), &block)
           end
         else
           log(position)
-          Type.new(type)
+          block&.call(type)
         end
       end
     end
