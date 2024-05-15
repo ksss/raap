@@ -19,21 +19,15 @@ module RaaP
 
   class CLI
     class Option < ::Struct[untyped]
-      def self.new: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?coverage: bool) -> instance
+      def self.new: (?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?coverage: bool) -> instance
 
-      def self.[]: (?dirs: ::Array[String], ?requires: ::Array[String], ?libraries: ::Array[String], ?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?coverage: bool) -> instance
+      def self.[]: (?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?coverage: bool) -> instance
 
       def self.keyword_init?: () -> true
 
-      def self.members: () -> [ :dirs, :requires, :library, :timeout, :size_from, :size_to, :size_by, :allow_private, :coverage]
+      def self.members: () -> [ :timeout, :size_from, :size_to, :size_by, :allow_private, :coverage]
 
-      def members: () -> [ :dirs, :requires, :library, :timeout, :size_from, :size_to, :size_by, :allow_private, :coverage]
-
-      attr_accessor dirs: ::Array[String]
-
-      attr_accessor requires: ::Array[String]
-
-      attr_accessor libraries: ::Array[String]
+      def members: () -> [ :timeout, :size_from, :size_to, :size_by, :allow_private, :coverage]
 
       attr_accessor timeout: (Integer | Float | nil)
 

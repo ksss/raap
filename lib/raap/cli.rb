@@ -38,9 +38,6 @@ module RaaP
     def initialize(argv)
       # defaults
       @option = Option.new(
-        dirs: [],
-        requires: [],
-        libraries: [],
         timeout: 3,
         size_from: 0,
         size_to: 99,
@@ -56,13 +53,13 @@ module RaaP
     def load
       OptionParser.new do |o|
         o.on('-I', '--include PATH') do |path|
-          @option.dirs << path
+          RaaP::RBS.loader.add(path: Pathname(path))
         end
         o.on('--library lib', 'load rbs library') do |lib|
-          @option.libraries << lib
+          RaaP::RBS.loader.add(library: lib, version: nil)
         end
         o.on('--require lib', 'require ruby library') do |lib|
-          @option.requires << lib
+          require lib
         end
         o.on('--log-level level', "default: info") do |arg|
           RaaP.logger.level = arg
@@ -89,16 +86,6 @@ module RaaP
           @option.coverage = arg
         end
       end.parse!(@argv)
-
-      @option.dirs.each do |dir|
-        RaaP::RBS.loader.add(path: Pathname(dir))
-      end
-      @option.libraries.each do |lib|
-        RaaP::RBS.loader.add(library: lib, version: nil)
-      end
-      @option.requires.each do |lib|
-        require lib
-      end
 
       self
     end
