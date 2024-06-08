@@ -30,6 +30,25 @@ class TestMethodProperty < Minitest::Test
     assert_kind_of(MethodProperty::Stats, stats)
   end
 
+  def test_run_with_argument
+    count = 0
+    stats = MethodProperty.new(
+      receiver_type: Type.new("Test::Property"),
+      method_name: :int_to_int,
+      method_type: MethodType.new("(Integer) -> Integer"),
+      size_step: 0...10,
+      timeout: 1,
+    ).run do |called|
+      count += 1
+      case called
+      in Result::Success
+      end
+    end
+
+    assert_equal 10, count
+    assert_kind_of(MethodProperty::Stats, stats)
+  end
+
   def test_run_with_break
     count = 0
     stats = MethodProperty.new(
