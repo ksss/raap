@@ -252,4 +252,9 @@ module Test
       yield 'zzz'
     end
   end
+
+  class NoKey
+    def a(**nil) = nil
+    def b(*, **nil) = nil
+  end
 end

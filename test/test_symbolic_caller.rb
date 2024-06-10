@@ -34,6 +34,20 @@ class TestSymbolicCaller < Minitest::Test
     assert_raises(NoMethodError) { SymbolicCaller.new(sc).eval }
   end
 
+  def test_nokey_argument
+    [true, false].each do |allow_private|
+      [:a, :b].each do |method_name|
+        sc = SymbolicCaller.new(
+          [:call,
+           [:call, Test::NoKey, :new, [], {}, nil],
+           method_name, [], {}, nil],
+          allow_private: allow_private
+        )
+        assert_nil sc.eval
+      end
+    end
+  end
+
   def test_to_lines
     sc = SymbolicCaller.new([
       :call,
