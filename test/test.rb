@@ -257,4 +257,9 @@ module Test
     def a(**nil) = nil
     def b(*, **nil) = nil
   end
+
+  class Set
+    def foo(a) = 123
+    def bar(a) = 456
+  end
 end

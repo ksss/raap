@@ -47,7 +47,7 @@ module RaaP
       if snew
         # class
         rbs_method_type = snew.method_types.sample or raise
-        type_params = definition.type_params_decl.concat(rbs_method_type.type_params.drop(definition.type_params_decl.length))
+        type_params = definition.type_params_decl.dup.concat(rbs_method_type.type_params.drop(definition.type_params_decl.length))
         ts = TypeSubstitution.new(type_params, type.args)
         maped_rbs_method_type = ts.method_type_sub(rbs_method_type)
         method_type = MethodType.new(maped_rbs_method_type)
