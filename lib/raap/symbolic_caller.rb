@@ -148,9 +148,17 @@ module RaaP
     def eval_one(symbolic_call)
       symbolic_call => [:call, receiver_value, method_name, args, kwargs, block]
       if @allow_private
-        receiver_value.__send__(method_name, *args, **kwargs, &block)
+        if kwargs.empty?
+          receiver_value.__send__(method_name, *args, &block)
+        else
+          receiver_value.__send__(method_name, *args, **kwargs, &block)
+        end
       else
-        BindCall.public_send(receiver_value, method_name, *args, **kwargs, &block)
+        if kwargs.empty?
+          BindCall.public_send(receiver_value, method_name, *args, &block)
+        else
+          BindCall.public_send(receiver_value, method_name, *args, **kwargs, &block)
+        end
       end
     end
 
