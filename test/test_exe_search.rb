@@ -17,6 +17,7 @@ class TestExeSearch < Minitest::Test
       "!Test::ExceptionWithBot",
       "!Test::Coverage",
       "!Test::BlockArgsCheck",
+      "!Test::Set"
     ]).load.run
   end
 end

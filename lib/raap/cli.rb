@@ -223,7 +223,7 @@ module RaaP
       type_args = type.args
 
       definition = RBS.builder.build_singleton(type_name)
-      type_params_decl = definition.type_params_decl
+      type_params_decl = definition.type_params_decl.freeze
       definition.methods.each do |method_name, method|
         if @skip.include?("#{type_name.absolute!}.#{method_name}")
           RaaP.logger.info("Skip #{"#{type_name.absolute!}.#{method_name}"}")
@@ -243,7 +243,7 @@ module RaaP
       end
 
       definition = RBS.builder.build_instance(type_name)
-      type_params_decl = definition.type_params_decl
+      type_params_decl = definition.type_params_decl.freeze
       definition.methods.each do |method_name, method|
         if @skip.include?("#{type_name.absolute!}##{method_name}")
           RaaP.logger.info("Skip #{"#{type_name.absolute!}.#{method_name}"}")
