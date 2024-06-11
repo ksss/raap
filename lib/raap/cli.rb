@@ -52,6 +52,8 @@ module RaaP
 
     def load
       OptionParser.new do |o|
+        o.version = RaaP::VERSION
+
         o.on('-I', '--include PATH') do |path|
           RaaP::RBS.loader.add(path: Pathname(path))
         end
