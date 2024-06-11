@@ -1,8 +1,9 @@
+require:
+  - rubocop-on-rbs
+
 AllCops:
   TargetRubyVersion: 3.0
   NewCops: enable
-  Include:
-  - 'lib/**/*.rb'
 
 Lint:
   Enabled: true

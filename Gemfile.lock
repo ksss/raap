@@ -79,6 +79,9 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.31.3)
       parser (>= 3.3.1.0)
+    rubocop-on-rbs (0.2.0)
+      rbs (~> 3.5)
+      rubocop (~> 1.41)
     ruby-progressbar (1.13.0)
     securerandom (0.3.1)
     steep (1.7.0)
@@ -116,6 +119,7 @@ DEPENDENCIES
   rake
   rbs
   rubocop
+  rubocop-on-rbs
   steep
 
 BUNDLED WITH

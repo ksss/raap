@@ -10,4 +10,5 @@ gem "minitest"
 gem "rake"
 gem "rbs"
 gem "rubocop", require: false
-gem "steep"
+gem "rubocop-on-rbs", require: false
+gem "steep", require: false
