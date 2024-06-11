@@ -1,16 +1,12 @@
 ---
 path: ".gem_rbs_collection"
 gems:
-- name: abbrev
-  version: '0'
-  source:
-    type: stdlib
 - name: activesupport
   version: '7.0'
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: d2e93d426c927fdab90ef12e30a9875aa05d60d6
+    revision: 0435724556cea28e795f8fb376ccd104aca27d1f
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: base64
@@ -26,7 +22,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: d2e93d426c927fdab90ef12e30a9875aa05d60d6
+    revision: 0435724556cea28e795f8fb376ccd104aca27d1f
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: connection_pool
@@ -34,7 +30,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: d2e93d426c927fdab90ef12e30a9875aa05d60d6
+    revision: 0435724556cea28e795f8fb376ccd104aca27d1f
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: date
@@ -54,7 +50,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: d2e93d426c927fdab90ef12e30a9875aa05d60d6
+    revision: 0435724556cea28e795f8fb376ccd104aca27d1f
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: io-console
@@ -94,11 +90,11 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: d2e93d426c927fdab90ef12e30a9875aa05d60d6
+    revision: 0435724556cea28e795f8fb376ccd104aca27d1f
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: rbs
-  version: 3.4.4
+  version: 3.5.1
   source:
     type: rubygems
 - name: rdoc
