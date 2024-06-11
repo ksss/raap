@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.9.0] - 2024-06-11
+
+* Update ruby by @ksss in https://github.com/ksss/raap/pull/15
+* Avoid ArgumentError no keywords accepted by @ksss in https://github.com/ksss/raap/pull/16
+* Fix bug for Set by @ksss in https://github.com/ksss/raap/pull/17
+
 ## [0.8.0] - 2024-06-09
 
 * Function of interface should not log coverage by @ksss in https://github.com/ksss/raap/pull/11
