@@ -48,7 +48,7 @@ module RaaP
 
     @argv: Array[String]
     @option: Option
-    @results:  Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
+    @results: Array[{ method: ::RBS::Definition::Method, properties: Array[property_result] }]
     @skip: ::Set[::String]
 
     def self.option: () -> Option
@@ -242,8 +242,8 @@ module RaaP
     private
 
     def try_eval: (untyped) -> untyped
-    def walk: () ?{ (symbolic_call) -> untyped} -> untyped
-    def _walk: (untyped, bool is_last) ?{ (symbolic_call) -> untyped} -> untyped
+    def walk: () ?{ (symbolic_call) -> untyped } -> untyped
+    def _walk: (untyped, bool is_last) ?{ (symbolic_call) -> untyped } -> untyped
     def eval_one: (symbolic_call) -> untyped
     def var_name: (Module) -> String
     def printable?: (untyped) -> bool
@@ -331,7 +331,7 @@ module RaaP
       @definition: ::RBS::Definition
 
       def self.define_method_from_interface: (::Module base_class, String | ::RBS::Types::Interface type, ?size: Integer) -> void
-      def initialize: (String | ::RBS::Types::Interface | String, ?size: Integer) -> void
+      def initialize: (String | ::RBS::Types::Interface, ?size: Integer) -> void
       def respond_to?: (Symbol, ?boolish) -> bool
       def inspect: () -> String
       def class: () -> class
