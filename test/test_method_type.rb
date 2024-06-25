@@ -160,5 +160,14 @@ class TestMethodType < Minitest::Test
     assert_equal [[:rest, :a]], block.parameters
     assert_equal(-1, block.arity)
     assert Set.new([:block_param_0, :block_return]), RaaP::Coverage.cov
+
+    RaaP::Coverage.start(RaaP::RBS.parse_method_type("() { (?nil) -> void } -> void"))
+    block = MethodType.new("() { (?nil) -> void } -> void").pick_block
+    assert block.call
+    assert block.call(nil)
+    assert_raises(TypeError) { block.call('a') }
+    assert_equal [[:opt, :a]], block.parameters
+    assert_equal(-1, block.arity)
+    assert Set.new([:block_param_0, :block_return]), RaaP::Coverage.cov
   end
 end
