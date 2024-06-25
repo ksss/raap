@@ -105,8 +105,13 @@ class TestExe < Minitest::Test
   end
 
   def test_exe_when_fail_block_params_type_mismatch
-    assert_equal 1, RaaP::CLI.new([
-      "Test::BlockArgsCheck#different_type",
-    ]).load.run
+    capture do |io|
+      status = RaaP::CLI.new([
+        "Test::BlockArgsCheck#different_type",
+      ]).load.run
+      assert status == 1
+      assert_match "def different_type: () { (::Integer) -> void } -> void", io.string
+      assert_match "  in test/test.rbs:184:24...184:56", io.string
+    end
   end
 end
