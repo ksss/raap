@@ -74,6 +74,21 @@ module RaaP
     register("::Complex") { complex }
     register("::Data") { Data.define }
     register("::Encoding") { encoding }
+    register("::Enumerator") do
+      sized do |size|
+        instance = __skip__ = type
+        Enumerator.new do |y|
+          size.times do
+            elem = if instance.args[0]
+                     Type.new(instance.args[0]).pick(size: size / 2)
+                   else
+                     Type.random.pick(size: size / 2)
+                   end
+            y.yield elem
+          end
+        end
+      end
+    end
     register("::FalseClass") { false }
     register("::File") { File.open("/dev/null") }
     register("::Float") { float }
