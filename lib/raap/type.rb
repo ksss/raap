@@ -96,6 +96,11 @@ module RaaP
     register("::Time") { [:call, Time, :now, [], {}, nil] }
     register("::TrueClass") { true }
     register("::UnboundMethod") { temp_method_object.unbind }
+    register("BigDecimal") do
+      sized do |size|
+        [:call, Kernel, :BigDecimal, [size], {}, nil]
+      end
+    end
 
     attr_reader :type
     attr_reader :range
