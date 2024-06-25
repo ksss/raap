@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.10.0] - 2024-06-25
+
+* Support default nil in block by @ksss in https://github.com/ksss/raap/pull/18
+* Support Enumerator by @ksss in https://github.com/ksss/raap/pull/19
+* Support BigDecimal by @ksss in https://github.com/ksss/raap/pull/20
+
 ## [0.9.0] - 2024-06-11
 
 * Update ruby by @ksss in https://github.com/ksss/raap/pull/15
