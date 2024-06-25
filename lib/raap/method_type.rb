@@ -62,10 +62,10 @@ module RaaP
         end
         fun.optional_positionals.each do |param|
           resource.shift.tap do |name|
-            # FIXME: Support without literal type
             default = Type.new(param.type).pick(size: size)
             args_name << name
-            args_source << "#{name} = #{default}"
+            # FIXME: Support any object
+            args_source << "#{name} = #{default.inspect}"
           end
         end
         fun.rest_positionals&.yield_self do |_|
