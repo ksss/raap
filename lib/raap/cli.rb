@@ -305,7 +305,7 @@ module RaaP
           print '.'
           RaaP.logger.debug { "Success: #{s.called_str}" }
         in Result::Failure => f
-          puts 'F'
+          print 'F'
           if (e = f.exception)
             RaaP.logger.info { "Failure: [#{e.class}] #{e.message}" }
             RaaP.logger.debug { e.backtrace.join("\n") }
@@ -336,12 +336,12 @@ module RaaP
       end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       puts
       RaaP::Coverage.show($stdout) if @option.coverage
-      puts
 
       time_diff = end_time - start_time
       time = ", time: #{(time_diff * 1000).round}ms"
       stats_log = "success: #{stats.success}, skip: #{stats.skip}, exception: #{stats.exception}#{time}"
       RaaP.logger.info(stats_log)
+      puts
 
       if status == 0 && stats.success.zero? && !stats.break
         status = 1
