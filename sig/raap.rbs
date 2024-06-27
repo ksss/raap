@@ -261,7 +261,7 @@ module RaaP
     private
 
     interface _MapType
-      def map_type: { (untyped) -> untyped } -> untyped
+      def map_type: () { (untyped) -> untyped } -> untyped
     end
 
     def sub: (_MapType search, self_type: ::RBS::Types::t?, instance_type: ::RBS::Types::t?, class_type: ::RBS::Types::t?) -> untyped
