@@ -283,7 +283,7 @@ module RaaP
     def self.random_without_basic_object: () -> Type
     def self.call_new_from: (Module, ::RBS::Types::ClassInstance, size: Integer) -> symbolic_call
 
-    attr_reader type: ::RBS::Types::t
+    attr_accessor type: ::RBS::Types::t
     attr_reader range: Range[untyped]
 
     def initialize: (String | ::RBS::Types::t, ?range: Range[untyped]) -> void
