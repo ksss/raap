@@ -6,7 +6,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: ea1342ae63c433b0d0c576f9207e96515de9d702
+    revision: a476a2a07da40f238a68afd88ffef247f95cdd2e
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: base64
@@ -22,7 +22,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: ea1342ae63c433b0d0c576f9207e96515de9d702
+    revision: a476a2a07da40f238a68afd88ffef247f95cdd2e
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: connection_pool
@@ -30,7 +30,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: ea1342ae63c433b0d0c576f9207e96515de9d702
+    revision: a476a2a07da40f238a68afd88ffef247f95cdd2e
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: date
@@ -50,7 +50,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: ea1342ae63c433b0d0c576f9207e96515de9d702
+    revision: a476a2a07da40f238a68afd88ffef247f95cdd2e
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: io-console
@@ -90,11 +90,11 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: ea1342ae63c433b0d0c576f9207e96515de9d702
+    revision: a476a2a07da40f238a68afd88ffef247f95cdd2e
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: rbs
-  version: 3.5.1
+  version: 3.5.3
   source:
     type: rubygems
 - name: rdoc
@@ -121,4 +121,12 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: tzinfo
+  version: '2.0'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: a476a2a07da40f238a68afd88ffef247f95cdd2e
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
 gemfile_lock_path: Gemfile.lock
