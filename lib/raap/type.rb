@@ -117,7 +117,7 @@ module RaaP
       end
     end
 
-    attr_accessor :type
+    attr_reader :type
     attr_reader :range
 
     def initialize(type, range: nil..nil)

@@ -278,7 +278,8 @@ module RaaP
         args = type_params_decl.map.with_index do |param, i|
           type_args[i] || param.upper_bound || ::RBS::Types::Bases::Any.new(location: nil)
         end
-        receiver_type.type = rtype = ::RBS::Types::ClassInstance.new(name: rtype.name, args: args, location: rtype.location)
+        rtype = ::RBS::Types::ClassInstance.new(name: rtype.name, args: args, location: rtype.location)
+        receiver_type = Type.new(rtype)
       end
       RaaP.logger.info("## def #{prefix}#{method_name}: #{method_type}")
       status = 0
