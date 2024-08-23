@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.0.0] - 2024-08-23
+
+* Do not modify array for RBS::Types::ClassInstance#args by @pocke in https://github.com/ksss/raap/pull/25
+
 ## [0.10.0] - 2024-06-25
 
 * Support default nil in block by @ksss in https://github.com/ksss/raap/pull/18
