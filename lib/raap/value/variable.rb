@@ -11,6 +11,7 @@ module RaaP
             # @type var type: String | Symbol
             ::RBS::Types::Variable.new(name: type.to_sym, location: nil)
           else
+            # @type var type: ::RBS::Types::Variable
             type
           end
         unless @type.instance_of?(::RBS::Types::Variable)

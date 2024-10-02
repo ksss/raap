@@ -83,7 +83,8 @@ module RaaP
         @cur = type.location.start_pos
         case type
         when ::RBS::Types::Tuple, ::RBS::Types::Union
-          name = type.class.name.split('::').last.downcase
+          cname = type.class.name or raise
+          name = cname.split('::').last.downcase
           type.types.each_with_index do |t, i|
             t.location or raise
             io.write(slice(@cur, @cur...t.location.start_pos)) # ( or [
