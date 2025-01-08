@@ -48,8 +48,8 @@ module RaaP
       return nil if block.nil?
       return nil if (block.required == false) && [true, false].sample
 
-      args_name = []
-      args_source = []
+      args_name = [] #: Array[String]
+      args_source = [] #: Array[String]
       resource = [*'a'..'z']
       case fun = block.type
       when ::RBS::Types::Function

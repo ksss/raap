@@ -32,6 +32,8 @@ Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 Layout/LineLength:
   Max: 150
+Layout/LeadingCommentSpace:
+  AllowRBSInlineAnnotation: true
 
 Naming:
   Enabled: false

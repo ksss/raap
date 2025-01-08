@@ -23,7 +23,7 @@ module RaaP
             subed_method_type = ts.method_type_sub(method_type, self_type: self_type, instance_type: instance_type, class_type: class_type)
 
             BindCall.define_method(base_mod, name) do |*_, &b|
-              @fixed_return_value ||= {}
+              @fixed_return_value ||= {} #: Hash[Symbol, Interface | Type]
               @fixed_return_value[name] ||= if self_type == subed_method_type.type.return_type
                                               self
                                             else
@@ -31,7 +31,7 @@ module RaaP
                                             end
               # @type var b: Proc?
               if b && subed_method_type.block && subed_method_type.block.type.is_a?(::RBS::Types::Function)
-                @fixed_block_arguments ||= {}
+                @fixed_block_arguments ||= {} #: Hash[Symbol, Array[FunctionType]]
                 @fixed_block_arguments[name] ||= size.times.map do
                   FunctionType.new(subed_method_type.block.type, coverage: false)
                               .pick_arguments(size: size)
