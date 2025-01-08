@@ -51,7 +51,7 @@ module RaaP
       receiver = try_eval(receiver)
       args, kwargs, block = try_eval([args, kwargs, block])
 
-      a = []
+      a = [] #: Array[String]
       a << args.map(&BindCall.method(:inspect)).join(', ') if !args.empty?
       a << kwargs.map { |k, v| "#{k}: #{BindCall.inspect(v)}" }.join(', ') if !kwargs.empty?
       argument_str = a.join(', ')
@@ -87,7 +87,7 @@ module RaaP
 
           var_eq = '' if is_last
 
-          arguments = []
+          arguments = [] #: Array[Array[String]]
           if !args.empty?
             # The reproduction code is kept short and executable.
             if [Value::Interface, Value::Intersection].include?(receiver_value)

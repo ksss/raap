@@ -43,7 +43,7 @@ module RaaP
         build_type_with_coverage("opt_#{i}", param)
       end
 
-      rest = []
+      rest = [] #: Array[untyped]
       if (rest_param = @fun.rest_positionals)
         rest = Array.new(Random.rand(4)) do
           build_type_with_coverage("rest", rest_param)
