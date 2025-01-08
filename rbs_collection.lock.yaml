@@ -6,10 +6,14 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: f5f878b82e8a8d341b8630040bb1e006ace1ddd7
+    revision: 7ff8cf6ab2759cb1d0fb2ca8d6c1f8ccab2c605c
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: base64
+  version: '0'
+  source:
+    type: stdlib
+- name: benchmark
   version: '0'
   source:
     type: stdlib
@@ -22,7 +26,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: f5f878b82e8a8d341b8630040bb1e006ace1ddd7
+    revision: 7ff8cf6ab2759cb1d0fb2ca8d6c1f8ccab2c605c
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: connection_pool
@@ -30,10 +34,14 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: f5f878b82e8a8d341b8630040bb1e006ace1ddd7
+    revision: 7ff8cf6ab2759cb1d0fb2ca8d6c1f8ccab2c605c
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: date
+  version: '0'
+  source:
+    type: stdlib
+- name: digest
   version: '0'
   source:
     type: stdlib
@@ -50,7 +58,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: f5f878b82e8a8d341b8630040bb1e006ace1ddd7
+    revision: 7ff8cf6ab2759cb1d0fb2ca8d6c1f8ccab2c605c
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: io-console
@@ -77,6 +85,10 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: openssl
+  version: '0'
+  source:
+    type: stdlib
 - name: optparse
   version: '0'
   source:
@@ -90,11 +102,11 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: f5f878b82e8a8d341b8630040bb1e006ace1ddd7
+    revision: 7ff8cf6ab2759cb1d0fb2ca8d6c1f8ccab2c605c
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: rbs
-  version: 3.6.0
+  version: 3.8.1
   source:
     type: rubygems
 - name: rdoc
@@ -106,6 +118,10 @@ gems:
   source:
     type: stdlib
 - name: singleton
+  version: '0'
+  source:
+    type: stdlib
+- name: socket
   version: '0'
   source:
     type: stdlib
@@ -126,7 +142,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: f5f878b82e8a8d341b8630040bb1e006ace1ddd7
+    revision: 7ff8cf6ab2759cb1d0fb2ca8d6c1f8ccab2c605c
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 gemfile_lock_path: Gemfile.lock
