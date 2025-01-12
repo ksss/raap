@@ -165,7 +165,7 @@ class TestSymbolicCaller < Minitest::Test
     type = ::RBS::Types::Intersection.new(
       types: [
         ::RBS::Types::ClassInstance.new(
-          name: TypeName("Array"),
+          name: ::RBS::TypeName.parse("Array"),
           args: [::RBS::Types::Variable.new(name: :T, location: nil)],
           location: nil
         )

@@ -12,8 +12,8 @@ module RaaP
           self_type = type
 
           # Referring to Steep
-          instance_type = ::RBS::Types::ClassInstance.new(name: TypeName("::Object"), args: [], location: nil)
-          class_type = ::RBS::Types::ClassSingleton.new(name: TypeName("::Object"), location: nil)
+          instance_type = ::RBS::Types::ClassInstance.new(name: ::RBS::TypeName.parse("::Object"), args: [], location: nil)
+          class_type = ::RBS::Types::ClassSingleton.new(name: ::RBS::TypeName.parse("::Object"), location: nil)
 
           definition = RBS.builder.build_interface(type.name.absolute!)
           definition.methods.each do |name, method|
