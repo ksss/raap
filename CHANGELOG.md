@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [1.1.0] - 2025-01-13
+
+* Bundle update by @ksss in https://github.com/ksss/raap/pull/31
+* Fix typing by @ksss in https://github.com/ksss/raap/pull/44
+* Support RBS v3.8 by @ksss in https://github.com/ksss/raap/pull/45
+* Use ruby34 by @ksss in https://github.com/ksss/raap/pull/46
+
 ## [1.0.0] - 2024-08-23
 
 * Do not modify array for RBS::Types::ClassInstance#args by @pocke in https://github.com/ksss/raap/pull/25
