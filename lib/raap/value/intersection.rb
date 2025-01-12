@@ -31,7 +31,7 @@ module RaaP
             end
           end
         end
-        type = ::RBS::Types::ClassInstance.new(name: TypeName(base.name), args: [], location: nil)
+        type = ::RBS::Types::ClassInstance.new(name: ::RBS::TypeName.parse(base.name), args: [], location: nil)
         SymbolicCaller.new(Type.call_new_from(c, type, size: size)).eval
       end
     end
