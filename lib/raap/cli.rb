@@ -314,8 +314,12 @@ module RaaP
           end
           RaaP.logger.debug { PP.pp(f.symbolic_call, ''.dup) }
           reason = StringIO.new
-          reason.puts "Failed in case of `#{f.called_str}`"
-          reason.puts
+          begin
+            reason.puts "Failed in case of `#{f.called_str}`"
+            reason.puts
+          rescue => e
+            RaaP.logger.debug { "Raised `#{e}` in Result::Failure" }
+          end
           reason.puts "### Repro"
           reason.puts
           reason.puts "```rb"
