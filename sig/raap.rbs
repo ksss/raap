@@ -19,15 +19,47 @@ module RaaP
 
   class CLI
     class Option < ::Struct[untyped]
-      def self.new: (?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?coverage: bool) -> instance
+      def self.new: (
+        ?timeout: (Integer | Float | nil),
+        ?size_from: ::Integer,
+        ?size_to: ::Integer,
+        ?size_by: ::Integer,
+        ?allow_private: bool,
+        ?coverage: bool,
+        ?numeric_positive: bool,
+      ) -> instance
 
-      def self.[]: (?timeout: (Integer | Float | nil), ?size_from: ::Integer, ?size_to: ::Integer, ?size_by: ::Integer, ?allow_private: bool, ?coverage: bool) -> instance
+      def self.[]: (
+        ?timeout: (Integer | Float | nil),
+        ?size_from: ::Integer,
+        ?size_to: ::Integer,
+        ?size_by: ::Integer,
+        ?allow_private: bool,
+        ?coverage: bool,
+        ?numeric_positive: bool,
+      ) -> instance
 
       def self.keyword_init?: () -> true
 
-      def self.members: () -> [ :timeout, :size_from, :size_to, :size_by, :allow_private, :coverage]
+      def self.members: () -> [
+        :timeout,
+        :size_from,
+        :size_to,
+        :size_by,
+        :allow_private,
+        :coverage,
+        :numeric_positive,
+      ]
 
-      def members: () -> [ :timeout, :size_from, :size_to, :size_by, :allow_private, :coverage]
+      def members: () -> [
+        :timeout,
+        :size_from,
+        :size_to,
+        :size_by,
+        :allow_private,
+        :coverage,
+        :numeric_positive,
+      ]
 
       attr_accessor timeout: (Integer | Float | nil)
 
@@ -40,6 +72,8 @@ module RaaP
       attr_accessor allow_private: bool
 
       attr_accessor coverage: bool
+
+      attr_accessor numeric_positive: bool
     end
 
     type property_result = [Integer, Symbol, ::RBS::MethodType, StringIO?]
@@ -269,6 +303,8 @@ module RaaP
 
   class Type
     module Arithmetic
+      self.@numeric_positive: bool
+      def self.numeric_positive=: (bool) -> void
       def self.float: () -> Float
       def self.positive_float: () -> Float
     end
