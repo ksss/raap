@@ -60,7 +60,12 @@ module RaaP
         type_params = definition.type_params_decl.dup.concat(rbs_method_type.type_params.drop(definition.type_params_decl.length))
         ts = TypeSubstitution.new(type_params, type.args)
         maped_rbs_method_type = ts.method_type_sub(rbs_method_type)
-        method_type = MethodType.new(maped_rbs_method_type)
+        method_type = MethodType.new(
+          maped_rbs_method_type,
+          class_type: ::RBS::Types::ClassSingleton.new(name: type.name, location: nil),
+          instance_type: type,
+          self_type: type
+        )
 
         begin
           args, kwargs, block = method_type.arguments_to_symbolic_call(size: size)
