@@ -7,8 +7,18 @@ module RaaP
   # Type.new("Array[Integer]") { sized { |size| Array.new(size + 1) { integer.pick(size: size) } } }
   class Type
     module Arithmetic
+      def self.numeric_positive=(bool)
+        @numeric_positive = bool
+      end
+
       def self.float
-        positive_float.then { |x| [x, -x].sample or raise }
+        positive_float.then do |x|
+          if @numeric_positive
+            x
+          else
+            [x, -x].sample or raise
+          end
+        end
       end
 
       def self.positive_float
