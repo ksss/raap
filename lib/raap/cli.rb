@@ -13,6 +13,7 @@ module RaaP
       :size_by,
       :allow_private,
       :coverage,
+      :numeric_positive,
       keyword_init: true
     )
 
@@ -44,6 +45,7 @@ module RaaP
         size_by: 1,
         coverage: true,
         allow_private: false,
+        numeric_positive: false,
       )
       @argv = argv
       @skip = DEFAULT_SKIP.dup
@@ -87,6 +89,9 @@ module RaaP
         o.on('--[no-]coverage', "Show coverage for RBS (default: #{@option.coverage})") do |arg|
           @option.coverage = arg
         end
+        o.on('--numeric-positive', "Generate positive numeric only (default: #{@option.numeric_positive})") do |arg|
+          @option.numeric_positive = arg
+        end
       end.parse!(@argv)
 
       self
@@ -109,6 +114,8 @@ module RaaP
         end
       end
       @skip.freeze
+
+      Type::Arithmetic.numeric_positive = @option.numeric_positive
 
       @argv.each do |tag|
         next if tag.start_with?('!')
