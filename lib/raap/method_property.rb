@@ -120,16 +120,6 @@ module RaaP
       end
 
       if BindCall.is_a?(receiver_value, Module)
-        if BindCall.is_a?(return_type, ::RBS::Types::ClassSingleton)
-          # ::RBS::Test::TypeCheck cannot support to check singleton class
-          if receiver_value == return_value
-            coverage("return", return_value, return_type)
-            [:success]
-          else
-            [:failure]
-          end
-        end
-
         self_class = receiver_value
         instance_class = receiver_value
       else
