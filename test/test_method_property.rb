@@ -155,4 +155,26 @@ class TestMethodProperty < Minitest::Test
     end
     assert_equal 10, stats.success
   end
+
+  def test_implicitly_returns_nil
+    prop = MethodProperty.new(
+      receiver_type: Type.new("Array[Integer]"),
+      method_name: :max,
+      method_type: MethodType.new(
+        "() -> Integer",
+        annotations: [
+          ::RBS::AST::Annotation.new(string: "implicitly-returns-nil", location: nil)
+        ]
+      ),
+      size_step: 0...10,
+      timeout: 1,
+    )
+    stats = prop.run do |called|
+      case called
+      in Result::Success
+        # ok
+      end
+    end
+    assert_equal 10, stats.success
+  end
 end
