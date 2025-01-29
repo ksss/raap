@@ -8,13 +8,14 @@ module RaaP
       end
     end
 
-    def initialize(receiver_type:, method_name:, method_type:, size_step:, timeout:, allow_private: false)
+    def initialize(receiver_type:, method_name:, method_type:, size_step:, timeout:, allow_private: false, annotations: [])
       @receiver_type = receiver_type
       @method_name = method_name
       @method_type = method_type
       @size_step = size_step
       @timeout = timeout
       @allow_private = allow_private
+      @annotations = annotations
     end
 
     def run
@@ -78,7 +79,7 @@ module RaaP
           end
         else
           return_value = symbolic_caller.eval
-          check = check_return(receiver_value: receiver_value, return_value: return_value, annotations: @method_type.annotations)
+          check = check_return(receiver_value: receiver_value, return_value: return_value)
         end
         case check
         in [:success]
@@ -109,27 +110,12 @@ module RaaP
       Result::Exception.new(symbolic_call: symbolic_call, exception: exception)
     end
 
-    def check_return(receiver_value:, return_value:, annotations:)
-      annotations.each do |a|
-        case a.string
-        when "implicitly-returns-nil"
-          if BindCall.is_a?(return_value, NilClass)
-            return [:success]
-          end
-        end
+    def check_return(receiver_value:, return_value:)
+      if implicitly_returns_nil? && BindCall.is_a?(return_value, NilClass)
+        return [:success]
       end
 
       if BindCall.is_a?(receiver_value, Module)
-        if BindCall.is_a?(return_type, ::RBS::Types::ClassSingleton)
-          # ::RBS::Test::TypeCheck cannot support to check singleton class
-          if receiver_value == return_value
-            coverage("return", return_value, return_type)
-            [:success]
-          else
-            [:failure]
-          end
-        end
-
         self_class = receiver_value
         instance_class = receiver_value
       else
@@ -154,6 +140,12 @@ module RaaP
       rescue => e
         RaaP.logger.debug("Type check fail by `(#{e.class}) #{e.message}`")
         [:exception, e]
+      end
+    end
+
+    def implicitly_returns_nil?
+      @annotations.any? do |a|
+        a.string == "implicitly-returns-nil"
       end
     end
 
