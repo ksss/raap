@@ -316,11 +316,11 @@ module RaaP
           self_type: rtype,
           instance_type: ::RBS::Types::ClassInstance.new(name: rtype.name, args: type_args, location: nil),
           class_type: ::RBS::Types::ClassSingleton.new(name: rtype.name, location: nil),
-          annotations: type_def.annotations
         ),
         size_step: @option.size_from.step(to: @option.size_to, by: @option.size_by),
         timeout: @option.timeout,
         allow_private: @option.allow_private,
+        annotations: type_def.annotations
       )
       RaaP::Coverage.start(type_def.type) if @option.coverage
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)

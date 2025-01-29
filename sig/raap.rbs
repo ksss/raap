@@ -164,14 +164,23 @@ module RaaP
     @size_step: _Each[Integer]
     @timeout: (Integer | Float | nil)
     @allow_private: bool
+    @annotations: Array[::RBS::AST::Annotation]
 
-    def initialize: (receiver_type: Type, method_name: Symbol, method_type: MethodType, size_step: _Each[Integer], timeout: (Integer | Float | nil), ?allow_private: bool) -> void
+    def initialize: (
+      receiver_type: Type,
+      method_name: Symbol,
+      method_type: MethodType,
+      size_step: _Each[Integer],
+      timeout: (Integer | Float | nil),
+      ?allow_private: bool,
+      annotations: Array[::RBS::AST::Annotation]) -> void
     def run: () { (Result::Success | Result::Failure | Result::Skip | Result::Exception) -> void } -> Stats
 
     private
 
     def call: (size: Integer, stats: Stats) -> (Result::Success | Result::Failure | Result::Skip | Result::Exception)
-    def check_return: (receiver_value: untyped, return_value: untyped, annotations: Array[::RBS::AST::Annotation]) -> ([Symbol] | [Symbol, Exception])
+    def check_return: (receiver_value: untyped, return_value: untyped) -> ([Symbol] | [Symbol, Exception])
+    def implicitly_returns_nil?: () -> bool
     def return_type: () -> RBS::Types::t
     def original_return_type: () -> RBS::Types::t
     def coverage: (String, untyped, RBS::Types::t, ?RBS::Test::TypeCheck?) -> void
@@ -179,7 +188,6 @@ module RaaP
 
   class MethodType
     attr_reader rbs: ::RBS::MethodType
-    attr_reader annotations: Array[::RBS::AST::Annotation]
     @fun_type: FunctionType
     @type_check: ::RBS::Test::TypeCheck
 
@@ -189,8 +197,7 @@ module RaaP
       ?type_args: Array[untyped],
       ?self_type: ::RBS::Types::ClassInstance?,
       ?instance_type: ::RBS::Types::ClassInstance?,
-      ?class_type: ::RBS::Types::ClassSingleton?,
-      ?annotations: Array[::RBS::AST::Annotation]) -> void
+      ?class_type: ::RBS::Types::ClassSingleton?) -> void
     def pick_arguments: (?size: Integer) -> [Array[untyped], Hash[Symbol, untyped], ::Proc?]
     def arguments_to_symbolic_call: (?size: Integer) -> [Array[untyped], Hash[Symbol, untyped], ::Proc?]
     def pick_block: (?size: Integer) -> ::Proc?
