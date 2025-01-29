@@ -7,8 +7,6 @@ AllCops:
   Include:
   - 'lib/**/*.rb'
   - 'sig/**/*.rbs'
-  Exclude:
-  - 'test/**/*'
 
 Lint:
   Enabled: true
