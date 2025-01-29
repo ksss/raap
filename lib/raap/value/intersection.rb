@@ -27,12 +27,12 @@ module RaaP
           type.types.each do |t|
             case t
             when ::RBS::Types::Interface
-              Interface.define_method_from_interface(self, t, size: size)
+              Interface.define_method_from_interface(self, t, size:)
             end
           end
         end
         type = ::RBS::Types::ClassInstance.new(name: ::RBS::TypeName.parse(base.name), args: [], location: nil)
-        SymbolicCaller.new(Type.call_new_from(c, type, size: size)).eval
+        SymbolicCaller.new(Type.call_new_from(c, type, size:)).eval
       end
     end
   end

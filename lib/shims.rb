@@ -48,8 +48,8 @@ unless RBS::TypeName.singleton_class.method_defined?(:parse)
         raise unless name
 
         TypeName.new(
-          name: name,
-          namespace: RBS::Namespace.new(path: path, absolute: absolute)
+          name:,
+          namespace: RBS::Namespace.new(path:, absolute:)
         )
       end
     end
