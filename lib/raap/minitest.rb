@@ -13,7 +13,7 @@ module RaaP
         method_type = RaaP::MethodType.new(type)
         size_step.each do |size|
           # TODO assert_send_type
-          args, kwargs, _block = method_type.pick_arguments(size: size)
+          args, kwargs, _block = method_type.pick_arguments(size:)
           return_value = yield(*args, **kwargs)
           i = BindCall.inspect(return_value)
           c = BindCall.class(return_value)
@@ -30,7 +30,7 @@ module RaaP
           end
         end
         size_step.each do |size|
-          values = types.map { |t| t.pick(size: size) }
+          values = types.map { |t| t.pick(size:) }
           assert yield(*values)
         end
       end

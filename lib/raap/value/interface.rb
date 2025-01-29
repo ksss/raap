@@ -20,21 +20,21 @@ module RaaP
             method_type = method.method_types.sample or ::Kernel.raise
             type_params = definition.type_params_decl.concat(method_type.type_params.drop(definition.type_params_decl.length))
             ts = TypeSubstitution.new(type_params, type.args)
-            subed_method_type = ts.method_type_sub(method_type, self_type: self_type, instance_type: instance_type, class_type: class_type)
+            subed_method_type = ts.method_type_sub(method_type, self_type:, instance_type:, class_type:)
 
             BindCall.define_method(base_mod, name) do |*_, &b|
               @fixed_return_value ||= {} #: Hash[Symbol, Interface | Type]
               @fixed_return_value[name] ||= if self_type == subed_method_type.type.return_type
                                               self
                                             else
-                                              Type.new(subed_method_type.type.return_type).pick(size: size)
+                                              Type.new(subed_method_type.type.return_type).pick(size:)
                                             end
               # @type var b: Proc?
               if b && subed_method_type.block && subed_method_type.block.type.is_a?(::RBS::Types::Function)
                 @fixed_block_arguments ||= {} #: Hash[Symbol, Array[FunctionType]]
                 @fixed_block_arguments[name] ||= size.times.map do
                   FunctionType.new(subed_method_type.block.type, coverage: false)
-                              .pick_arguments(size: size)
+                              .pick_arguments(size:)
                 end
 
                 @fixed_block_arguments[name].each do |a, kw|
@@ -48,10 +48,10 @@ module RaaP
 
         def new(type, size: 3)
           temp_class = ::Class.new(Interface) do |c|
-            define_method_from_interface(c, type, size: size)
+            define_method_from_interface(c, type, size:)
           end
           instance = temp_class.allocate
-          instance.__send__(:initialize, type, size: size)
+          instance.__send__(:initialize, type, size:)
           instance
         end
       end

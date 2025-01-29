@@ -19,7 +19,7 @@ module RaaP
 
       params = (type_params_decl + rbs.type_params).uniq
       ts = TypeSubstitution.new(params, type_args)
-      @rbs = ts.method_type_sub(rbs, self_type: self_type, instance_type: instance_type, class_type: class_type)
+      @rbs = ts.method_type_sub(rbs, self_type:, instance_type:, class_type:)
       function_or_untypedfunction = __skip__ = @rbs.type
       @fun_type = FunctionType.new(function_or_untypedfunction)
       @type_check = ::RBS::Test::TypeCheck.new(
@@ -33,12 +33,12 @@ module RaaP
     end
 
     def pick_arguments(size: 10)
-      SymbolicCaller.new(arguments_to_symbolic_call(size: size)).eval
+      SymbolicCaller.new(arguments_to_symbolic_call(size:)).eval
     end
 
     def arguments_to_symbolic_call(size: 10)
-      args, kwargs = @fun_type.arguments_to_symbolic_call(size: size)
-      block = pick_block(size: size)
+      args, kwargs = @fun_type.arguments_to_symbolic_call(size:)
+      block = pick_block(size:)
 
       [args, kwargs, block]
     end
@@ -62,7 +62,7 @@ module RaaP
         end
         fun.optional_positionals.each do |param|
           resource.shift.tap do |name|
-            default = Type.new(param.type).pick(size: size)
+            default = Type.new(param.type).pick(size:)
             args_name << name
             # FIXME: Support any object
             args_source << "#{name} = #{default.inspect}"
@@ -82,7 +82,7 @@ module RaaP
         end
       end
       # Hack: Use local variable in eval
-      fixed_return_value = Type.new(block.type.return_type).pick(size: size)
+      fixed_return_value = Type.new(block.type.return_type).pick(size:)
       _ = fixed_return_value
       type_check = @type_check
       _ = type_check
