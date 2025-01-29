@@ -3,8 +3,9 @@
 module RaaP
   class MethodType
     attr_reader :rbs
+    attr_reader :annotations
 
-    def initialize(method, type_params_decl: [], type_args: [], self_type: nil, instance_type: nil, class_type: nil)
+    def initialize(method, type_params_decl: [], type_args: [], annotations: [], self_type: nil, instance_type: nil, class_type: nil)
       rbs =
         case method
         when ""
@@ -22,6 +23,7 @@ module RaaP
       @rbs = ts.method_type_sub(rbs, self_type: self_type, instance_type: instance_type, class_type: class_type)
       function_or_untypedfunction = __skip__ = @rbs.type
       @fun_type = FunctionType.new(function_or_untypedfunction)
+      @annotations = annotations
       @type_check = ::RBS::Test::TypeCheck.new(
         self_class: (_ = self_type),
         instance_class: (_ = instance_type),

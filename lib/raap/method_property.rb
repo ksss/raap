@@ -78,7 +78,7 @@ module RaaP
           end
         else
           return_value = symbolic_caller.eval
-          check = check_return(receiver_value: receiver_value, return_value: return_value)
+          check = check_return(receiver_value: receiver_value, return_value: return_value, annotations: @method_type.annotations)
         end
         case check
         in [:success]
@@ -109,7 +109,16 @@ module RaaP
       Result::Exception.new(symbolic_call: symbolic_call, exception: exception)
     end
 
-    def check_return(receiver_value:, return_value:)
+    def check_return(receiver_value:, return_value:, annotations:)
+      annotations.each do |a|
+        case a.string
+        when "implicitly-returns-nil"
+          if BindCall.is_a?(return_value, NilClass)
+            return [:success]
+          end
+        end
+      end
+
       if BindCall.is_a?(receiver_value, Module)
         if BindCall.is_a?(return_type, ::RBS::Types::ClassSingleton)
           # ::RBS::Test::TypeCheck cannot support to check singleton class

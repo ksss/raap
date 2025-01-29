@@ -203,9 +203,14 @@ module RaaP
       RaaP.logger.info("# #{type}")
       @results << {
         method: method,
-        properties: method.method_types.map do |method_type|
-          property(receiver_type: receiver_type, type_params_decl: type_params_decl, type_args: type_args, method_type: method_type,
-                   method_name: method_name)
+        properties: method.defs.map do |type_def|
+          property(
+            receiver_type: receiver_type,
+            type_params_decl: type_params_decl,
+            type_args: type_args,
+            type_def: type_def,
+            method_name: method_name
+          )
         end
       }
     end
@@ -244,9 +249,14 @@ module RaaP
         RaaP.logger.info("# #{type_name}.#{method_name}")
         @results << {
           method: method,
-          properties: method.method_types.map do |method_type|
-            property(receiver_type: Type.new("singleton(#{type.name})"), type_params_decl: type_params_decl, type_args: type_args,
-                     method_type: method_type, method_name: method_name)
+          properties: method.defs.map do |type_def|
+            property(
+              receiver_type: Type.new("singleton(#{type.name})"),
+              type_params_decl: type_params_decl,
+              type_args: type_args,
+              type_def: type_def,
+              method_name: method_name
+            )
           end
         }
       end
@@ -264,15 +274,20 @@ module RaaP
         RaaP.logger.info("# #{type_name}##{method_name}")
         @results << {
           method: method,
-          properties: method.method_types.map do |method_type|
-            property(receiver_type: Type.new(type.name), type_params_decl: type_params_decl, type_args: type_args, method_type: method_type,
-                     method_name: method_name)
+          properties: method.defs.map do |type_def|
+            property(
+              receiver_type: Type.new(type.name),
+              type_params_decl: type_params_decl,
+              type_args: type_args,
+              type_def: type_def,
+              method_name: method_name
+            )
           end
         }
       end
     end
 
-    def property(receiver_type:, type_params_decl:, type_args:, method_type:, method_name:)
+    def property(receiver_type:, type_params_decl:, type_args:, type_def:, method_name:)
       rtype = __skip__ = receiver_type.type
       if receiver_type.type.instance_of?(::RBS::Types::ClassSingleton)
         prefix = 'self.'
@@ -288,25 +303,26 @@ module RaaP
         rtype = ::RBS::Types::ClassInstance.new(name: rtype.name, args: args, location: rtype.location)
         receiver_type = Type.new(rtype)
       end
-      RaaP.logger.info("## def #{prefix}#{method_name}: #{method_type}")
+      RaaP.logger.info("## def #{prefix}#{method_name}: #{type_def.type}")
       status = 0
       reason = nil
       prop = MethodProperty.new(
         receiver_type: receiver_type,
         method_name: method_name,
         method_type: MethodType.new(
-          method_type,
+          type_def.type,
           type_params_decl: type_params_decl,
           type_args: type_args,
           self_type: rtype,
           instance_type: ::RBS::Types::ClassInstance.new(name: rtype.name, args: type_args, location: nil),
           class_type: ::RBS::Types::ClassSingleton.new(name: rtype.name, location: nil),
+          annotations: type_def.annotations
         ),
         size_step: @option.size_from.step(to: @option.size_to, by: @option.size_by),
         timeout: @option.timeout,
         allow_private: @option.allow_private,
       )
-      RaaP::Coverage.start(method_type) if @option.coverage
+      RaaP::Coverage.start(type_def.type) if @option.coverage
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       stats = prop.run do |called|
         case called
@@ -362,7 +378,7 @@ module RaaP
         reason.puts "Never succeeded => #{stats_log}"
       end
 
-      [status, method_name, method_type, reason]
+      [status, method_name, type_def.type, reason]
     end
   end
 end
