@@ -1,5 +1,14 @@
 ## [Unreleased]
 
+## [1.2.0] - 2025-01-29
+
+* Skip if fail to call `called_str` by @ksss in https://github.com/ksss/raap/pull/47
+* Add CLI option `--numeric-positive` by @ksss in https://github.com/ksss/raap/pull/48
+* Set dynamic types by @ksss in https://github.com/ksss/raap/pull/49
+* Support `%a{implicitly-returns-nil}` by @ksss in https://github.com/ksss/raap/pull/50
+* Refactoring by @ksss in https://github.com/ksss/raap/pull/51
+* Update ruby syntax over 3.0 by @ksss in https://github.com/ksss/raap/pull/52
+
 ## [1.1.0] - 2025-01-13
 
 * Bundle update by @ksss in https://github.com/ksss/raap/pull/31
