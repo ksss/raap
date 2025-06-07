@@ -14,6 +14,7 @@ unless defined?(Data)
       def define(*syms)
         _ = Class.new do |c|
           define_method(:initialize) do |*args, **kwargs|
+            # @type self: Object
             if !args.empty?
               syms.zip(args).each do |sym, arg|
                 instance_variable_set("@#{sym}", arg)
@@ -28,6 +29,7 @@ unless defined?(Data)
 
           syms.each do |sym|
             c.define_method(sym) do
+              # @type self: Object
               instance_variable_get("@#{sym}")
             end
           end

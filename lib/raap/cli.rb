@@ -303,6 +303,10 @@ module RaaP
         rtype = ::RBS::Types::ClassInstance.new(name: rtype.name, args:, location: rtype.location)
         receiver_type = Type.new(rtype)
       end
+      annotations = type_def.each_annotation.to_a
+      if !annotations.empty?
+        RaaP.logger.info("## #{annotations.map { |a| "%a{#{a.string}}" }.join(' ')}")
+      end
       RaaP.logger.info("## def #{prefix}#{method_name}: #{type_def.type}")
       status = 0
       reason = nil
@@ -320,7 +324,7 @@ module RaaP
         size_step: @option.size_from.step(to: @option.size_to, by: @option.size_by),
         timeout: @option.timeout,
         allow_private: @option.allow_private,
-        annotations: type_def.annotations
+        annotations:
       )
       RaaP::Coverage.start(type_def.type) if @option.coverage
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
