@@ -9,6 +9,7 @@ AllCops:
   - 'sig/**/*.rbs'
   Exclude:
   - 'test/test.rbs'
+  - 'vendor/**/*'
 
 Lint:
   Enabled: true
