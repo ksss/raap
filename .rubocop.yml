@@ -1,12 +1,15 @@
-require:
+plugins:
   - rubocop-on-rbs
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
   NewCops: enable
   Include:
   - 'lib/**/*.rb'
   - 'sig/**/*.rbs'
+  Exclude:
+  - 'test/test.rbs'
+  - 'vendor/**/*'
 
 Lint:
   Enabled: true

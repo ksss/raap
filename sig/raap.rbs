@@ -205,6 +205,7 @@ module RaaP
   end
 
   module Minitest
+    def forall: (*String | ::RaaP::Type, ?size_step: _Each[Integer]) { (?) -> untyped } -> void
   end
 
   module RBS
@@ -242,6 +243,7 @@ module RaaP
       attr_reader return_value: untyped
       def called_str: () -> String
     end
+
     class Failure < Data
       include ReturnValueWithType
       def self.new: (symbolic_call: symbolic_call, return_value: untyped, ?exception: ::Exception?) -> instance
@@ -250,11 +252,13 @@ module RaaP
       attr_reader exception: ::Exception?
       def called_str: () -> String
     end
+
     class Skip < Data
       def self.new: (symbolic_call: symbolic_call?, exception: ::Exception) -> instance
       attr_reader symbolic_call: symbolic_call?
       attr_reader exception: ::Exception
     end
+
     class Exception < Data
       def self.new: (symbolic_call: symbolic_call?, exception: ::Exception) -> instance
       attr_reader symbolic_call: symbolic_call?
@@ -351,6 +355,7 @@ module RaaP
 
     private
 
+    def pick_by_generator: (untyped, size: Integer) -> untyped
     def to_symbolic_call_from_initialize: (::RBS::Types::ClassInstance, size: Integer) -> (symbolic_call | Value::Module)
     def parse: (String | ::RBS::Types::t) -> ::RBS::Types::t?
     def try: (times: Integer, size: Integer) { (Integer size) -> untyped } -> untyped
@@ -393,7 +398,7 @@ module RaaP
       @children: Array[Type]
       @size: Integer
 
-      def initialize: (::RBS::Types::Intersection | String, ?size: Integer) -> void
+      def self.new: (::RBS::Types::Intersection | String, ?size: Integer) -> untyped
       def respond_to?: (Symbol, ?boolish) -> bool
       def inspect: () -> String
       def class: () -> class

@@ -189,4 +189,10 @@ module Test
     def foo: (self) -> 123
     def bar: (self) -> 456
   end
+
+  class ImplicitlyReturnsNil
+    def overload: %a{implicitly-returns-nil} () -> :overload
+    %a{implicitly-returns-nil} def method: () -> :method
+    %a{implicitly-returns-nil} def both: %a{implicitly-returns-nil} () -> :both
+  end
 end

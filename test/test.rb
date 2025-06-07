@@ -262,4 +262,10 @@ module Test
     def foo(a) = 123
     def bar(a) = 456
   end
+
+  class ImplicitlyReturnsNil
+    def overload = [:overload, nil].sample
+    def method = [:method, nil].sample
+    def both = [:both, nil].sample
+  end
 end

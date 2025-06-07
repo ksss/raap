@@ -7,8 +7,9 @@ module RaaP
     def forall(*types, size_step: 0...100)
       # @type self: Minitest::Test
 
-      if types.length == 1 && types.first.instance_of?(String) && types.first.start_with?("(")
+      if types.length == 1 && types.first.instance_of?(String) && types.first.start_with?("(") # steep:ignore
         # forall("(Integer) -> String") { |int| Foo.new.int2str(int) }
+        # @type var type: String
         type = types.first
         method_type = RaaP::MethodType.new(type)
         size_step.each do |size|
@@ -23,14 +24,15 @@ module RaaP
         end
       else
         # forall("Integer", "String") { |int, str| Foo.new.int_str(int, str) }
-        types.map! do |type|
+        # @type var normalized_types: Array[RaaP::Type]
+        normalized_types = types.map! do |type|
           case type
           in String then RaaP::Type.new(type)
           else type
           end
         end
         size_step.each do |size|
-          values = types.map { |t| t.pick(size:) }
+          values = normalized_types.map { |t| t.pick(size:) }
           assert yield(*values)
         end
       end
