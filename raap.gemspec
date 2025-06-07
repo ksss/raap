@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "rbs", "~> 3.0"
+  spec.add_dependency "rbs", "~> 3.9.0"
   spec.add_dependency "timeout", "~> 0.4"
   spec.metadata['rubygems_mfa_required'] = 'true'
 end

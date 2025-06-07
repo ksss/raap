@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     raap (1.2.0)
-      rbs (~> 3.0)
+      rbs (~> 3.9.0)
       timeout (~> 0.4)
 
 GEM
