@@ -1,0 +1,20 @@
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/strscan-3.1.5/ext/strscan
+/opt/hostedtoolcache/Ruby/3.4.4/x64/bin/ruby extconf.rb
+checking for onig_region_memsize() in ruby.h... yes
+checking for rb_reg_onig_match() in ruby.h... yes
+creating Makefile
+
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/strscan-3.1.5/ext/strscan
+make DESTDIR\= sitearchdir\=./.gem.20250702-1959-w4k33e sitelibdir\=./.gem.20250702-1959-w4k33e clean
+
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/strscan-3.1.5/ext/strscan
+make DESTDIR\= sitearchdir\=./.gem.20250702-1959-w4k33e sitelibdir\=./.gem.20250702-1959-w4k33e
+compiling strscan.c
+linking shared-object strscan.so
+
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/strscan-3.1.5/ext/strscan
+make DESTDIR\= sitearchdir\=./.gem.20250702-1959-w4k33e sitelibdir\=./.gem.20250702-1959-w4k33e install
+/usr/bin/install -c -m 0755 strscan.so ./.gem.20250702-1959-w4k33e
+
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/strscan-3.1.5/ext/strscan
+make DESTDIR\= sitearchdir\=./.gem.20250702-1959-w4k33e sitelibdir\=./.gem.20250702-1959-w4k33e clean

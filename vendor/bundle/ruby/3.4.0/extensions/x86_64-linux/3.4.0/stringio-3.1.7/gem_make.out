@@ -1,0 +1,19 @@
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/stringio-3.1.7/ext/stringio
+/opt/hostedtoolcache/Ruby/3.4.4/x64/bin/ruby extconf.rb
+checking for rb_io_mode_t in ruby/io.h... no
+creating Makefile
+
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/stringio-3.1.7/ext/stringio
+make DESTDIR\= sitearchdir\=./.gem.20250702-1959-kqa8jo sitelibdir\=./.gem.20250702-1959-kqa8jo clean
+
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/stringio-3.1.7/ext/stringio
+make DESTDIR\= sitearchdir\=./.gem.20250702-1959-kqa8jo sitelibdir\=./.gem.20250702-1959-kqa8jo
+compiling stringio.c
+linking shared-object stringio.so
+
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/stringio-3.1.7/ext/stringio
+make DESTDIR\= sitearchdir\=./.gem.20250702-1959-kqa8jo sitelibdir\=./.gem.20250702-1959-kqa8jo install
+/usr/bin/install -c -m 0755 stringio.so ./.gem.20250702-1959-kqa8jo
+
+current directory: /home/runner/work/raap/raap/vendor/bundle/ruby/3.4.0/gems/stringio-3.1.7/ext/stringio
+make DESTDIR\= sitearchdir\=./.gem.20250702-1959-kqa8jo sitelibdir\=./.gem.20250702-1959-kqa8jo clean
