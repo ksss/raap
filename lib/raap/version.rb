@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module RaaP
-  VERSION = "1.3.0"
+  VERSION = "2.0.0.dev"
 end
