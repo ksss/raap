@@ -12,4 +12,4 @@ gem "rake"
 gem "rbs"
 gem "rubocop", require: false
 gem "rubocop-on-rbs", require: false
-gem "steep", require: false
+gem "steep", github: 'soutaro/steep', branch: 'master', require: false
