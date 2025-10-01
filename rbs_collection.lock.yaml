@@ -22,7 +22,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: 14112a82013860a7d2e5246b4c4f36fbb8c349dc
+    revision: e2034fcc1cfb92bdb3099354c4ade15722d63138
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: monitor
@@ -50,11 +50,11 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: 14112a82013860a7d2e5246b4c4f36fbb8c349dc
+    revision: e2034fcc1cfb92bdb3099354c4ade15722d63138
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: rbs
-  version: 3.9.4
+  version: 3.9.5
   source:
     type: rubygems
 - name: rdoc
