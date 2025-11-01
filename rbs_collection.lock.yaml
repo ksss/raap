@@ -22,7 +22,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: e2034fcc1cfb92bdb3099354c4ade15722d63138
+    revision: 04ed82d7df5d5ee825d7864abfa29d624b52e549
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: monitor
@@ -50,7 +50,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: e2034fcc1cfb92bdb3099354c4ade15722d63138
+    revision: 04ed82d7df5d5ee825d7864abfa29d624b52e549
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: rbs
