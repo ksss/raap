@@ -117,8 +117,6 @@ module Test
     def i(interface)
       interface.void
       interface.selfie
-      interface.instance
-      interface.klass
     end
   end
 

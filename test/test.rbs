@@ -74,8 +74,6 @@ module Test
     def lit: () -> :sym
     def void: () -> void
     def selfie: (self) -> self
-    def instance: (instance) -> instance
-    def klass: (class) -> class
   end
 
   class Interface
