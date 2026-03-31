@@ -14,6 +14,7 @@ module RaaP
       :allow_private,
       :coverage,
       :numeric_positive,
+      :inline,
       keyword_init: true
     )
 
@@ -46,6 +47,7 @@ module RaaP
         coverage: true,
         allow_private: false,
         numeric_positive: false,
+        inline: nil,
       )
       @argv = argv
       @skip = DEFAULT_SKIP.dup
@@ -92,6 +94,9 @@ module RaaP
         o.on('--numeric-positive', "Generate positive numeric only (default: #{@option.numeric_positive})") do |arg|
           @option.numeric_positive = arg
         end
+        o.on('--inline path', String, "Path to ruby file included inline RBS") do |arg|
+          @option.inline = arg
+        end
       end.parse!(@argv)
 
       self
@@ -116,6 +121,7 @@ module RaaP
       @skip.freeze
 
       Type::Arithmetic.numeric_positive = @option.numeric_positive
+      Inline.load(@option.inline) if @option.inline
 
       @argv.each do |tag|
         next if tag.start_with?('!')
@@ -150,7 +156,12 @@ module RaaP
                      else
                        method_type.location
                      end
-          prefix = method.defs.first.member.kind == :instance ? '' : 'self.'
+          prefix = case method.defs.first.member
+                   when ::RBS::AST::Members::Base
+                     method.defs.first.member.kind == :instance ? '' : 'self.'
+                   when ::RBS::AST::Ruby::Members::Base
+                     ''
+                   end
 
           puts "\e[41m\e[1m#\e[m\e[1m #{i}) Failure:\e[m"
           puts
@@ -326,7 +337,8 @@ module RaaP
         allow_private: @option.allow_private,
         annotations:
       )
-      RaaP::Coverage.start(type_def.type) if @option.coverage
+      with_coverage = @option.coverage && type_def.member.is_a?(::RBS::AST::Members::Base)
+      RaaP::Coverage.start(type_def.type) if with_coverage
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       stats = prop.run do |called|
         case called
@@ -368,7 +380,7 @@ module RaaP
       end
       end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       puts
-      RaaP::Coverage.show($stdout) if @option.coverage
+      RaaP::Coverage.show($stdout) if with_coverage
 
       time_diff = end_time - start_time
       time = ", time: #{(time_diff * 1000).round}ms"
