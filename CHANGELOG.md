@@ -1,5 +1,12 @@
 ## [Unreleased]
 
+## [2.0.0] - 2026-03-31
+
+* Add logger to dependency by @ksss in https://github.com/ksss/raap/pull/94
+* Update rbs v4 by @ksss in https://github.com/ksss/raap/pull/93
+* Drop support ruby 3.2 by @ksss in https://github.com/ksss/raap/pull/91
+* Add ruby 4 by @ksss in https://github.com/ksss/raap/pull/87
+
 ## [1.2.0] - 2025-01-29
 
 * Skip if fail to call `called_str` by @ksss in https://github.com/ksss/raap/pull/47
