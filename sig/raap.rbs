@@ -2,8 +2,8 @@ module RaaP
   type symbolic_call = [:call, untyped, Symbol, Array[untyped], Hash[Symbol, untyped], Proc?]
   VERSION: String
 
-  def self.logger: () -> ::Logger
-  def self.logger=: (::Logger) -> void
+  # def self.logger: () -> ::Logger
+  # def self.logger=: (::Logger) -> void
 
   module BindCall
     def self.define_method: (untyped, Symbol) { (*untyped, **untyped) -> untyped } -> void

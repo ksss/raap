@@ -11,9 +11,17 @@ require_relative 'raap/version'
 require_relative 'raap/value'
 require_relative 'shims'
 
+
+class Foo
+  #: () -> String
+  def foo
+    "foo"
+  end
+end
+
 module RaaP
   class << self
-    attr_accessor :logger
+    attr_accessor :logger #: Logger
   end
 
   self.logger = ::Logger.new($stdout, formatter: proc { |severity, _datetime, _progname, msg|
@@ -25,6 +33,7 @@ module RaaP
   autoload :CLI, "raap/cli"
   autoload :Coverage, "raap/coverage"
   autoload :FunctionType, "raap/function_type"
+  autoload :Inline, "raap/inline"
   autoload :MethodProperty, "raap/method_property"
   autoload :MethodType, "raap/method_type"
   autoload :RBS, "raap/rbs"
