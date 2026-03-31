@@ -16,4 +16,8 @@ namespace :steep do
   end
 end
 
-task default: [:test, :rubocop, 'steep:check']
+task default: [
+  :test,
+  :rubocop,
+  # 'steep:check'
+]

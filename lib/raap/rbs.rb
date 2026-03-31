@@ -69,8 +69,8 @@ module RaaP
     end
 
     def self.find_alias_decl(type_name, method_name)
-      env.class_decls[type_name].decls.each do |d|
-        d.decl.members.each do |member|
+      env.class_decls[type_name].each_decl do |decl|
+        decl.members.each do |member|
           case member
           when ::RBS::AST::Members::Alias
             return member if member.new_name == method_name

@@ -8,7 +8,7 @@ class TestTypeSubstitution < Minitest::Test
   def test_method_type_sub
     ts = TypeSubstitution.new(
       [
-        ::RBS::AST::TypeParam.new(name: :A, variance: :invariant, upper_bound: nil, location: nil)
+        ::RBS::AST::TypeParam.new(name: :A, variance: :invariant, upper_bound: nil, lower_bound: nil, location: nil)
       ],
       [
         RaaP::RBS.parse_type("Integer")
@@ -21,7 +21,7 @@ class TestTypeSubstitution < Minitest::Test
   def test_method_type_sub_with_generic
     ts = TypeSubstitution.new(
       [
-        ::RBS::AST::TypeParam.new(name: :A, variance: :invariant, upper_bound: nil, location: nil)
+        ::RBS::AST::TypeParam.new(name: :A, variance: :invariant, upper_bound: nil, lower_bound: nil, location: nil)
       ],
       [
         RaaP::RBS.parse_type("Integer")
@@ -34,7 +34,7 @@ class TestTypeSubstitution < Minitest::Test
   def test_method_type_sub_with_upper_bound
     ts = TypeSubstitution.new(
       [
-        ::RBS::AST::TypeParam.new(name: :A, variance: :invariant, upper_bound: RaaP::RBS.parse_type("Numeric"), location: nil)
+        ::RBS::AST::TypeParam.new(name: :A, variance: :invariant, upper_bound: RaaP::RBS.parse_type("Numeric"), lower_bound: nil, location: nil)
       ],
       []
     )

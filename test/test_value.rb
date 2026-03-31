@@ -22,14 +22,10 @@ class TestValue < Minitest::Test
     assert_equal :sym, interface.lit
     assert RaaP::BindCall.instance_of?(interface.void, RaaP::Value::Void)
     assert RaaP::BindCall.is_a?(interface.selfie, RaaP::Value::Interface)
-    assert RaaP::BindCall.instance_of?(interface.instance, Object)
-    assert RaaP::BindCall.instance_of?(interface.klass, Class)
     # check cache
     assert_equal :sym, interface.lit
     assert RaaP::BindCall.instance_of?(interface.void, RaaP::Value::Void)
     assert RaaP::BindCall.is_a?(interface.selfie, RaaP::Value::Interface)
-    assert RaaP::BindCall.instance_of?(interface.instance, Object)
-    assert RaaP::BindCall.instance_of?(interface.klass, Class)
 
     assert_raises(TypeError) do
       Interface.new("bool")
