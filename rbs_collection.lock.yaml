@@ -18,7 +18,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: ecdc16fbc015cc667476120bdc2bd20735882f3a
+    revision: d7090c40bcea7011ad2ebaaa46bdd7d7ac3136a7
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: minitest
@@ -26,7 +26,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: ecdc16fbc015cc667476120bdc2bd20735882f3a
+    revision: d7090c40bcea7011ad2ebaaa46bdd7d7ac3136a7
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: monitor
@@ -54,7 +54,7 @@ gems:
   source:
     type: git
     name: ruby/gem_rbs_collection
-    revision: ecdc16fbc015cc667476120bdc2bd20735882f3a
+    revision: d7090c40bcea7011ad2ebaaa46bdd7d7ac3136a7
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: rbs
